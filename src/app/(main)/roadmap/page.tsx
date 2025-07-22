@@ -53,7 +53,6 @@ const roadmapData = {
     { title: 'Real-time Co-Pilot', status: 'pending', description: 'Enable multiple users to interact with the AI Co-Pilot simultaneously.' },
     { title: 'Voice-to-Voice Chat', status: 'pending', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
     { title: 'Expanded AI Toolset', status: 'pending', description: 'Integrate more advanced Genkit tools for functions like web searches, data analysis, and more.' },
-    { title: 'Theme Customization', status: 'pending', description: 'Allow users to select different color themes and personalize the application\'s appearance.' },
   ],
 };
 
