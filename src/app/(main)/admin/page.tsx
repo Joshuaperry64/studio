@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { useAuth } from '@/hooks/use-auth';
+import { useUserStore } from '@/store/user-store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
-    const { user } = useAuth();
+    const { user } = useUserStore();
     const router = useRouter();
 
     React.useEffect(() => {

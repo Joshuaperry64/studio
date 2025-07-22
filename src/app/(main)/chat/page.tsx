@@ -12,6 +12,8 @@ import { Bot, Loader2, Mic, Paperclip, Send, User, X } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { useCharacterStore } from '@/store/character-store';
+import { useUserStore } from '@/store/user-store';
 
 interface Message {
   id: number;
@@ -19,6 +21,10 @@ interface Message {
   text: string;
   photo?: string;
   video?: string;
+  character?: {
+      name: string;
+      avatar: string;
+  }
 }
 
 export default function ChatPage() {
@@ -32,6 +38,9 @@ export default function ChatPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { activeCharacter } = useCharacterStore();
+  const { user } = useUserStore();
+
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -67,11 +76,16 @@ export default function ChatPage() {
         photoDataUri,
         videoDataUri
       });
-      const aiMessage: Message = { id: Date.now() + 1, sender: 'ai', text: result.analysisResult };
+      const aiMessage: Message = { 
+          id: Date.now() + 1, 
+          sender: 'ai', 
+          text: result.analysisResult,
+          character: activeCharacter ? {name: activeCharacter.name, avatar: activeCharacter.avatarDataUri} : undefined
+      };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error(error);
-      toast({ title: 'Error', description: 'Failed to get response from AI.', variant: 'destructive' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get response from AI.';
+      toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
       setMessages(prev => prev.slice(0, -1)); // Remove user message on error
     } finally {
       setIsLoading(false);
@@ -111,7 +125,8 @@ export default function ChatPage() {
       const result = await enableVoiceInput({ audioDataUri });
       setInput(prev => prev ? `${prev} ${result.transcription}` : result.transcription);
     } catch (error) {
-      toast({ title: 'Error', description: 'Failed to transcribe audio.', variant: 'destructive' });
+       const errorMessage = error instanceof Error ? error.message : 'Failed to transcribe audio.';
+      toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +150,9 @@ export default function ChatPage() {
           {messages.length === 0 && (
             <div className="text-center text-muted-foreground pt-16">
               <Bot size={48} className="mx-auto" />
-              <h2 className="text-2xl font-headline mt-4">Welcome to AlphaLink</h2>
+              <h2 className="text-2xl font-headline mt-4">
+                {activeCharacter ? `Chatting as ${activeCharacter.name}`: "Welcome to AlphaLink"}
+              </h2>
               <p>Start the conversation by typing a message below.</p>
             </div>
           )}
@@ -143,10 +160,12 @@ export default function ChatPage() {
             <div key={message.id} className={`flex items-start gap-4 ${message.sender === 'user' ? 'justify-end' : ''}`}>
               {message.sender === 'ai' && (
                 <Avatar>
+                  <AvatarImage src={message.character?.avatar} alt={message.character?.name} />
                   <AvatarFallback><Bot /></AvatarFallback>
                 </Avatar>
               )}
               <div className={`max-w-[75%] rounded-lg p-3 ${message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}>
+                {message.character && <p className="text-xs font-bold mb-1">{message.character.name}</p>}
                 <p className="whitespace-pre-wrap">{message.text}</p>
                 {message.photo && (
                   <div className="mt-2 rounded-md overflow-hidden">
@@ -159,6 +178,7 @@ export default function ChatPage() {
               </div>
               {message.sender === 'user' && (
                 <Avatar>
+                  <AvatarImage src="https://placehold.co/40x40" alt={user?.username} />
                   <AvatarFallback><User /></AvatarFallback>
                 </Avatar>
               )}
@@ -167,6 +187,7 @@ export default function ChatPage() {
           {isLoading && messages.length > 0 && messages[messages.length-1].sender === 'user' && (
              <div className="flex items-start gap-4">
                 <Avatar>
+                  <AvatarImage src={activeCharacter?.avatarDataUri} alt={activeCharacter?.name} />
                   <AvatarFallback><Bot /></AvatarFallback>
                 </Avatar>
                 <div className="max-w-[75%] rounded-lg p-3 bg-secondary flex items-center">
@@ -190,7 +211,7 @@ export default function ChatPage() {
           )}
           <div className="relative">
             <Textarea
-              placeholder="Type your message or use the microphone..."
+              placeholder={activeCharacter ? `Message ${activeCharacter.name}...` : "Type your message or use the microphone..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {

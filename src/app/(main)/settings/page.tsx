@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -9,36 +9,40 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { useSettingsStore } from '@/store/settings-store';
 
 export default function SettingsPage() {
-  const [isNsfwMode, setIsNsfwMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [apiKey, setApiKey] = useState('');
+  const {
+    apiKey,
+    setApiKey: setStoreApiKey,
+    nsfwMode,
+    toggleNsfwMode,
+    notifications,
+    toggleNotifications,
+    saveApiKey,
+  } = useSettingsStore();
+
   const [isLoading, setIsLoading] = useState(false);
+  const [localApiKey, setLocalApiKey] = useState('');
   const { toast } = useToast();
+  
+  useEffect(() => {
+      setLocalApiKey(apiKey);
+  }, [apiKey]);
+
 
   const handleSaveApiKey = async () => {
-    if (!apiKey) {
+    if (!localApiKey) {
         toast({ title: 'Error', description: 'API Key cannot be empty.', variant: 'destructive' });
         return;
     }
     setIsLoading(true);
     try {
-        const response = await fetch('/api/user/key', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ apiKey }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            toast({ title: 'Success', description: 'API Key saved successfully.' });
-        } else {
-            toast({ title: 'Error', description: data.message || 'Failed to save API Key.', variant: 'destructive' });
-        }
+        await saveApiKey(localApiKey);
+        toast({ title: 'Success', description: 'API Key saved successfully.' });
     } catch (error) {
-        toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+        toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     } finally {
         setIsLoading(false);
     }
@@ -67,8 +71,8 @@ export default function SettingsPage() {
                     id="api-key" 
                     type="password"
                     placeholder="Enter your Gemini API Key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
+                    value={localApiKey}
+                    onChange={(e) => setLocalApiKey(e.target.value)}
                     />
                  <Button onClick={handleSaveApiKey} disabled={isLoading}>
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
@@ -87,8 +91,8 @@ export default function SettingsPage() {
               </div>
               <Switch
                 id="nsfw-mode"
-                checked={isNsfwMode}
-                onCheckedChange={setIsNsfwMode}
+                checked={nsfwMode}
+                onCheckedChange={toggleNsfwMode}
                 aria-label="Toggle NSFW mode"
               />
             </div>
@@ -105,7 +109,7 @@ export default function SettingsPage() {
               <Switch
                 id="notifications"
                 checked={notifications}
-                onCheckedChange={setNotifications}
+                onCheckedChange={toggleNotifications}
                 aria-label="Toggle push notifications"
               />
             </div>

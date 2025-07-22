@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: 'An internal server error occurred.' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'An internal server error occurred.';
+    return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }

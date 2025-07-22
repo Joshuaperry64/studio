@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useUserStore } from '@/store/user-store';
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState('login');
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [registerUsername, setRegisterUsername] = useState('');
   const [registerPin, setRegisterPin] = useState('');
   const [registerPinConfirm, setRegisterPinConfirm] = useState('');
+  const { login } = useUserStore();
 
   const { toast } = useToast();
   const router = useRouter();
@@ -38,12 +40,14 @@ export default function LoginPage() {
 
       if (response.ok) {
         toast({ title: 'Login Successful', description: "Welcome back!" });
+        login(); // Update user state
         router.push('/chat');
       } else {
         toast({ title: 'Login Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
       }
     } catch (error) {
-       toast({ title: 'Error', description: 'Could not connect to the server.', variant: 'destructive' });
+       const errorMessage = error instanceof Error ? error.message : 'Could not connect to the server.';
+       toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +76,8 @@ export default function LoginPage() {
          toast({ title: 'Registration Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
       }
     } catch (error) {
-       toast({ title: 'Error', description: 'Could not connect to the server.', variant: 'destructive' });
+       const errorMessage = error instanceof Error ? error.message : 'Could not connect to the server.';
+       toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +90,7 @@ export default function LoginPage() {
         <TabsTrigger value="register" className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=inactive]:text-muted-foreground rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-none">Register</TabsTrigger>
       </TabsList>
       <TabsContent value="login">
-        <Card>
+        <Card className="bg-card/80 backdrop-blur-sm">
           <form onSubmit={handleLogin}>
             <CardHeader>
               <CardTitle className="text-2xl">Login to AlphaLink</CardTitle>
@@ -111,7 +116,7 @@ export default function LoginPage() {
         </Card>
       </TabsContent>
       <TabsContent value="register">
-        <Card>
+        <Card className="bg-card/80 backdrop-blur-sm">
           <form onSubmit={handleRegister}>
             <CardHeader>
               <CardTitle className="text-2xl">Create an Account</CardTitle>
