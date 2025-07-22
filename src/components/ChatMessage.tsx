@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bot, User, Copy, Download } from 'lucide-react';
+import { Bot, User, Copy, Download, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Timestamp } from 'firebase/firestore';
+import { useCharacterStore, Character } from '@/store/character-store';
 
 interface MessagePayload {
   id: string | number;
@@ -176,6 +177,23 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, currentUserId, userA
       )}
     </div>
   );
+};
+
+
+export const ThinkingMessage: React.FC<{ activeCharacter: Character | null }> = ({ activeCharacter }) => {
+    return (
+        <div className="flex items-start gap-4">
+            <Avatar className="animate-pulse-slow">
+                <AvatarImage src={activeCharacter?.avatarDataUri} alt={activeCharacter?.name} />
+                <AvatarFallback>
+                    <Bot className="h-5 w-5" />
+                </AvatarFallback>
+            </Avatar>
+            <div className="max-w-[75%] rounded-lg p-3 bg-secondary flex items-center">
+                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+        </div>
+    );
 };
 
 export default ChatMessage;

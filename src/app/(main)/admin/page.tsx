@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash2, Users, UserCheck, UserX, Server, CheckCircle, AlertCircle, Wifi } from 'lucide-react';
+import { MoreHorizontal, Trash2, Users, UserCheck, UserX, Server, CheckCircle, AlertCircle, Wifi, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -146,10 +146,10 @@ export default function AdminPage() {
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{userStats?.total ?? <Loader2 className="h-6 w-6 animate-spin" />}</div>
+                        <div className="text-2xl font-bold">{isLoading || !userStats ? <Loader2 className="h-6 w-6 animate-spin" /> : userStats.total}</div>
                          <div className="flex space-x-4 text-xs text-muted-foreground">
-                            <div className="flex items-center"><UserCheck className="h-3 w-3 mr-1 text-green-500"/> Approved: {userStats?.approved ?? '-'}</div>
-                            <div className="flex items-center"><UserX className="h-3 w-3 mr-1 text-yellow-500"/> Pending: {userStats?.pending ?? '-'}</div>
+                            <div className="flex items-center"><UserCheck className="h-3 w-3 mr-1 text-green-500"/> Approved: {isLoading || !userStats ? '-' : userStats.approved}</div>
+                            <div className="flex items-center"><UserX className="h-3 w-3 mr-1 text-yellow-500"/> Pending: {isLoading || !userStats ? '-' : userStats.pending}</div>
                         </div>
                     </CardContent>
                 </Card>
@@ -337,5 +337,3 @@ export default function AdminPage() {
     </main>
   );
 }
-
-    

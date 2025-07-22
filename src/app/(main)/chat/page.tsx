@@ -17,7 +17,7 @@ import { useUserStore } from '@/store/user-store';
 import { WelcomeDialog } from '@/components/welcome-dialog';
 import { useSettingsStore } from '@/store/settings-store';
 import { useChatStore } from '@/store/chat-store';
-import ChatMessage from '@/components/ChatMessage';
+import ChatMessage, { ThinkingMessage } from '@/components/ChatMessage';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
@@ -50,7 +50,7 @@ export default function ChatPage() {
         behavior: 'smooth',
       });
     }
-  }, [messages]);
+  }, [messages, isLoading]);
   
   const playAudio = (audioDataUri: string) => {
     if (audioPlayerRef.current) {
@@ -61,22 +61,25 @@ export default function ChatPage() {
 
   const handleSendMessage = async () => {
     if (!input.trim() && !mediaAttachment) return;
-    startLoading();
 
-    const userMessage = {
-      id: Date.now(),
-      sender: 'user' as const,
-      text: input,
-      photo: mediaAttachment?.type.startsWith('image/') ? URL.createObjectURL(mediaAttachment) : undefined,
-      video: mediaAttachment?.type.startsWith('video/') ? URL.createObjectURL(mediaAttachment) : undefined,
-    };
-    addMessage(userMessage);
-
-    const photoDataUri = mediaAttachment?.type.startsWith('image/') ? await fileToDataUri(mediaAttachment) : undefined;
-    const videoDataUri = mediaAttachment?.type.startsWith('video/') ? await fileToDataUri(mediaAttachment) : undefined;
+    const userMessageText = input;
+    const userMessageAttachment = mediaAttachment;
 
     setInput('');
     setMediaAttachment(null);
+    startLoading();
+
+    addMessage({
+      id: Date.now(),
+      sender: 'user' as const,
+      text: userMessageText,
+      photo: userMessageAttachment?.type.startsWith('image/') ? URL.createObjectURL(userMessageAttachment) : undefined,
+      video: userMessageAttachment?.type.startsWith('video/') ? URL.createObjectURL(userMessageAttachment) : undefined,
+    });
+
+    const photoDataUri = userMessageAttachment?.type.startsWith('image/') ? await fileToDataUri(userMessageAttachment) : undefined;
+    const videoDataUri = userMessageAttachment?.type.startsWith('video/') ? await fileToDataUri(userMessageAttachment) : undefined;
+
 
     try {
       // Use the character's assigned voice, or a default voice if no character is active.
@@ -89,19 +92,18 @@ export default function ChatPage() {
 
 
       const result = await analyzeUserInput({
-        textPrompt: input,
+        textPrompt: userMessageText,
         photoDataUri,
         videoDataUri,
         voiceName,
         characterDetails,
       });
-      const aiMessage = {
+      addMessage({
         id: Date.now() + 1,
         sender: 'ai' as const,
         text: result.analysisResult,
         character: activeCharacter ? { name: activeCharacter.name, avatar: activeCharacter.avatarDataUri } : undefined,
-      };
-      addMessage(aiMessage);
+      });
       
       if (result.audioDataUri) {
         playAudio(result.audioDataUri);
@@ -152,21 +154,19 @@ export default function ChatPage() {
       const result = await voiceToVoiceChat({ audioDataUri, voiceName });
 
       // Add user's transcribed message to chat
-      const userMessage = {
+      addMessage({
           id: Date.now(),
           sender: 'user' as const,
           text: result.transcription,
-      };
-      addMessage(userMessage);
+      });
 
       // Add AI's response message to chat
-      const aiMessage = {
+      addMessage({
           id: Date.now() + 1,
           sender: 'ai' as const,
           text: result.responseText,
           character: activeCharacter ? { name: activeCharacter.name, avatar: activeCharacter.avatarDataUri } : undefined,
-      };
-      addMessage(aiMessage);
+      });
 
       // Play AI's audio response
       if (result.audioDataUri) {
@@ -207,7 +207,7 @@ export default function ChatPage() {
       <div className="flex flex-col h-[calc(100vh-4rem)] sm:h-[calc(100vh-4rem)]">
         <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
           <div className="space-y-6 max-w-3xl mx-auto">
-            {messages.length === 0 && (
+            {messages.length === 0 && !isLoading && (
               <div className="text-center text-muted-foreground pt-16">
                 <Bot size={48} className="mx-auto" />
                 <h2 className="text-2xl font-headline mt-4">
@@ -224,19 +224,7 @@ export default function ChatPage() {
                 userName={user?.username}
               />
             ))}
-            {isLoading && (
-              <div className="flex items-start gap-4">
-                <Avatar>
-                  <AvatarImage src={activeCharacter?.avatarDataUri} alt={activeCharacter?.name} />
-                  <AvatarFallback>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="max-w-[75%] rounded-lg p-3 bg-secondary flex items-center">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                </div>
-              </div>
-            )}
+            {isLoading && <ThinkingMessage activeCharacter={activeCharacter} />}
           </div>
         </ScrollArea>
         <div className="border-t p-4 bg-background">
