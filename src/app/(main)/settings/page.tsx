@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useSettingsStore } from '@/store/settings-store';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   const {
@@ -80,6 +81,9 @@ export default function SettingsPage() {
                     value={localApiKey}
                     onChange={(e) => setLocalApiKey(e.target.value)}
                     />
+                  <Button asChild variant="outline">
+                    <Link href="https://aistudio.google.com/app/apikey" target="_blank">Get API Key</Link>
+                  </Button>
                  <Button onClick={handleSaveApiKey} disabled={isLoading}>
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
                  </Button>
