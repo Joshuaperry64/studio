@@ -1,185 +1,200 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { collaborativeAiAssistance, CollaborativeAiAssistanceOutput } from '@/ai/flows/collaborative-ai-assistance';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, ThumbsDown, ThumbsUp, Trash2, Wand2 } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Separator } from '@/components/ui/separator';
+import { Loader2, PlusCircle, Users } from 'lucide-react';
+import { useUserStore } from '@/store/user-store';
+import { useRouter } from 'next/navigation';
+import { createCoPilotSessionFlow } from '@/ai/flows/create-copilot-session';
+import { listCoPilotSessionsFlow } from '@/ai/flows/list-copilot-sessions';
+import { formatDistanceToNow } from 'date-fns';
 
 const formSchema = z.object({
+  sessionName: z.string().min(5, 'Session name must be at least 5 characters.'),
   projectDescription: z.string().min(20, 'Project description must be at least 20 characters.'),
   aiPersonaDescription: z.string().min(10, 'AI persona must be at least 10 characters.'),
-  groupSuggestions: z.array(z.object({ value: z.string().min(5, 'Suggestion must be at least 5 characters.') })),
 });
 
-export default function CoPilotPage() {
+interface CoPilotSession {
+    id: string;
+    name: string;
+    projectDescription: string;
+    aiPersonaDescription: string;
+    createdBy: string;
+    createdAt: any;
+}
+
+export default function CoPilotLobbyPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<CollaborativeAiAssistanceOutput | null>(null);
+  const [sessions, setSessions] = useState<CoPilotSession[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(true);
+  const { user } = useUserStore();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      sessionName: '',
       projectDescription: '',
       aiPersonaDescription: 'A helpful and creative assistant',
-      groupSuggestions: [{ value: '' }],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "groupSuggestions",
-  });
+  const fetchSessions = async () => {
+    try {
+      const { sessions: fetchedSessions, errorMessage } = await listCoPilotSessionsFlow();
+      if (errorMessage) {
+        toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
+      } else {
+        setSessions(fetchedSessions);
+      }
+    } catch (error) {
+      toast({ title: 'Error fetching sessions', description: 'Could not load available co-pilot sessions.', variant: 'destructive' });
+    } finally {
+        setLoadingSessions(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSessions();
+  }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+      toast({ title: 'Authentication Error', description: 'You must be logged in to create a session.', variant: 'destructive' });
+      return;
+    }
     setIsLoading(true);
-    setResult(null);
     try {
-      const input = {
+      const { sessionId } = await createCoPilotSessionFlow({
         ...values,
-        groupSuggestions: values.groupSuggestions.map(s => s.value),
-      };
-      const assistanceResult = await collaborativeAiAssistance(input);
-      setResult(assistanceResult);
-      toast({ title: 'Success', description: 'AI analysis complete.' });
+        createdBy: user.username,
+      });
+      toast({ title: 'Success', description: `Session "${values.sessionName}" created!` });
+      form.reset();
+      fetchSessions(); // Refresh the list
+      // TODO: Uncomment the line below when the session page is ready
+      // router.push(`/co-pilot/${sessionId}`);
     } catch (error) {
-      console.error(error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to get AI assistance.';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create session.';
       toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
   }
 
+  const handleJoinSession = (sessionId: string) => {
+    // TODO: Implement joining logic, for now it will just navigate
+    toast({ title: 'Coming Soon!', description: 'Joining a session is not yet implemented.' });
+    // router.push(`/co-pilot/${sessionId}`);
+  }
+
   return (
     <main className="p-4 sm:p-6 flex-1">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>AI Co-Pilot</CardTitle>
-              <CardDescription>Get AI-powered feedback on your project in real-time with your team.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="projectDescription"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Project Description</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Describe your project goals, scope, and current state." {...field} rows={4} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="aiPersonaDescription"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>AI Persona</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., A critical project manager, an enthusiastic creative..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div>
-                    <FormLabel>Group Suggestions</FormLabel>
-                    <div className="space-y-2 mt-2">
-                    {fields.map((field, index) => (
-                      <FormField
-                        key={field.id}
-                        control={form.control}
-                        name={`groupSuggestions.${index}.value`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="flex items-center gap-2">
-                                <FormControl>
-                                <Input placeholder={`Suggestion #${index + 1}`} {...field} />
-                                </FormControl>
-                                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} disabled={fields.length <= 1}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                    </div>
-                     <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => append({ value: '' })}>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Add Suggestion
-                    </Button>
-                  </div>
-                  <Button type="submit" disabled={isLoading} className="w-full">
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <><Wand2 className="mr-2 h-4 w-4" />Analyze Suggestions</>}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="space-y-6">
-            <Card className="flex items-center justify-center p-6 bg-secondary/50 border-dashed min-h-[400px]">
-                {isLoading ? (
-                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                        <p>AI is analyzing... please wait.</p>
-                    </div>
-                ) : !result ? (
-                     <div className="flex flex-col items-center gap-2 text-muted-foreground text-center">
-                        <Wand2 className="h-12 w-12" />
-                        <p>Your AI analysis results will appear here.</p>
-                    </div>
-                ) : (
-                    <div className="w-full space-y-4">
-                        <h3 className="text-xl font-headline">Analysis Results</h3>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Revised Project Description</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-muted-foreground">{result.revisedProjectDescription}</p>
-                            </CardContent>
-                        </Card>
-                         <Accordion type="single" collapsible className="w-full">
-                            {result.analyzedSuggestions.map((item, index) => (
-                                <AccordionItem value={`item-${index}`} key={index}>
-                                <AccordionTrigger>
-                                    <div className="flex items-center gap-2">
-                                        {item.isIncorporated ? <ThumbsUp className="h-4 w-4 text-green-500" /> : <ThumbsDown className="h-4 w-4 text-red-500" />}
-                                        <span className="truncate flex-1 text-left">{item.suggestion}</span>
-                                    </div>
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    <p className="text-sm text-muted-foreground">{item.incorporationRationale}</p>
-                                </AccordionContent>
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
-                    </div>
-                )}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Create Co-Pilot Session</CardTitle>
+                    <CardDescription>Start a new session for your team to collaborate with the AI.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                             <FormField
+                                control={form.control}
+                                name="sessionName"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Session Name</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="e.g., Q3 Brainstorming" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="projectDescription"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Project Description</FormLabel>
+                                    <FormControl>
+                                    <Textarea placeholder="Describe your project goals, scope, and current state." {...field} rows={4} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="aiPersonaDescription"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>AI Persona</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="e.g., A critical project manager, an enthusiastic creative..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                            <Button type="submit" disabled={isLoading} className="w-full">
+                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+                                Create Session
+                            </Button>
+                        </form>
+                    </Form>
+                </CardContent>
             </Card>
         </div>
-
+        
+        <div className="lg:col-span-2">
+            <h2 className="text-2xl font-headline mb-4">Available Sessions</h2>
+             {loadingSessions ? (
+                 <div className="flex items-center justify-center h-64 rounded-lg border border-dashed">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+            ) : sessions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-center text-muted-foreground border-2 border-dashed rounded-lg py-24">
+                    <Users size={48} />
+                    <h2 className="text-xl font-semibold mt-4">No Active Sessions</h2>
+                    <p>Be the first to create a new Co-Pilot session.</p>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {sessions.map((session) => (
+                        <Card key={session.id}>
+                           <CardHeader>
+                                <CardTitle>{session.name}</CardTitle>
+                                <CardDescription>
+                                   Created by {session.createdBy} {formatDistanceToNow(new Date(session.createdAt.seconds * 1000), { addSuffix: true })}
+                                </CardDescription>
+                           </CardHeader>
+                           <CardContent>
+                                <p className="text-sm text-muted-foreground line-clamp-2">{session.projectDescription}</p>
+                           </CardContent>
+                           <CardFooter>
+                                <Button onClick={() => handleJoinSession(session.id)} className="ml-auto">
+                                    Join Session
+                                </Button>
+                           </CardFooter>
+                        </Card>
+                    ))}
+                </div>
+            )}
+        </div>
       </div>
     </main>
   );

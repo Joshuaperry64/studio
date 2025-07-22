@@ -8,3 +8,5 @@ import '@/ai/flows/collaborative-ai-assistance.ts';
 import '@/ai/flows/generate-character.ts';
 import '@/ai/flows/generate-audio.ts';
 import '@/ai/flows/voice-biometrics.ts';
+import '@/ai/flows/create-copilot-session.ts';
+import '@/ai/flows/list-copilot-sessions.ts';
