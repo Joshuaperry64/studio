@@ -50,6 +50,7 @@ const roadmapData = {
     { title: 'Voice-to-Voice Chat', status: 'complete', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
     { title: 'AI Co-Pilot', status: 'complete', description: 'Collaborative tool for AI-powered project feedback.' },
     { title: 'Gamification & Co-op Features', status: 'complete', description: 'Introduce cooperative goals, like the AI Co-Pilot, to enhance user engagement.' },
+    { title: 'Persistent Memory Management', status: 'complete', description: 'Admin-only interface to configure and test the AI\'s external memory connection.' },
   ],
   upcoming: [
     { title: 'AI-Powered Code Modification', status: 'pending', description: 'Allow the AI to directly suggest and apply code changes to the application codebase.' },
