@@ -13,6 +13,33 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { generateAudio } from './generate-audio';
 
+// Define the search tool
+const searchTool = ai.defineTool(
+  {
+    name: 'search',
+    description: 'Search the web for information.',
+    inputSchema: z.object({ query: z.string() }),
+    outputSchema: z.string(),
+  },
+  async ({ query }) => {
+    // In a real application, you would use a search API like Tavily or SerpAPI.
+    // For this example, we'll simulate a search result.
+    console.log(`[Search Tool] Searching for: ${query}`);
+    try {
+        // This is a placeholder for a real search API call.
+        // You would replace this with something like:
+        // const response = await fetch(`https://api.tavily.com/search`, { ... });
+        // const data = await response.json();
+        // return JSON.stringify(data.results);
+        return `Simulated web search results for "${query}". The capital of France is Paris. The James Webb Space Telescope was launched in December 2021. The latest iPhone model is the iPhone 16.`;
+    } catch (error) {
+        console.error(`[Search Tool] Error:`, error);
+        return 'Failed to fetch search results.';
+    }
+  }
+);
+
+
 const AnalyzeUserInputInputSchema = z.object({
   textPrompt: z.string().optional().describe('The text prompt from the user.'),
   photoDataUri: z
@@ -48,7 +75,16 @@ const prompt = ai.definePrompt({
   output: {schema: z.object({
     analysisResult: z.string().describe('The analysis result of the user input.'),
   })},
-  prompt: `You are an AI assistant designed to analyze user input and provide relevant responses.\n\nYou will receive text, photo, and video prompts from the user. Analyze the provided information and generate a comprehensive analysis result.\n\nHere's the user input:\n\n{{#if textPrompt}}
+  tools: [searchTool],
+  prompt: `You are an AI assistant designed to analyze user input and provide relevant and helpful responses.
+
+If the user's question requires real-time information, recent events, or specific data from the web, use the provided search tool to find the answer.
+
+You will receive text, photo, and video prompts from the user. Analyze the provided information and generate a comprehensive analysis result.
+
+Here's the user input:
+
+{{#if textPrompt}}
 Text Prompt: {{{textPrompt}}}
 {{/if}}
 
@@ -59,7 +95,8 @@ Photo: {{media url=photoDataUri}}
 {{#if videoDataUri}}
 Video: Analyzing video content is beyond the current capabilities.  The user provided a video.  Please acknowledge that it was received, but it will not be analyzed.
 {{/if}}
-\nBased on the information, provide a detailed analysis.\n`,
+
+Based on all the available information and any search results, provide a detailed analysis and answer.`,
 });
 
 const analyzeUserInputFlow = ai.defineFlow(
