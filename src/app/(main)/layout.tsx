@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut, Map, Loader2, Wand2, Fingerprint, Code } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -84,6 +84,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const adminMenuItems = [
     { href: '/admin', label: 'Admin Panel', icon: Shield },
+    { href: '/local-deployment', label: 'Local Deployment', icon: Server },
   ]
 
   if (!isInitialized || !user) {
@@ -126,7 +127,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-            {user?.role === 'admin' && adminMenuItems.map((item) => (
+            {user?.username === 'Joshua' && adminMenuItems.map((item) => (
                <SidebarMenuItem key={item.label}>
                <SidebarMenuButton
                  asChild
@@ -141,6 +142,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                </SidebarMenuButton>
              </SidebarMenuItem>
             ))}
+             {user?.role === 'admin' && user?.username !== 'Joshua' && (
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === '/admin'}
+                  tooltip={{ children: 'Admin Panel' }}
+                  className="justify-start"
+                >
+                  <Link href={'/admin'}>
+                    <Shield className="h-5 w-5" />
+                    <span className="group-data-[collapsible=icon]:hidden">Admin Panel</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarContent>
         <Separator className="my-2" />
