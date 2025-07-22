@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -23,6 +24,7 @@ const GenerateVisualMediaInputSchema = z.object({
     .describe(
       "A photo to use as a reference for video generation, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ).optional(),
+    imageModel: z.string().optional().describe('The name of the image generation model to use.'),
 });
 
 export type GenerateVisualMediaInput = z.infer<typeof GenerateVisualMediaInputSchema>;
@@ -60,7 +62,7 @@ const generateVisualMediaFlow = ai.defineFlow(
   async input => {
     if (input.mediaType === 'image') {
       const {media} = await ai.generate({
-        model: 'googleai/gemini-2.0-flash-preview-image-generation',
+        model: input.imageModel || 'googleai/gemini-2.0-flash-preview-image-generation',
         prompt: input.prompt,
         config: {
           responseModalities: ['TEXT', 'IMAGE'],

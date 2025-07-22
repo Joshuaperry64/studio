@@ -10,6 +10,21 @@ export interface MemorySettings {
     password?: string;
 }
 
+export type SafetyCategory = 
+    | 'HARM_CATEGORY_HATE_SPEECH'
+    | 'HARM_CATEGORY_DANGEROUS_CONTENT'
+    | 'HARM_CATEGORY_HARASSMENT'
+    | 'HARM_CATEGORY_SEXUALLY_EXPLICIT'
+    | 'HARM_CATEGORY_CIVIC_INTEGRITY';
+
+export type BlockThreshold = 
+    | 'BLOCK_NONE'
+    | 'BLOCK_ONLY_HIGH'
+    | 'BLOCK_MEDIUM_AND_ABOVE'
+    | 'BLOCK_LOW_AND_ABOVE';
+
+export type SafetySettings = Record<SafetyCategory, BlockThreshold>;
+
 interface SettingsState {
   apiKey: string;
   setApiKey: (key: string) => void;
@@ -23,6 +38,12 @@ interface SettingsState {
   setHasSeenWelcomeScreen: (hasSeen: boolean) => void;
   memorySettings: MemorySettings;
   saveMemorySettings: (settings: MemorySettings) => Promise<void>;
+  textModel: string;
+  setTextModel: (model: string) => void;
+  imageModel: string;
+  setImageModel: (model: string) => void;
+  safetySettings: SafetySettings;
+  setSafetySetting: (category: SafetyCategory, threshold: BlockThreshold) => void;
 }
 
 const initialMemorySettings: MemorySettings = {
@@ -32,6 +53,15 @@ const initialMemorySettings: MemorySettings = {
     username: '',
     password: '',
 };
+
+const initialSafetySettings: SafetySettings = {
+    HARM_CATEGORY_HATE_SPEECH: 'BLOCK_MEDIUM_AND_ABOVE',
+    HARM_CATEGORY_DANGEROUS_CONTENT: 'BLOCK_MEDIUM_AND_ABOVE',
+    HARM_CATEGORY_HARASSMENT: 'BLOCK_MEDIUM_AND_ABOVE',
+    HARM_CATEGORY_SEXUALLY_EXPLICIT: 'BLOCK_MEDIUM_AND_ABOVE',
+    HARM_CATEGORY_CIVIC_INTEGRITY: 'BLOCK_MEDIUM_AND_ABOVE',
+};
+
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
@@ -70,6 +100,18 @@ export const useSettingsStore = create<SettingsState>()(
         }
         set({ memorySettings: settings });
       },
+      textModel: 'googleai/gemini-2.5-pro',
+      setTextModel: (model) => set({ textModel: model }),
+      imageModel: 'googleai/gemini-2.0-flash-preview-image-generation',
+      setImageModel: (model) => set({ imageModel: model }),
+      safetySettings: initialSafetySettings,
+      setSafetySetting: (category, threshold) =>
+        set((state) => ({
+          safetySettings: {
+            ...state.safetySettings,
+            [category]: threshold,
+          },
+        })),
     }),
     {
       name: 'settings-storage',
@@ -79,6 +121,9 @@ export const useSettingsStore = create<SettingsState>()(
         nsfwMode: state.nsfwMode,
         notifications: state.notifications,
         hasSeenWelcomeScreen: state.hasSeenWelcomeScreen,
+        textModel: state.textModel,
+        imageModel: state.imageModel,
+        safetySettings: state.safetySettings,
         memorySettings: {
             ...state.memorySettings,
             password: '', // Do not persist password

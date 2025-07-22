@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
@@ -23,6 +23,32 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { ModeToggle } from '@/components/ui/mode-toggle';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const safetyCategories = [
+    { id: 'HARM_CATEGORY_HATE_SPEECH', name: 'Hate Speech' },
+    { id: 'HARM_CATEGORY_DANGEROUS_CONTENT', name: 'Dangerous Content' },
+    { id: 'HARM_CATEGORY_HARASSMENT', name: 'Harassment' },
+    { id: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', name: 'Sexually Explicit' },
+    { id: 'HARM_CATEGORY_CIVIC_INTEGRITY', name: 'Civic Integrity' },
+];
+
+const blockThresholds = [
+    { id: 'BLOCK_NONE', name: 'Block None' },
+    { id: 'BLOCK_ONLY_HIGH', name: 'Block Only High' },
+    { id: 'BLOCK_MEDIUM_AND_ABOVE', name: 'Block Medium & Above' },
+    { id: 'BLOCK_LOW_AND_ABOVE', name: 'Block Low & Above' },
+];
+
+const textModels = [
+    { id: 'googleai/gemini-2.5-pro', name: 'Gemini 2.5 Pro (Recommended)' },
+    { id: 'googleai/gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+];
+
+const imageModels = [
+    { id: 'googleai/gemini-2.0-flash-preview-image-generation', name: 'Gemini 2.0 Flash Image Generation' },
+];
+
 
 export default function ApplicationSettingsPage() {
   const {
@@ -34,6 +60,12 @@ export default function ApplicationSettingsPage() {
     toggleNotifications,
     saveApiKey,
     setHasSeenWelcomeScreen,
+    textModel,
+    setTextModel,
+    imageModel,
+    setImageModel,
+    safetySettings,
+    setSafetySetting,
   } = useSettingsStore();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -93,6 +125,7 @@ export default function ApplicationSettingsPage() {
   }
 
   return (
+    <>
     <Card>
         <CardHeader>
         <CardTitle>Application Settings</CardTitle>
@@ -184,33 +217,99 @@ export default function ApplicationSettingsPage() {
             <Button variant="outline" onClick={handleShowWelcome}>Show Again</Button>
         </div>
         </CardContent>
-        <AlertDialog open={isNsfwDialogOpen} onOpenChange={setIsNsfwDialogOpen}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                <AlertDialogTitle>Enter Access Code</AlertDialogTitle>
-                <AlertDialogDescription>
-                    To enable NSFW mode, please enter the 4-digit access code.
-                </AlertDialogDescription>
-                </AlertDialogHeader>
-                <div className="py-2">
-                <Input
-                    id="nsfw-code"
-                    type="password"
-                    maxLength={4}
-                    placeholder="●●●●"
-                    value={nsfwAccessCode}
-                    onChange={(e) => setNsfwAccessCode(e.target.value)}
-                    className="text-center text-lg tracking-[0.5em]"
-                />
-                </div>
-                <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleNsfwAccessCodeSubmit}>
-                    Submit
-                </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
     </Card>
+
+    <Card className="mt-6">
+        <CardHeader>
+            <CardTitle>AI Model Configuration</CardTitle>
+            <CardDescription>Select the models used for generation.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+            <div className="rounded-lg border p-4">
+                <Label htmlFor="text-model" className="font-semibold">Default Text Model</Label>
+                <p className="text-sm text-muted-foreground mb-2">The primary model for chat and text-based analysis.</p>
+                <Select value={textModel} onValueChange={setTextModel}>
+                    <SelectTrigger id="text-model">
+                        <SelectValue placeholder="Select a text model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {textModels.map(model => <SelectItem key={model.id} value={model.id}>{model.name}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+            </div>
+             <div className="rounded-lg border p-4">
+                <Label htmlFor="image-model" className="font-semibold">Image Generation Model</Label>
+                 <p className="text-sm text-muted-foreground mb-2">The model used for the Visual Media Generation page.</p>
+                <Select value={imageModel} onValueChange={setImageModel}>
+                    <SelectTrigger id="image-model">
+                        <SelectValue placeholder="Select an image model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {imageModels.map(model => <SelectItem key={model.id} value={model.id}>{model.name}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+            </div>
+        </CardContent>
+    </Card>
+
+    <Card className="mt-6">
+        <CardHeader>
+            <CardTitle>AI Safety Settings</CardTitle>
+            <CardDescription>Configure the content safety filters for the AI. Applies to text generation.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+            {safetyCategories.map(category => (
+                <div key={category.id} className="flex flex-col gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <Label className="font-medium">{category.name}</Label>
+                        <p className="text-sm text-muted-foreground">Set the blocking threshold for {category.name.toLowerCase()} content.</p>
+                    </div>
+                    <Select
+                        value={safetySettings[category.id as keyof typeof safetySettings]}
+                        onValueChange={(value) => setSafetySetting(category.id as keyof typeof safetySettings, value)}
+                    >
+                        <SelectTrigger className="w-full sm:w-[220px]">
+                            <SelectValue placeholder="Select threshold" />
+                        </SelectTrigger>
+                        <SelectContent>
+                             {blockThresholds.map(threshold => <SelectItem key={threshold.id} value={threshold.id}>{threshold.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
+            ))}
+        </CardContent>
+        <CardFooter>
+            <p className="text-xs text-muted-foreground">Note: These settings provide control over the model's safety filters but do not override any underlying safety policies of the service.</p>
+        </CardFooter>
+    </Card>
+
+    <AlertDialog open={isNsfwDialogOpen} onOpenChange={setIsNsfwDialogOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Enter Access Code</AlertDialogTitle>
+            <AlertDialogDescription>
+                To enable NSFW mode, please enter the 4-digit access code.
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="py-2">
+            <Input
+                id="nsfw-code"
+                type="password"
+                maxLength={4}
+                placeholder="●●●●"
+                value={nsfwAccessCode}
+                onChange={(e) => setNsfwAccessCode(e.target.value)}
+                className="text-center text-lg tracking-[0.5em]"
+            />
+            </div>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleNsfwAccessCodeSubmit}>
+                Submit
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

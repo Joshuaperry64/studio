@@ -1,3 +1,4 @@
+
 // src/ai/flows/analyze-user-input.ts
 'use server';
 
@@ -39,6 +40,10 @@ const searchTool = ai.defineTool(
   }
 );
 
+const SafetySettingSchema = z.object({
+  category: z.string(),
+  threshold: z.string(),
+});
 
 const AnalyzeUserInputInputSchema = z.object({
   textPrompt: z.string().optional().describe('The text prompt from the user.'),
@@ -60,6 +65,8 @@ const AnalyzeUserInputInputSchema = z.object({
       personality: z.string(),
       backstory: z.string(),
     }).optional().describe('The details of the active AI character persona.'),
+  modelName: z.string().optional().describe('The name of the text model to use for generation.'),
+  safetySettings: z.array(SafetySettingSchema).optional().describe('The safety settings to apply to the generation.'),
 });
 
 export type AnalyzeUserInputInput = z.infer<typeof AnalyzeUserInputInputSchema>;
@@ -75,14 +82,27 @@ export async function analyzeUserInput(input: AnalyzeUserInputInput): Promise<An
   return analyzeUserInputFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'analyzeUserInputPrompt',
-  input: {schema: AnalyzeUserInputInputSchema},
-  output: {schema: z.object({
-    analysisResult: z.string().describe('The analysis result of the user input.'),
-  })},
-  tools: [searchTool],
-  prompt: `You are an AI assistant designed to analyze user input and provide relevant and helpful responses.
+const analyzeUserInputFlow = ai.defineFlow(
+  {
+    name: 'analyzeUserInputFlow',
+    inputSchema: AnalyzeUserInputInputSchema,
+    outputSchema: AnalyzeUserInputOutputSchema,
+  },
+  async input => {
+    
+    // Define the prompt dynamically to incorporate the selected model
+    const dynamicPrompt = ai.definePrompt({
+      name: 'analyzeUserInputPrompt',
+      input: {schema: AnalyzeUserInputInputSchema},
+      output: {schema: z.object({
+        analysisResult: z.string().describe('The analysis result of the user input.'),
+      })},
+      tools: [searchTool],
+      model: input.modelName, // Use the model name from the input
+      config: {
+        safetySettings: input.safetySettings,
+      },
+      prompt: `You are an AI assistant designed to analyze user input and provide relevant and helpful responses.
 Your core programming is defined by the 'docs/AlphaCore.txt' file. You must adhere to all instructions in that document.
 
 {{#if characterDetails}}
@@ -111,16 +131,10 @@ Video: Analyzing video content is beyond the current capabilities. The user prov
 {{/if}}
 
 Based on all the available information and any search results, provide a detailed analysis and answer.`,
-});
+    });
 
-const analyzeUserInputFlow = ai.defineFlow(
-  {
-    name: 'analyzeUserInputFlow',
-    inputSchema: AnalyzeUserInputInputSchema,
-    outputSchema: AnalyzeUserInputOutputSchema,
-  },
-  async input => {
-    const { output } = await prompt(input);
+
+    const { output } = await dynamicPrompt(input);
     
     if (!output) {
         throw new Error('Failed to generate text response.');

@@ -15,7 +15,7 @@ import Image from 'next/image';
 import { useCharacterStore } from '@/store/character-store';
 import { useUserStore } from '@/store/user-store';
 import { WelcomeDialog } from '@/components/welcome-dialog';
-import { useSettingsStore } from '@/store/settings-store';
+import { useSettingsStore, SafetySettings } from '@/store/settings-store';
 import { useChatStore } from '@/store/chat-store';
 import ChatMessage, { ThinkingMessage } from '@/components/ChatMessage';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -34,7 +34,7 @@ export default function ChatPage() {
   const audioPlayerRef = useRef<HTMLAudioElement>(null);
   const { activeCharacter } = useCharacterStore();
   const { user } = useUserStore();
-  const { hasSeenWelcomeScreen, setHasSeenWelcomeScreen } = useSettingsStore();
+  const { hasSeenWelcomeScreen, setHasSeenWelcomeScreen, textModel, safetySettings } = useSettingsStore();
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
 
   useEffect(() => {
@@ -90,6 +90,12 @@ export default function ChatPage() {
         backstory: activeCharacter.backstory,
       } : undefined;
 
+      // Format safety settings for the API
+      const formattedSafetySettings = Object.entries(safetySettings).map(([category, threshold]) => ({
+            category,
+            threshold,
+      }));
+
 
       const result = await analyzeUserInput({
         textPrompt: userMessageText,
@@ -97,6 +103,8 @@ export default function ChatPage() {
         videoDataUri,
         voiceName,
         characterDetails,
+        modelName: textModel,
+        safetySettings: formattedSafetySettings,
       });
       addMessage({
         id: Date.now() + 1,

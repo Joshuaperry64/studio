@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -15,6 +16,7 @@ import { Loader2, Clapperboard, ImageIcon as ImageIconLucide } from 'lucide-reac
 import Image from 'next/image';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
+import { useSettingsStore } from '@/store/settings-store';
 
 const formSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters long.'),
@@ -28,6 +30,7 @@ export default function MediaGenerationPage() {
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
   const { toast } = useToast();
+  const { imageModel } = useSettingsStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,13 +53,14 @@ export default function MediaGenerationPage() {
     setIsLoading(true);
     setResultUrl(null);
     try {
-      const input: GenerateVisualMediaInput = { ...values };
+      const input: GenerateVisualMediaInput = { ...values, imageModel };
       const result = await generateVisualMedia(input);
       setResultUrl(result.mediaUrl);
       toast({ title: 'Success', description: `${watchMediaType === 'image' ? 'Image' : 'Video'} generated successfully.` });
     } catch (error) {
       console.error(error);
-      toast({ title: 'Error', description: `Failed to generate ${watchMediaType}.`, variant: 'destructive' });
+      const errorMessage = error instanceof Error ? error.message : `Failed to generate ${watchMediaType}.`;
+      toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
