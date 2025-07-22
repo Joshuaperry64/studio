@@ -70,6 +70,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/character-hub', label: 'Character Hub', icon: Smile },
     { href: '/media-generation', label: 'Visual Media', icon: ImageIcon },
     { href: '/co-pilot', label: 'Co-Pilot', icon: Users },
+    { href: '/lobby', label: 'Collaboration', icon: Users },
     { href: '/roadmap', label: 'Roadmap', icon: Map },
   ];
 
