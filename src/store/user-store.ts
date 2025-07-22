@@ -15,7 +15,7 @@ interface UserPayload {
 interface UserState {
   user: UserPayload | null;
   isInitialized: boolean;
-  login: () => Promise<void>;
+  login: () => void;
   logout: () => void;
   initialize: () => void;
   updateAvatar: (avatarDataUri: string) => void;
@@ -30,7 +30,18 @@ const decodeToken = (token: string): UserPayload | null => {
   }
 };
 
-const fetchAndSetUser = async (set: (state: Partial<UserState>) => void) => {
+export const useUserStore = create<UserState>((set, get) => ({
+  user: null,
+  isInitialized: false,
+  login: () => {
+    // The login process is handled by setting the cookie and then re-initializing.
+    get().initialize();
+  },
+  logout: () => {
+    Cookies.remove('auth_token');
+    set({ user: null, isInitialized: true }); // Mark as initialized after logout
+  },
+  initialize: async () => {
     const token = Cookies.get('auth_token');
     if (token) {
         const decodedUser = decodeToken(token);
@@ -42,7 +53,8 @@ const fetchAndSetUser = async (set: (state: Partial<UserState>) => void) => {
                     const fullUser = await response.json();
                      set({ user: { ...decodedUser, avatar: fullUser.avatarDataUri }, isInitialized: true });
                 } else {
-                     set({ user: decodedUser, isInitialized: true });
+                    // If fetching fails, still set user from token but mark as initialized
+                    set({ user: decodedUser, isInitialized: true });
                 }
             } catch (e) {
                 // Fallback to decoded token if the API call fails
@@ -57,25 +69,6 @@ const fetchAndSetUser = async (set: (state: Partial<UserState>) => void) => {
         // No token found
          set({ user: null, isInitialized: true });
     }
-}
-
-
-export const useUserStore = create<UserState>((set, get) => ({
-  user: null,
-  isInitialized: false,
-  login: async () => {
-    set({ isInitialized: false });
-    await fetchAndSetUser(set);
-  },
-  logout: () => {
-    Cookies.remove('auth_token');
-    set({ user: null });
-  },
-  initialize: () => {
-    // Only initialize if not already done
-    if (!get().isInitialized) {
-        fetchAndSetUser(set);
-    }
   },
   updateAvatar: (avatarDataUri: string) => {
     set((state) => ({
@@ -84,5 +77,5 @@ export const useUserStore = create<UserState>((set, get) => ({
   }
 }));
 
-// Initialize the store on app load
-useUserStore.getState().initialize();
+// Initialize the store on app load by calling initialize in the main layout.
+// This prevents race conditions and ensures a predictable loading sequence.

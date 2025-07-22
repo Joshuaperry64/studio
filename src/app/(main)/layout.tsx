@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut, Map } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut, Map, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -33,15 +33,24 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, initialize, logout } = useUserStore();
+  const { user, isInitialized, initialize, logout } = useUserStore();
   const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Manually initialize the user store on layout mount
-    // to ensure user data is available.
-    initialize();
-  }, [initialize]);
+    // This effect runs once on mount to initialize the user state.
+    if (!isInitialized) {
+        initialize();
+    }
+  }, [initialize, isInitialized]);
+
+   useEffect(() => {
+    // This effect redirects to login if initialization is complete and there's no user.
+    if (isInitialized && !user && pathname !== '/login') {
+        router.push('/login');
+    }
+  }, [isInitialized, user, router, pathname]);
+
 
   const handleLogout = async () => {
     try {
@@ -72,11 +81,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/admin', label: 'Admin Panel', icon: Shield },
   ]
 
-  if (!user) {
-    // You can render a loading state here while the user is being initialized
+  if (!isInitialized || !user) {
+    // Render a full-page loading indicator while the user state is being initialized.
     return (
-        <div className="flex items-center justify-center h-screen w-full">
-            <p>Loading...</p>
+        <div className="flex items-center justify-center h-screen w-full bg-background">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
     );
   }
@@ -115,7 +124,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                <SidebarMenuItem key={item.label}>
                <SidebarMenuButton
                  asChild
-                 isActive={pathname === item.href && item.label === 'Admin Panel'}
+                 isActive={pathname === item.href}
                  tooltip={{ children: item.label }}
                  className="justify-start"
                >
