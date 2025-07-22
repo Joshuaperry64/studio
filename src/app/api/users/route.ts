@@ -1,12 +1,14 @@
+
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/auth';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
 
 // This is an unprotected route to allow the login page to populate the user dropdown.
 export async function GET() {
     try {
-        const users = await db.users.findMany();
+        const usersSnapshot = await getDocs(collection(db, 'users'));
         // Only return usernames for security.
-        const usernames = users.map(user => user.username);
+        const usernames = usersSnapshot.docs.map(doc => doc.data().username);
         return NextResponse.json(usernames, { status: 200 });
     } catch (error) {
         console.error('Failed to fetch usernames:', error);
