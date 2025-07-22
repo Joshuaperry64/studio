@@ -4,6 +4,7 @@ interface User {
   id: number;
   username: string;
   pinHash: string;
+  apiKeyEncrypted?: string;
 }
 
 const users: User[] = [];
@@ -11,8 +12,14 @@ let userIdCounter = 1;
 
 export const db = {
   users: {
-    findUnique: async ({ where: { username } }: { where: { username: string } }) => {
-      return users.find(user => user.username === username);
+    findUnique: async ({ where: { id, username } }: { where: { id?: number, username?: string } }) => {
+      if (id) {
+        return users.find(user => user.id === id);
+      }
+      if (username) {
+        return users.find(user => user.username === username);
+      }
+      return undefined;
     },
     create: async ({ data }: { data: { username: string; pinHash: string } }) => {
       const newUser: User = {
@@ -22,6 +29,16 @@ export const db = {
       };
       users.push(newUser);
       return newUser;
+    },
+    update: async ({ where: { id }, data }: { where: { id: number }, data: { apiKeyEncrypted: string }}) => {
+        const userIndex = users.findIndex(user => user.id === id);
+        if (userIndex > -1) {
+            users[userIndex] = { ...users[userIndex], ...data };
+            return users[userIndex];
+        }
+        return undefined;
     }
   }
 };
+
+    
