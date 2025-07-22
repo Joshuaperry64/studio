@@ -56,7 +56,7 @@ export default function LoginPage() {
   const handleRegister = async (event: React.FormEvent) => {
     event.preventDefault();
     if (registerPin !== registerPinConfirm) {
-      toast({ title: 'Registration Failed', description: 'PINs do not match.', variant: 'destructive' });
+      toast({ title: 'Application Failed', description: 'PINs do not match.', variant: 'destructive' });
       return;
     }
     setIsLoading(true);
@@ -70,10 +70,10 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        toast({ title: 'Registration Successful', description: 'You can now log in.' });
+        toast({ title: 'Application Submitted', description: 'Your application is pending review.' });
         setActiveTab('login');
       } else {
-         toast({ title: 'Registration Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
+         toast({ title: 'Application Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
       }
     } catch (error) {
        const errorMessage = error instanceof Error ? error.message : 'Could not connect to the server.';
@@ -87,7 +87,7 @@ export default function LoginPage() {
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
       <TabsList className="grid w-full grid-cols-2 bg-transparent p-0">
         <TabsTrigger value="login" className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=inactive]:text-muted-foreground rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-none">Login</TabsTrigger>
-        <TabsTrigger value="register" className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=inactive]:text-muted-foreground rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-none">Register</TabsTrigger>
+        <TabsTrigger value="register" className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=inactive]:text-muted-foreground rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-none">Submit Application</TabsTrigger>
       </TabsList>
       <TabsContent value="login">
         <Card className="bg-card/80 backdrop-blur-sm">
@@ -119,8 +119,8 @@ export default function LoginPage() {
         <Card className="bg-card/80 backdrop-blur-sm">
           <form onSubmit={handleRegister}>
             <CardHeader>
-              <CardTitle className="text-2xl">Create an Account</CardTitle>
-              <CardDescription>Choose a username and a 4-6 digit PIN to get started.</CardDescription>
+              <CardTitle className="text-2xl">Submit an Application</CardTitle>
+              <CardDescription>Submit an application to gain access. Your application will be reviewed by an administrator.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -139,7 +139,7 @@ export default function LoginPage() {
             <CardFooter>
               <Button type="submit" className="w-full" disabled={isLoading}>
                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
-                 <span>Register</span>
+                 <span>Submit Application</span>
               </Button>
             </CardFooter>
           </form>
