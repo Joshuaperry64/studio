@@ -2,15 +2,21 @@
 'use server';
 
 /**
- * @fileOverview A Genkit flow for generating AI character profiles, including an avatar image.
+ * @fileOverview A Genkit flow for generating AI character profiles, including an avatar image and a unique voice.
  *
- * - generateCharacter - A function that creates a detailed character profile and avatar.
+ * - generateCharacter - A function that creates a detailed character profile, avatar, and voice.
  * - GenerateCharacterInput - The input type for the generateCharacter function.
  * - GenerateCharacterOutput - The return type for the generateCharacter function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+
+// A curated list of high-quality prebuilt voices from the Gemini API.
+const PREBUILT_VOICES = [
+    "Algenib", "Mintaka", "Rigel", "Sirius", "Vega", "Spica", "Canopus",
+    "Altair", "Antares", "Arcturus", "Deneb", "Capella", "Achernar"
+];
 
 export const GenerateCharacterInputSchema = z.object({
   name: z.string().describe('The name of the character.'),
@@ -27,6 +33,7 @@ export const GenerateCharacterOutputSchema = z.object({
     .describe(
       "A generated portrait of the character, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  voiceName: z.string().describe("The assigned prebuilt voice name for the character."),
 });
 export type GenerateCharacterOutput = z.infer<typeof GenerateCharacterOutputSchema>;
 
@@ -57,6 +64,9 @@ const generateCharacterFlow = ai.defineFlow(
     outputSchema: GenerateCharacterOutputSchema,
   },
   async input => {
+    // Select a random voice from the list
+    const randomVoice = PREBUILT_VOICES[Math.floor(Math.random() * PREBUILT_VOICES.length)];
+
     // Generate character details and avatar in parallel
     const [detailsResponse, avatarResponse] = await Promise.all([
       characterGenerationPrompt(input),
@@ -84,6 +94,7 @@ const generateCharacterFlow = ai.defineFlow(
       backstory: details.backstory,
       personality: details.personality,
       avatarDataUri: avatar.url,
+      voiceName: randomVoice,
     };
   }
 );

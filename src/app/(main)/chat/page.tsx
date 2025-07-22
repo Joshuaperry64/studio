@@ -77,9 +77,8 @@ export default function ChatPage() {
     setMediaAttachment(null);
 
     try {
-      // Assign a different voice based on the character.
-      // These are example prebuilt voices from the Gemini API.
-      const voiceName = activeCharacter ? 'Mintaka' : 'Algenib';
+      // Use the character's assigned voice, or a default voice if no character is active.
+      const voiceName = activeCharacter?.voiceName || 'Algenib';
 
       const result = await analyzeUserInput({
         textPrompt: input,
