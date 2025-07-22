@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 type DisplayUser = Omit<User, 'pinHash' | 'apiKeyEncrypted'>;
 
@@ -155,7 +156,15 @@ export default function AdminPage() {
                                         <Badge variant={u.role === 'admin' ? 'default' : 'secondary'} className="capitalize">{u.role}</Badge>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={u.status === 'approved' ? 'secondary' : 'destructive'} className="capitalize bg-green-700">{u.status}</Badge>
+                                         <Badge
+                                            variant="outline"
+                                            className={cn("capitalize", {
+                                                'bg-green-700/50 text-green-400 border-green-400/50': u.status === 'approved',
+                                                'bg-yellow-700/50 text-yellow-400 border-yellow-400/50': u.status === 'pending',
+                                            })}
+                                            >
+                                            {u.status}
+                                        </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
                                         {u.id !== user.userId && (
@@ -251,3 +260,5 @@ export default function AdminPage() {
     </main>
   );
 }
+
+    
