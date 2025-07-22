@@ -10,9 +10,8 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import * as fs from 'fs';
-import {Readable} from 'stream';
-import {MediaPart} from 'genkit';
+import * as fs from 'fs/promises'; // Use fs.promises for async file operations
+import * as path from 'path'; // Import path module
 
 const GenerateVisualMediaInputSchema = z.object({
   prompt: z.string().describe('The text prompt to use for generating the visual media.'),
@@ -34,8 +33,20 @@ const GenerateVisualMediaOutputSchema = z.object({
 
 export type GenerateVisualMediaOutput = z.infer<typeof GenerateVisualMediaOutputSchema>;
 
+// Define the directory for shared files within the public directory
+const SHARED_FILES_DIR = path.join(process.cwd(), 'public', 'shared-files');
+
+// Ensure the shared files directory exists
+async function ensureSharedFilesDir() {
+  try {
+    await fs.mkdir(SHARED_FILES_DIR, { recursive: true });
+  } catch (error) {
+    console.error('Error ensuring shared files directory exists:', error);
+  }
+}
 
 export async function generateVisualMedia(input: GenerateVisualMediaInput): Promise<GenerateVisualMediaOutput> {
+  await ensureSharedFilesDir(); // Ensure directory exists before generating
   return generateVisualMediaFlow(input);
 }
 
@@ -103,14 +114,32 @@ const generateVisualMediaFlow = ai.defineFlow(
       }
 
       const video = operation.output?.message?.content.find(p => !!p.media);
-      if (!video) {
-        throw new Error('Failed to find the generated video');
+      if (!video || !video.media?.url) {
+        throw new Error('Failed to find the generated video URL');
       }
 
-      // we cannot return the video directly, so we save it to disk and return a file url
-      // video.media.url
+      // Download and save the video to the shared files directory
+      const videoUrl = video.media.url;
+      const fileName = `video_${Date.now()}.webm`; // Generate a unique filename
+      const filePath = path.join(SHARED_FILES_DIR, fileName);
 
-      return {mediaUrl: video.media!.url};
+      try {
+        const response = await fetch(videoUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to download video: ${response.statusText}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        await fs.writeFile(filePath, buffer);
+        console.log(`Video saved to ${filePath}`);
+
+        // Return the local URL relative to the public directory
+        return {mediaUrl: `/shared-files/${fileName}`};
+
+      } catch (error) {
+        console.error('Error saving video to file share:', error);
+        throw new Error('Failed to save generated video.');
+      }
     }
   }
 );

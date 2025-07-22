@@ -22,6 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { ModeToggle } from '@/components/ui/mode-toggle';
 
 export default function ApplicationSettingsPage() {
   const {
@@ -40,7 +41,7 @@ export default function ApplicationSettingsPage() {
   const [isNsfwDialogOpen, setIsNsfwDialogOpen] = useState(false);
   const [nsfwAccessCode, setNsfwAccessCode] = useState('');
   const { toast } = useToast();
-  
+
   useEffect(() => {
       setLocalApiKey(apiKey);
   }, [apiKey]);
@@ -98,6 +99,18 @@ export default function ApplicationSettingsPage() {
         <CardDescription>Manage your preferences for AlphaLink.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+
+        <div className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <p className="font-medium">Theme</p>
+              <p className="text-sm text-muted-foreground">
+                Customize the look and feel of the application.
+              </p>
+            </div>
+            <ModeToggle />
+          </div>
+
+
         <div className="flex flex-col gap-4 rounded-lg border p-4">
             <div>
             <Label htmlFor="api-key" className="font-semibold">
@@ -157,9 +170,10 @@ export default function ApplicationSettingsPage() {
             aria-label="Toggle push notifications"
             />
         </div>
+
         
         <Separator />
-        
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border p-4 gap-4">
             <div>
             <p className="font-medium">Show Welcome Screen</p>

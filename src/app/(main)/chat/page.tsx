@@ -17,6 +17,7 @@ import { useUserStore } from '@/store/user-store';
 import { WelcomeDialog } from '@/components/welcome-dialog';
 import { useSettingsStore } from '@/store/settings-store';
 import { useChatStore } from '@/store/chat-store';
+import ChatMessage from '@/components/ChatMessage';
 
 export default function ChatPage() {
   const { messages, addMessage, removeLastMessage, startLoading, stopLoading, isLoading } = useChatStore();
@@ -128,7 +129,7 @@ export default function ChatPage() {
         mediaRecorderRef.current.start();
         setIsRecording(true);
       } catch (error) {
-        toast({ title: 'Error', description: 'Microphone access denied.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Microphone access denied or failed to start recording.', variant: 'destructive' });
       }
     }
   };
@@ -139,6 +140,7 @@ export default function ChatPage() {
       const audioDataUri = await fileToDataUri(audioFile);
       const result = await enableVoiceInput({ audioDataUri });
       setInput((prev) => (prev ? `${prev} ${result.transcription}` : result.transcription));
+      toast({ title: 'Transcription Successful', description: 'Voice input transcribed to text.' });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to transcribe audio.';
       toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
@@ -183,57 +185,19 @@ export default function ChatPage() {
               </div>
             )}
             {messages.map((message) => (
-              <div
+              <ChatMessage 
                 key={message.id}
-                className={`flex items-start gap-4 ${message.sender === 'user' ? 'justify-end' : ''}`}
-              >
-                {message.sender === 'ai' && (
-                  <Avatar>
-                    <AvatarImage src={message.character?.avatar} alt={message.character?.name} />
-                    <AvatarFallback>
-                      <Bot />
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                <div
-                  className={`max-w-[75%] rounded-lg p-3 ${
-                    message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
-                  }`}
-                >
-                  {message.character && <p className="text-xs font-bold mb-1">{message.character.name}</p>}
-                  <p className="whitespace-pre-wrap">{message.text}</p>
-                  {message.photo && (
-                    <div className="mt-2 rounded-md overflow-hidden">
-                      <Image
-                        src={message.photo}
-                        alt="User upload"
-                        width={300}
-                        height={200}
-                        className="max-w-full h-auto"
-                        data-ai-hint="photo attachment"
-                      />
-                    </div>
-                  )}
-                  {message.video && (
-                    <video src={message.video} controls className="mt-2 rounded-md max-w-full" data-ai-hint="video attachment" />
-                  )}
-                </div>
-                {message.sender === 'user' && (
-                  <Avatar>
-                    <AvatarImage src={user?.avatar} alt={user?.username} />
-                    <AvatarFallback>
-                      {user?.username?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-              </div>
+                message={message}
+                userAvatar={user?.avatar}
+                userName={user?.username}
+              />
             ))}
             {isLoading && (
               <div className="flex items-start gap-4">
                 <Avatar>
                   <AvatarImage src={activeCharacter?.avatarDataUri} alt={activeCharacter?.name} />
                   <AvatarFallback>
-                    <Bot />
+                    <Loader2 className="h-5 w-5 animate-spin" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="max-w-[75%] rounded-lg p-3 bg-secondary flex items-center">
@@ -282,7 +246,7 @@ export default function ChatPage() {
                   size="icon"
                   variant="ghost"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading}
+                  disabled={isLoading || isRecording}
                 >
                   <Paperclip className="h-5 w-5" />
                 </Button>
@@ -299,8 +263,9 @@ export default function ChatPage() {
                   variant={isRecording ? 'destructive' : 'ghost'}
                   onClick={handleMicClick}
                   disabled={isLoading}
+                  className={isRecording ? 'animate-pulse-slow' : ''}
                 >
-                  <Mic className="h-5 w-5" />
+                  {isLoading && !isRecording ? <Loader2 className="h-5 w-5 animate-spin" /> : <Mic className="h-5 w-5" />}
                 </Button>
                 <Button
                   type="submit"

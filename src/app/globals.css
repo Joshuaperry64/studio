@@ -10,42 +10,42 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 221.2 83.2% 53.3%; /* Dark Navy Blue */
+    --primary: 280 100% 41%; /* Deep violet */
     --primary-foreground: 210 40% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 240, 100%, 50%; /* Blue */
+    --accent: 240 100% 50%; /* Blue */
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 280 100% 41%; /* Deep violet */
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 224, 13%, 13%; /* Dark Gray */
+    --background: 0 0% 13%; /* Dark Gray */
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 221.2 83.2% 53.3%; /* Dark Navy Blue */
+    --primary: 280 100% 41%; /* Deep violet */
     --primary-foreground: 210 40% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 240, 100%, 60%; /* Blue */
+    --accent: 240 100% 50%; /* Blue */
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 280 100% 41%; /* Deep violet */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -53,12 +53,12 @@
     --chart-5: 340 75% 55%;
     --sidebar-background: 222.2 84% 4.9%;
     --sidebar-foreground: 0 0% 95.9%;
-    --sidebar-primary: 221.2 83.2% 53.3%;
+    --sidebar-primary: 280 100% 41%; /* Deep violet */
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 217.2 32.6% 17.5%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 217.2 32.6% 23.5%;
-    --sidebar-ring: 221.2 83.2% 53.3%;
+    --sidebar-ring: 280 100% 41%; /* Deep violet */
   }
 }
 
@@ -95,4 +95,18 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
