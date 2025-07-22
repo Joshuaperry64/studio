@@ -11,21 +11,33 @@ export async function GET() {
     const q = query(usersRef, where("status", "==", "approved"));
     const querySnapshot = await getDocs(q);
 
-    const usernames = querySnapshot.docs.map(doc => doc.data().username);
+    const usernames = querySnapshot.docs.map(doc => doc.data().username as string);
     
-    // As a safeguard, ensure the 'Joshua' user can always log in if present in the database,
-    // even if the status is somehow not 'approved'. This check is added for robustness.
-    const joshuaQuery = query(collection(db, 'users'), where("username", "==", "Joshua"));
-    const joshuaSnapshot = await getDocs(joshuaQuery);
-    if (!joshuaSnapshot.empty && !usernames.includes('Joshua')) {
+    // As a safeguard, ensure the 'Joshua' user can always log in.
+    // Check if Joshua is already in the list from the 'approved' query.
+    if (!usernames.includes('Joshua')) {
+        const joshuaQuery = query(collection(db, 'users'), where("username", "==", "Joshua"));
+        const joshuaSnapshot = await getDocs(joshuaQuery);
+        // If Joshua exists in the database but wasn't in the 'approved' list, add him.
+        if (!joshuaSnapshot.empty) {
+            usernames.push('Joshua');
+        }
+    }
+    
+    // If after all checks the list is still empty, add Joshua as a final fallback.
+    // This handles the case of a completely empty or new database.
+    if (usernames.length === 0) {
         usernames.push('Joshua');
     }
 
-    return NextResponse.json(usernames, { status: 200 });
+    // Remove duplicates, just in case.
+    const uniqueUsernames = [...new Set(usernames)];
+
+    return NextResponse.json(uniqueUsernames, { status: 200 });
 
   } catch (error) {
     console.error('Error fetching users:', error);
-    // Fallback to a default user if there's a DB error to prevent total lockout
+    // If the database query itself fails, fallback to a default user to prevent total lockout.
     return NextResponse.json(['Joshua'], { status: 500 });
   }
 }
