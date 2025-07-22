@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -40,7 +41,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   ];
 
   const adminMenuItems = [
-    { href: '/admin', label: 'Admin', icon: Shield, admin: true },
+    { href: '/admin', label: 'Admin', icon: Shield },
   ]
 
   return (
