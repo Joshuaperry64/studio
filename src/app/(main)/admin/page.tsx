@@ -148,8 +148,8 @@ export default function AdminPage() {
                     <CardContent>
                         <div className="text-2xl font-bold">{isLoading || !userStats ? <Loader2 className="h-6 w-6 animate-spin" /> : userStats.total}</div>
                          <div className="flex space-x-4 text-xs text-muted-foreground">
-                            <div className="flex items-center"><UserCheck className="h-3 w-3 mr-1 text-green-500"/> Approved: {isLoading || !userStats ? '-' : userStats.approved}</div>
-                            <div className="flex items-center"><UserX className="h-3 w-3 mr-1 text-yellow-500"/> Pending: {isLoading || !userStats ? '-' : userStats.pending}</div>
+                            <div className="flex items-center"><UserCheck className="h-3 w-3 mr-1 text-green-500"/> Approved: {isLoading || userStats === null ? '-' : userStats.approved}</div>
+                            <div className="flex items-center"><UserX className="h-3 w-3 mr-1 text-yellow-500"/> Pending: {isLoading || userStats === null ? '-' : userStats.pending}</div>
                         </div>
                     </CardContent>
                 </Card>

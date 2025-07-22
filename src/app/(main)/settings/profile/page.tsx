@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Loader2, LogOut, Save, Trash2 } from 'lucide-react';
+import { Camera, Loader2, Save, Trash2, Download } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { fileToDataUri } from '@/lib/utils';
@@ -22,9 +22,11 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
+import { useChatStore } from '@/store/chat-store';
 
 export default function ProfileSettingsPage() {
     const { user, login, logout } = useUserStore();
+    const { messages: chatMessages } = useChatStore();
     const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -99,6 +101,24 @@ export default function ProfileSettingsPage() {
             setIsDeleting(false);
         }
     }
+    
+    const handleExportData = () => {
+        try {
+            const dataStr = JSON.stringify(chatMessages, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `alphalink_chat_history_${user?.username}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            toast({ title: 'Success', description: 'Your chat history has been downloaded.' });
+        } catch (error) {
+            toast({ title: 'Error', description: 'Failed to export your data.', variant: 'destructive' });
+        }
+    };
 
 
     if (!user) {
@@ -152,10 +172,13 @@ export default function ProfileSettingsPage() {
                         <div>
                             <p className="font-medium">Export Your Data</p>
                             <p className="text-sm text-muted-foreground">
-                                Download a copy of all your conversations. (Not yet implemented)
+                                Download a copy of all your solo chat conversations.
                             </p>
                         </div>
-                        <Button variant="outline" disabled>Export Data</Button>
+                        <Button variant="outline" onClick={handleExportData} disabled={chatMessages.length === 0}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Export Data
+                        </Button>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border border-destructive/50 p-4 gap-4">
                         <div>

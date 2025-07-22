@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 
 interface UserPayload {
-  userId: number;
+  userId: string; // Can be a string (firestore ID) or a special string ('creator-joshua')
   username: string;
   role: 'admin' | 'user';
   avatar?: string;

@@ -1,7 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth-server';
-import { db } from '@/lib/auth';
 
 // This is a placeholder API. In a real application, you would securely store
 // these settings in your database, likely encrypted. For this example, we will
