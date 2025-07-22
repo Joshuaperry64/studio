@@ -168,7 +168,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     </Avatar>
                     <div className="flex flex-col group-data-[collapsible=icon]:hidden">
                         <span className="text-sm font-medium">{user?.username}</span>
-                        <span className="text-xs text-muted-foreground capitalize">{user?.role}</span>
+                        <span className="text-xs text-muted-foreground capitalize">
+                          {user?.username === 'Joshua' ? 'Creator' : user?.role}
+                        </span>
                     </div>
                 </button>
             </DialogTrigger>
