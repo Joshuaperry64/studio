@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -34,6 +34,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   ];
 
   const bottomMenuItems = [
+      { href: '/instructions', label: 'Instructions', icon: BookOpen },
       { href: '/settings', label: 'Settings', icon: Settings },
   ];
 
