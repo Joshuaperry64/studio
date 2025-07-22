@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -14,27 +13,68 @@ import { useRouter } from 'next/navigation';
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPin, setLoginPin] = useState('');
+  const [registerUsername, setRegisterUsername] = useState('');
+  const [registerPin, setRegisterPin] = useState('');
+  const [registerPinConfirm, setRegisterPinConfirm] = useState('');
+
   const { toast } = useToast();
   const router = useRouter();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-    // TODO: Implement actual login logic
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    toast({ title: 'Login Successful', description: "Welcome back!" });
-    router.push('/chat');
-    setIsLoading(false);
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: loginUsername, pin: loginPin }),
+      });
+      
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({ title: 'Login Successful', description: "Welcome back!" });
+        router.push('/chat');
+      } else {
+        toast({ title: 'Login Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
+      }
+    } catch (error) {
+       toast({ title: 'Error', description: 'Could not connect to the server.', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRegister = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (registerPin !== registerPinConfirm) {
+      toast({ title: 'Registration Failed', description: 'PINs do not match.', variant: 'destructive' });
+      return;
+    }
     setIsLoading(true);
-    // TODO: Implement actual registration logic
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    toast({ title: 'Registration Successful', description: 'You can now log in.' });
-    setActiveTab('login');
-    setIsLoading(false);
+    try {
+       const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: registerUsername, pin: registerPin }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({ title: 'Registration Successful', description: 'You can now log in.' });
+        setActiveTab('login');
+      } else {
+         toast({ title: 'Registration Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
+      }
+    } catch (error) {
+       toast({ title: 'Error', description: 'Could not connect to the server.', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,11 +94,11 @@ export default function LoginPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="login-username">Username</Label>
-                  <Input id="login-username" required placeholder="alphatester" />
+                  <Input id="login-username" required placeholder="alphatester" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-pin">PIN</Label>
-                  <Input id="login-pin" type="password" required placeholder="&#9679;&#9679;&#9679;&#9679;" />
+                  <Input id="login-pin" type="password" required placeholder="&#9679;&#9679;&#9679;&#9679;" value={loginPin} onChange={(e) => setLoginPin(e.target.value)} />
                 </div>
               </CardContent>
               <CardFooter>
@@ -80,15 +120,15 @@ export default function LoginPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="register-username">Username</Label>
-                  <Input id="register-username" required />
+                  <Input id="register-username" required value={registerUsername} onChange={(e) => setRegisterUsername(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="register-pin">PIN</Label>
-                  <Input id="register-pin" type="password" required minLength={4} maxLength={6} />
+                  <Input id="register-pin" type="password" required minLength={4} maxLength={6} value={registerPin} onChange={(e) => setRegisterPin(e.target.value)} />
                 </div>
                  <div className="space-y-2">
                   <Label htmlFor="register-pin-confirm">Confirm PIN</Label>
-                  <Input id="register-pin-confirm" type="password" required minLength={4} maxLength={6} />
+                  <Input id="register-pin-confirm" type="password" required minLength={4} maxLength={6} value={registerPinConfirm} onChange={(e) => setRegisterPinConfirm(e.target.value)} />
                 </div>
               </CardContent>
               <CardFooter>
