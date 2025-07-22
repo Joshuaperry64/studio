@@ -11,13 +11,23 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useSettingsStore } from '@/store/settings-store';
 import Link from 'next/link';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function SettingsPage() {
   const {
     apiKey,
-    setApiKey: setStoreApiKey,
     nsfwMode,
-    toggleNsfwMode,
+    enableNsfwMode,
+    disableNsfwMode,
     notifications,
     toggleNotifications,
     saveApiKey,
@@ -26,6 +36,8 @@ export default function SettingsPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [localApiKey, setLocalApiKey] = useState('');
+  const [isNsfwDialogOpen, setIsNsfwDialogOpen] = useState(false);
+  const [nsfwAccessCode, setNsfwAccessCode] = useState('');
   const { toast } = useToast();
   
   useEffect(() => {
@@ -49,6 +61,29 @@ export default function SettingsPage() {
         setIsLoading(false);
     }
   };
+
+  const handleNsfwToggle = (checked: boolean) => {
+    if (checked) {
+      // open dialog to ask for code
+      setIsNsfwDialogOpen(true);
+    } else {
+      // disable without code
+      disableNsfwMode();
+      toast({ title: 'NSFW Mode Disabled' });
+    }
+  };
+
+  const handleNsfwAccessCodeSubmit = () => {
+    if (nsfwAccessCode === '2002') {
+      enableNsfwMode();
+      toast({ title: 'Success', description: 'NSFW Mode Enabled.' });
+      setIsNsfwDialogOpen(false);
+      setNsfwAccessCode('');
+    } else {
+      toast({ title: 'Error', description: 'Incorrect access code.', variant: 'destructive' });
+    }
+  };
+
 
   const handleShowWelcome = () => {
       setHasSeenWelcomeScreen(false);
@@ -102,7 +137,7 @@ export default function SettingsPage() {
               <Switch
                 id="nsfw-mode"
                 checked={nsfwMode}
-                onCheckedChange={toggleNsfwMode}
+                onCheckedChange={handleNsfwToggle}
                 aria-label="Toggle NSFW mode"
               />
             </div>
@@ -161,6 +196,33 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+      <AlertDialog open={isNsfwDialogOpen} onOpenChange={setIsNsfwDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Enter Access Code</AlertDialogTitle>
+            <AlertDialogDescription>
+              To enable NSFW mode, please enter the 4-digit access code.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-2">
+            <Input
+              id="nsfw-code"
+              type="password"
+              maxLength={4}
+              placeholder="&#9679;&#9679;&#9679;&#9679;"
+              value={nsfwAccessCode}
+              onChange={(e) => setNsfwAccessCode(e.target.value)}
+              className="text-center text-lg tracking-[0.5em]"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleNsfwAccessCodeSubmit}>
+              Submit
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }

@@ -6,7 +6,8 @@ interface SettingsState {
   setApiKey: (key: string) => void;
   saveApiKey: (key: string) => Promise<void>;
   nsfwMode: boolean;
-  toggleNsfwMode: () => void;
+  enableNsfwMode: () => void;
+  disableNsfwMode: () => void;
   notifications: boolean;
   toggleNotifications: () => void;
   hasSeenWelcomeScreen: boolean;
@@ -31,7 +32,8 @@ export const useSettingsStore = create<SettingsState>()(
         set({ apiKey: key });
       },
       nsfwMode: false,
-      toggleNsfwMode: () => set((state) => ({ nsfwMode: !state.nsfwMode })),
+      enableNsfwMode: () => set({ nsfwMode: true }),
+      disableNsfwMode: () => set({ nsfwMode: false }),
       notifications: true,
       toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
       hasSeenWelcomeScreen: false,
