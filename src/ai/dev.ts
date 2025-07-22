@@ -1,3 +1,4 @@
+
 import { config } from 'dotenv';
 config();
 
@@ -22,3 +23,6 @@ import '@/ai/flows/list-sessions.ts';
 import '@/ai/flows/get-user-by-username.ts';
 import '@/ai/flows/voice-biometrics.ts';
 import '@/ai/flows/voice-to-voice-chat.ts';
+import '@/ai/flows/propose-code-changes.ts';
+import '@/ai/flows/read-file.ts';
+import '@/ai/flows/list-files.ts';
