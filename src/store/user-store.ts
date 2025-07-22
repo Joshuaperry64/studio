@@ -15,7 +15,7 @@ interface UserPayload {
 interface UserState {
   user: UserPayload | null;
   isInitialized: boolean;
-  login: () => void;
+  login: (token: string) => void;
   logout: () => void;
   initialize: () => void;
   updateAvatar: (avatarDataUri: string) => void;
@@ -33,28 +33,23 @@ const decodeToken = (token: string): UserPayload | null => {
 export const useUserStore = create<UserState>((set, get) => ({
   user: null,
   isInitialized: false,
-  login: () => {
-    // This function is now primarily called *after* a successful login API call.
-    // Its job is to sync the Zustand state with the newly set cookie.
-    const token = Cookies.get('auth_token');
-    if (token) {
-        const decodedUser = decodeToken(token);
-        if (decodedUser) {
-            set({ user: decodedUser, isInitialized: true });
-        } else {
-             // If decoding fails, ensure we're in a logged-out state.
-             set({ user: null, isInitialized: true });
-        }
+  login: (token) => {
+    // This function is now called by the login page with the token.
+    // It directly updates the state, solving the race condition.
+    const decodedUser = decodeToken(token);
+    if (decodedUser) {
+      set({ user: decodedUser, isInitialized: true });
     } else {
-         // If for some reason the cookie isn't there, we are logged out.
-         set({ user: null, isInitialized: true });
+      set({ user: null, isInitialized: true });
     }
   },
   logout: () => {
     Cookies.remove('auth_token');
-    set({ user: null });
+    set({ user: null, isInitialized: true });
   },
   initialize: () => {
+    // This function handles the initial load of the application,
+    // checking if a valid cookie already exists.
     if (get().isInitialized) return;
 
     const token = Cookies.get('auth_token');

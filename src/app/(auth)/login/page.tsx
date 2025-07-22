@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/user-store';
+import { jwtDecode } from 'jwt-decode';
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState('login');
@@ -40,7 +41,8 @@ export default function LoginPage() {
 
       if (response.ok) {
         toast({ title: 'Login Successful', description: "Welcome back!" });
-        login(); // Update user state from new cookie
+        // The token is in the httpOnly cookie, but the response body contains it for client-side state update.
+        login(data.token); // Update user state immediately
         router.push('/chat');
       } else {
         toast({ title: 'Login Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
@@ -72,6 +74,9 @@ export default function LoginPage() {
       if (response.ok) {
         toast({ title: 'Application Submitted', description: 'Your application is pending review.' });
         setActiveTab('login');
+        setRegisterUsername('');
+        setRegisterPin('');
+        setRegisterPinConfirm('');
       } else {
          toast({ title: 'Application Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
       }
@@ -128,7 +133,7 @@ export default function LoginPage() {
                 <Input id="register-username" required value={registerUsername} onChange={(e) => setRegisterUsername(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="register-pin">PIN</Label>
+                <Label htmlFor="register-pin">PIN (4-6 digits)</Label>
                 <Input id="register-pin" type="password" required minLength={4} maxLength={6} value={registerPin} onChange={(e) => setRegisterPin(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
                <div className="space-y-2">

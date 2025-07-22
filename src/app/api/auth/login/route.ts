@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
@@ -40,7 +41,8 @@ export async function POST(request: Request) {
         }
     );
     
-    const response = NextResponse.json({ message: 'Login successful.' });
+    // We send the token in the response body so the client can initialize its state without re-reading the cookie.
+    const response = NextResponse.json({ message: 'Login successful.', token: token });
     
     response.cookies.set('auth_token', token, {
         httpOnly: true,
