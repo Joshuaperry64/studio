@@ -54,6 +54,7 @@ const AnalyzeUserInputInputSchema = z.object({
     .describe(
       "A video from the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+   voiceName: z.string().optional().describe('The voice to use for the audio response.'),
 });
 
 export type AnalyzeUserInputInput = z.infer<typeof AnalyzeUserInputInputSchema>;
@@ -106,18 +107,20 @@ const analyzeUserInputFlow = ai.defineFlow(
     outputSchema: AnalyzeUserInputOutputSchema,
   },
   async input => {
-    const [{ output: textOutput }, audioOutput] = await Promise.all([
-        prompt(input),
-        generateAudio(input.textPrompt || "I have received your media but no text prompt.")
-    ]);
+    const { output } = await prompt(input);
     
-    if (!textOutput) {
+    if (!output) {
         throw new Error('Failed to generate text response.');
     }
 
+    const { media: audioDataUri } = await generateAudio({
+        text: output.analysisResult,
+        voiceName: input.voiceName,
+    });
+
     return {
-      analysisResult: textOutput.analysisResult,
-      audioDataUri: audioOutput.media,
+      analysisResult: output.analysisResult,
+      audioDataUri,
     };
   }
 );
