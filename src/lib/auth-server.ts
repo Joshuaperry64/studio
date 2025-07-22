@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-import { cookies } from 'next/headers';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 interface UserPayload extends JwtPayload {
@@ -9,7 +8,7 @@ interface UserPayload extends JwtPayload {
 }
 
 export async function verifyAuth(request: NextRequest) {
-    const token = cookies().get('auth_token')?.value;
+    const token = request.cookies.get('auth_token')?.value;
 
     if (!token) {
         return { user: null };
