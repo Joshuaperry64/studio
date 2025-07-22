@@ -16,6 +16,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
     { href: '/settings/application', label: 'Application' },
     { href: '/settings/profile', label: 'Profile' },
     ...(user?.role === 'admin' ? [{ href: '/settings/memory', label: 'Persistent Memory' }] : []),
+    ...(user?.username === 'Joshua' ? [{ href: '/settings/directive', label: 'AI Directive' }] : []),
   ];
 
   return (
