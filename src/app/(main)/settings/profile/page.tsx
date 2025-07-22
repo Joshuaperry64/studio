@@ -143,6 +143,7 @@ export default function ProfileSettingsPage() {
                                 size="icon" 
                                 className="absolute bottom-1 right-1 rounded-full"
                                 onClick={() => fileInputRef.current?.click()}
+                                disabled={isCreator}
                             >
                                 <Camera className="h-5 w-5"/>
                             </Button>
