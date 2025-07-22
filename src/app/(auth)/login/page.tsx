@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Loader2, LogIn, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/user-store';
 import { jwtDecode } from 'jwt-decode';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState('login');
@@ -21,10 +22,28 @@ export default function LoginPage() {
   const [registerUsername, setRegisterUsername] = useState('');
   const [registerPin, setRegisterPin] = useState('');
   const [registerPinConfirm, setRegisterPinConfirm] = useState('');
+  const [allUsernames, setAllUsernames] = useState<string[]>([]);
   const { login } = useUserStore();
 
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    async function fetchUsernames() {
+      try {
+        const response = await fetch('/api/users');
+        if(response.ok) {
+          const data = await response.json();
+          setAllUsernames(data);
+        } else {
+          toast({ title: 'Error', description: 'Could not load user list.', variant: 'destructive' });
+        }
+      } catch (error) {
+        toast({ title: 'Error', description: 'Could not connect to server to get user list.', variant: 'destructive' });
+      }
+    }
+    fetchUsernames();
+  }, []);
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -104,7 +123,18 @@ export default function LoginPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="login-username">Username</Label>
-                <Input id="login-username" required placeholder="alphatester" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                <Select value={loginUsername} onValueChange={setLoginUsername}>
+                    <SelectTrigger id="login-username" className="bg-transparent border-0 border-b-2 rounded-none px-0 focus:ring-0 focus:ring-offset-0">
+                        <SelectValue placeholder="Select a user" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {allUsernames.map((name) => (
+                            <SelectItem key={name} value={name}>
+                                {name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="login-pin">PIN</Label>
@@ -112,7 +142,7 @@ export default function LoginPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || !loginUsername}>
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
                 <span>Login</span>
               </Button>
