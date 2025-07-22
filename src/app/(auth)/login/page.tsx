@@ -85,7 +85,7 @@ export default function LoginPage() {
         <TabsTrigger value="register" className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=inactive]:text-muted-foreground rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-none">Register</TabsTrigger>
       </TabsList>
       <TabsContent value="login">
-        <Card className="bg-transparent border-none shadow-none">
+        <Card>
           <form onSubmit={handleLogin}>
             <CardHeader>
               <CardTitle className="text-2xl">Login to AlphaLink</CardTitle>
@@ -111,7 +111,7 @@ export default function LoginPage() {
         </Card>
       </TabsContent>
       <TabsContent value="register">
-        <Card className="bg-transparent border-none shadow-none">
+        <Card>
           <form onSubmit={handleRegister}>
             <CardHeader>
               <CardTitle className="text-2xl">Create an Account</CardTitle>
