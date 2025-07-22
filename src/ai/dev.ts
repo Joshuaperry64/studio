@@ -20,3 +20,4 @@ import '@/ai/flows/remove-participant-from-session.ts';
 import '@/ai/flows/save-message-to-session.ts';
 import '@/ai/flows/list-sessions.ts';
 import '@/ai/flows/get-user-by-username.ts';
+import '@/ai/flows/voice-biometrics.ts';
