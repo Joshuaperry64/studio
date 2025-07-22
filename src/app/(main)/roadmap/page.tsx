@@ -57,6 +57,7 @@ const roadmapData = {
   upcoming: [
     { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
     { title: 'Cross-Platform Integration', status: 'pending', description: 'Extend the AI\'s reach to mobile and desktop applications.' },
+    { title: 'Android Application Export/Creation', status: 'pending', description: 'Provide the ability to compile and export the application as a native Android package.' },
   ],
 };
 
