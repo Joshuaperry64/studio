@@ -21,10 +21,17 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useUserStore } from '@/store/user-store';
+import { useEffect, useState } from 'react';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user } = useUserStore();
+  const { user, initialize } = useUserStore();
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    initialize();
+    setIsInitialized(true);
+  }, [initialize]);
 
 
   const menuItems = [
@@ -43,6 +50,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const adminMenuItems = [
     { href: '/admin', label: 'Admin', icon: Shield },
   ]
+  
+  if (!isInitialized) {
+      return null; // Or a loading spinner
+  }
 
   return (
     <SidebarProvider>
