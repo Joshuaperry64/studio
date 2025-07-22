@@ -6,8 +6,9 @@ export interface Message {
   id: number;
   sender: 'user' | 'ai';
   text: string;
-  photo?: string;
-  video?: string;
+  photo?: string; // This will be a blob URL, not persisted
+  video?: string; // This will be a blob URL, not persisted
+  audio?: string; // This will be a data URI, can be persisted
   character?: {
     name: string;
     avatar: string;

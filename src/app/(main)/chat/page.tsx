@@ -28,6 +28,7 @@ export default function ChatPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const audioPlayerRef = useRef<HTMLAudioElement>(null);
   const { activeCharacter } = useCharacterStore();
   const { user } = useUserStore();
   const { hasSeenWelcomeScreen, setHasSeenWelcomeScreen } = useSettingsStore();
@@ -47,6 +48,13 @@ export default function ChatPage() {
       });
     }
   }, [messages]);
+  
+  const playAudio = (audioDataUri: string) => {
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.src = audioDataUri;
+      audioPlayerRef.current.play().catch(e => console.error("Audio playback failed:", e));
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!input.trim() && !mediaAttachment) return;
@@ -80,6 +88,11 @@ export default function ChatPage() {
         character: activeCharacter ? { name: activeCharacter.name, avatar: activeCharacter.avatarDataUri } : undefined,
       };
       addMessage(aiMessage);
+      
+      if (result.audioDataUri) {
+        playAudio(result.audioDataUri);
+      }
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to get response from AI.';
       toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
@@ -142,6 +155,7 @@ export default function ChatPage() {
 
   return (
     <>
+      <audio ref={audioPlayerRef} className="hidden" />
       <WelcomeDialog
         open={isWelcomeOpen}
         onOpenChange={(open) => {
