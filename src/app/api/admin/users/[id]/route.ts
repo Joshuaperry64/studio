@@ -32,8 +32,8 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
         return NextResponse.json({ message: 'User not found.' }, { status: 404 });
     }
 
-    if (userToUpdate.role === 'admin' && auth.user.id !== userToUpdate.id) {
-        return NextResponse.json({ message: 'Cannot modify another administrator.'}, { status: 403 });
+    if (userToUpdate.id === auth.user.userId) {
+        return NextResponse.json({ message: 'Administrators cannot modify their own account.'}, { status: 403 });
     }
 
     const updatedUser = await db.users.update({

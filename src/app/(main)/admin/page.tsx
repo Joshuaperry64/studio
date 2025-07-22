@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -157,7 +158,7 @@ export default function AdminPage() {
                                         <Badge variant={u.status === 'approved' ? 'secondary' : 'destructive'} className="capitalize bg-green-700">{u.status}</Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        {u.username !== 'Joshua' && (
+                                        {u.id !== user.userId && (
                                         <AlertDialog>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
@@ -176,7 +177,7 @@ export default function AdminPage() {
                                                             Make Admin
                                                         </DropdownMenuItem>
                                                     )}
-                                                    {u.role === 'admin' && u.username !== 'Joshua' && (
+                                                    {u.role === 'admin' && (
                                                         <DropdownMenuItem onClick={() => handleUpdateUser(u.id, { role: 'user' })}>
                                                             Make User
                                                         </DropdownMenuItem>
