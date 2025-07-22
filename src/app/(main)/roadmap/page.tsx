@@ -35,6 +35,7 @@ const roadmapData = {
     { title: 'TypeScript Integration', status: 'complete', description: 'Full type-safety across the entire application.' },
     { title: 'UI with ShadCN & Tailwind', status: 'complete', description: 'Modern, responsive, and accessible user interface.' },
     { title: 'Genkit for AI', status: 'complete', description: 'Integrated Google\'s Genkit for all generative AI functionalities.' },
+    { title: 'Cloud-Based Data Storage', status: 'complete', description: 'User accounts, feedback, and collaborative sessions are stored persistently in Firestore.' },
   ],
   userFeatures: [
     { title: 'Authentication System', status: 'complete', description: 'Secure PIN-based login with session management and user roles.' },
@@ -44,13 +45,13 @@ const roadmapData = {
     { title: 'Visual Media Generation', status: 'complete', description: 'Generate images and videos from text prompts.' },
     { title: 'AI Co-Pilot', status: 'complete', description: 'Collaborative tool for AI-powered project feedback.' },
     { title: 'Persistent Chat History', status: 'complete', description: 'Conversations are saved locally and persist between sessions.' },
+    { title: 'Real-time Collaboration', status: 'complete', description: 'Real-time chat sessions with live updates for messages and participants.' },
   ],
   upcoming: [
     { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
-    { title: 'Real-time Collaboration', status: 'pending', description: 'Enable multiple users to interact with the AI Co-Pilot simultaneously.' },
+    { title: 'Real-time Co-Pilot', status: 'pending', description: 'Enable multiple users to interact with the AI Co-Pilot simultaneously.' },
     { title: 'Voice-to-Voice Chat', status: 'pending', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
     { title: 'Expanded AI Toolset', status: 'pending', description: 'Integrate more advanced Genkit tools for functions like web searches, data analysis, and more.' },
-    { title: 'Cloud-Based Data Storage', status: 'pending', description: 'Migrate from in-memory/local storage to a persistent cloud database (e.g., Firestore) for user data and chat history.' },
     { title: 'Theme Customization', status: 'pending', description: 'Allow users to select different color themes and personalize the application\'s appearance.' },
   ],
 };
