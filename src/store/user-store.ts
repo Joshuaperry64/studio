@@ -18,7 +18,6 @@ interface UserState {
   login: (token: string) => void;
   logout: () => void;
   initialize: () => void;
-  updateAvatar: (avatarDataUri: string) => void;
 }
 
 const decodeToken = (token: string): UserPayload | null => {
@@ -34,8 +33,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   user: null,
   isInitialized: false,
   login: (token) => {
-    // This function is now called by the login page with the token.
-    // It directly updates the state, solving the race condition.
+    // This function can be called on login or when the token is refreshed (e.g., after profile update)
     const decodedUser = decodeToken(token);
     if (decodedUser) {
       set({ user: decodedUser, isInitialized: true });
@@ -67,9 +65,4 @@ export const useUserStore = create<UserState>((set, get) => ({
          set({ user: null, isInitialized: true });
     }
   },
-  updateAvatar: (avatarDataUri: string) => {
-    set((state) => ({
-        user: state.user ? { ...state.user, avatar: avatarDataUri } : null,
-    }));
-  }
 }));

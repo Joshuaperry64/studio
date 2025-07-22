@@ -24,7 +24,7 @@ import {
 import { useRouter } from 'next/navigation';
 
 export default function ProfileSettingsPage() {
-    const { user, updateAvatar, logout } = useUserStore();
+    const { user, login, logout } = useUserStore();
     const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -64,7 +64,7 @@ export default function ProfileSettingsPage() {
             const data = await response.json();
 
             if (response.ok) {
-                updateAvatar(avatarDataUri);
+                login(data.token);
                 toast({ title: 'Success', description: 'Profile updated successfully.' });
                 setAvatarFile(null); // Reset file state
             } else {
@@ -134,7 +134,7 @@ export default function ProfileSettingsPage() {
                         </div>
                         <div>
                             <p className="text-2xl font-bold">{user.username}</p>
-                            <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
+                            <p className="text-sm text-muted-foreground capitalize">{user.username === 'Joshua' ? 'Creator' : user.role}</p>
                         </div>
                     </div>
                 </CardContent>

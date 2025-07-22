@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest) {
             }
         );
         
-        const response = NextResponse.json({ message: 'Profile updated successfully' });
+        const response = NextResponse.json({ message: 'Profile updated successfully', token });
         
         response.cookies.set('auth_token', token, {
             httpOnly: true,
