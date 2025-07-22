@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Clock, Map } from 'lucide-react';
+import { CheckCircle2, Clock, Map, Globe } from 'lucide-react';
 
 interface RoadmapItemProps {
   title: string;
@@ -56,6 +56,7 @@ const roadmapData = {
   ],
   upcoming: [
     { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
+    { title: 'Cross-Platform Integration', status: 'pending', description: 'Extend the AI\'s reach to mobile and desktop applications.' },
   ],
 };
 

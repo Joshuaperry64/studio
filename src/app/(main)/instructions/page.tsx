@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, ImageIcon, MessageSquare, Smile, Users } from 'lucide-react';
+import { BookOpen, ImageIcon, MessageSquare, Smile, Users, Home, Globe } from 'lucide-react';
 
 export default function InstructionsPage() {
   return (
@@ -96,6 +96,21 @@ export default function InstructionsPage() {
                 <li><strong>Add Suggestions:</strong> Input suggestions or feedback points from your team members.</li>
                 <li><strong>Analyze:</strong> The AI will review all the information, decide whether to incorporate each suggestion, provide a rationale for its decision, and generate a revised project description.</li>
             </ul>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+                <Home className="h-6 w-6" />
+                Smart Home (Upcoming)
+            </CardTitle>
+            <CardDescription>
+              Connect with Google Home and Amazon Alexa for a multi-platform AI experience.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-muted-foreground">
+             <p>This upcoming feature will allow AlphaLink to integrate with your smart home devices. You'll be able to interact with the AI from anywhere in your home, connecting your digital and physical worlds.</p>
           </CardContent>
         </Card>
 

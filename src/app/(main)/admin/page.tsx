@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash2, Users, UserCheck, UserX, Server, CheckCircle, AlertCircle, Wifi, Loader2 } from 'lucide-react';
+import { MoreHorizontal, Trash2, Users, UserCheck, UserX, Server, CheckCircle, AlertCircle, Wifi, Loader2, Home } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -158,7 +158,7 @@ export default function AdminPage() {
                         <CardTitle className="text-sm font-medium">System Status</CardTitle>
                         <Server className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="space-y-2 pt-2">
                        <div className="flex items-center text-sm">
                            <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
                            <span>Firebase Services: <span className="font-semibold">Operational</span></span>
@@ -166,6 +166,14 @@ export default function AdminPage() {
                        <div className="flex items-center text-sm">
                            {memorySettings.enabled ? <Wifi className="h-4 w-4 mr-2 text-green-500" /> : <AlertCircle className="h-4 w-4 mr-2 text-yellow-500" />}
                            <span>Persistent Memory: <span className="font-semibold">{memorySettings.enabled ? 'Enabled' : 'Disabled'}</span></span>
+                       </div>
+                        <div className="flex items-center text-sm">
+                           <AlertCircle className="h-4 w-4 mr-2 text-yellow-500" />
+                           <span>Google Home: <span className="font-semibold">Not Connected</span></span>
+                       </div>
+                       <div className="flex items-center text-sm">
+                           <AlertCircle className="h-4 w-4 mr-2 text-yellow-500" />
+                           <span>Amazon Alexa: <span className="font-semibold">Not Connected</span></span>
                        </div>
                     </CardContent>
                 </Card>
