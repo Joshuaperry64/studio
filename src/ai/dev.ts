@@ -10,6 +10,8 @@ import '@/ai/flows/generate-audio.ts';
 import '@/ai/flows/voice-biometrics.ts';
 import '@/ai/flows/create-copilot-session.ts';
 import '@/ai/flows/list-copilot-sessions.ts';
+import '@/ai/flows/get-copilot-session.ts';
+import '@/ai/flows/update-copilot-session.ts';
 import '@/ai/flows/create-session.ts';
 import '@/ai/flows/add-participant-to-session.ts';
 import '@/ai/flows/get-session-messages.ts';
