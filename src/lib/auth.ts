@@ -1,14 +1,26 @@
 // In a real application, you would use a database.
 // For this example, we'll use an in-memory store.
+import bcrypt from 'bcryptjs';
+
 interface User {
   id: number;
   username: string;
   pinHash: string;
   apiKeyEncrypted?: string;
+  role: 'admin' | 'user';
 }
 
-const users: User[] = [];
-let userIdCounter = 1;
+// Pre-seed the master admin user
+const adminPinHash = bcrypt.hashSync('14235', 10);
+const users: User[] = [
+  {
+    id: 1,
+    username: 'Joshua',
+    pinHash: adminPinHash,
+    role: 'admin'
+  }
+];
+let userIdCounter = 2; // Start after the admin user
 
 export const db = {
   users: {
@@ -26,6 +38,7 @@ export const db = {
         id: userIdCounter++,
         username: data.username,
         pinHash: data.pinHash,
+        role: 'user', // Default role is 'user'
       };
       users.push(newUser);
       return newUser;
@@ -40,5 +53,4 @@ export const db = {
     }
   }
 };
-
     
