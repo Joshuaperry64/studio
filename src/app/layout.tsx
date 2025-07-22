@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
-import { Inter, Space_Grotesk, Source_Code_Pro } from 'next/font/google';
+import { Space_Grotesk, Source_Code_Pro } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' });
 const sourceCodePro = Source_Code_Pro({ subsets: ['latin'], variable: '--font-source-code-pro' });
 
@@ -19,10 +18,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${sourceCodePro.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${spaceGrotesk.variable} ${sourceCodePro.variable}`} suppressHydrationWarning>
       <head>
       </head>
-      <body className="font-sans antialiased bg-background">
+      <body className="font-code antialiased bg-background">
         <ThemeProvider
             attribute="class"
             defaultTheme="dark"
