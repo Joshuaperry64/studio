@@ -7,14 +7,17 @@ import { collection, query, orderBy, onSnapshot, Timestamp, doc } from 'firebase
 import { db } from '@/ai/genkit';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Send, Loader2, Users } from 'lucide-react';
+import { Send, Loader2, Users, Bot } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
 import { useToast } from '@/hooks/use-toast';
 import { saveMessageToSessionFlow } from '@/ai/flows/save-message-to-session';
+import { analyzeUserInput } from '@/ai/flows/analyze-user-input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatRelative } from 'date-fns';
+import { useCharacterStore } from '@/store/character-store';
+import ChatMessage from '@/components/ChatMessage';
 
 interface Message {
   id: string;
@@ -23,6 +26,7 @@ interface Message {
   text?: string;
   mediaUrl?: string;
   timestamp: Timestamp;
+  isAiMessage?: boolean;
 }
 
 interface Participant {
@@ -42,9 +46,10 @@ export default function CollaborativeChatPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [inputMessage, setInputMessage] = useState('');
-  const [sendingMessage, setSendingMessage] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const { user } = useUserStore();
+  const { activeCharacter } = useCharacterStore();
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
@@ -63,7 +68,6 @@ export default function CollaborativeChatPage() {
       
       setLoading(true);
       
-      // Listener for session details (like the name)
       const sessionRef = doc(db, 'sessions', sessionId);
       const sessionUnsubscribe = onSnapshot(sessionRef, (doc) => {
           if (doc.exists()) {
@@ -76,7 +80,6 @@ export default function CollaborativeChatPage() {
           setError("Failed to load session details.");
       });
 
-      // Listener for messages
       const messagesColRef = collection(db, 'sessions', sessionId, 'messages');
       const messagesQuery = query(messagesColRef, orderBy('timestamp'));
       const messagesUnsubscribe = onSnapshot(messagesQuery, (snapshot) => {
@@ -92,7 +95,6 @@ export default function CollaborativeChatPage() {
           setLoading(false);
       });
 
-      // Listener for participants
       const participantsColRef = collection(db, 'sessions', sessionId, 'participants');
       const participantsQuery = query(participantsColRef, orderBy('joinedAt'));
       const participantsUnsubscribe = onSnapshot(participantsColRef, (snapshot) => {
@@ -103,7 +105,6 @@ export default function CollaborativeChatPage() {
           setParticipants(newParticipants);
       }, (err) => {
           console.error('Error listening for participants:', err);
-          // Non-critical error, so we don't set the main error state
           toast({ title: "Warning", description: "Could not fetch participant list.", variant: "destructive" });
       });
 
@@ -113,33 +114,59 @@ export default function CollaborativeChatPage() {
           messagesUnsubscribe();
           participantsUnsubscribe();
       };
-  }, [sessionId, toast]); // Re-run effect if sessionId changes
+  }, [sessionId, toast, loading]);
 
 
   const handleSendMessage = async () => {
-      if (!inputMessage.trim() || sendingMessage || !user) return;
+      if (!inputMessage.trim() || isSending || !user) return;
 
-      setSendingMessage(true);
+      setIsSending(true);
+      const originalMessage = inputMessage;
+      setInputMessage('');
+
       try {
           const result = await saveMessageToSessionFlow({
               sessionId,
               userId: user.userId,
               username: user.username,
-              text: inputMessage,
+              text: originalMessage,
           });
 
-          if (result.success) {
-              setInputMessage('');
-          } else {
+          if (!result.success) {
               toast({ title: 'Error', description: result.errorMessage || 'Failed to send message.', variant: 'destructive' });
+              setInputMessage(originalMessage); // Restore message on failure
+              return;
           }
+
+          // Check if the message is an AI command
+          if (originalMessage.trim().toLowerCase().startsWith('@ai')) {
+              const aiPrompt = originalMessage.trim().substring(3).trim();
+              
+              const aiResult = await analyzeUserInput({
+                  textPrompt: aiPrompt,
+                  voiceName: activeCharacter?.voiceName,
+              });
+
+              // Save AI response to chat
+              await saveMessageToSessionFlow({
+                  sessionId,
+                  userId: 'ai', // Special ID for AI
+                  username: activeCharacter?.name || 'AI',
+                  text: aiResult.analysisResult,
+                  // @ts-ignore - adding a custom field
+                  isAiMessage: true,
+              });
+          }
+
       } catch (err) {
           const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
           toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
+          setInputMessage(originalMessage); // Restore message on failure
       } finally {
-          setSendingMessage(false);
+          setIsSending(false);
       }
   };
+
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -187,24 +214,41 @@ export default function CollaborativeChatPage() {
           <div className="space-y-4">
             {messages.length === 0 ? (
                 <div className="text-center text-muted-foreground py-16">
-                    <p>No messages yet. Start the conversation!</p>
+                    <p>No messages yet. Start the conversation! Mention <code className="bg-muted px-1.5 py-1 rounded-sm">@ai</code> to talk to the AI.</p>
                 </div>
             ) : (
-                messages.map((message) => (
-                <div key={message.id} className={`flex items-end gap-2 ${message.senderId === user?.userId ? 'justify-end' : ''}`}>
-                    <div className={`flex flex-col space-y-1 max-w-lg ${message.senderId === user?.userId ? 'items-end' : 'items-start'}`}>
-                        <div className={`px-4 py-2 rounded-lg inline-block ${message.senderId === user?.userId ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted rounded-bl-none'}`}>
-                           <p className="text-sm">{message.text}</p>
-                        </div>
-                        <div className="flex items-center gap-1">
-                             <span className="text-xs font-bold">{message.senderUsername}</span>
-                            <span className="text-xs text-muted-foreground">
-                                {formatRelative(message.timestamp.toDate(), new Date())}
-                            </span>
-                        </div>
+                messages.map((message) => {
+                  const isUserMessage = message.senderId === user?.userId;
+                  const isAiMessage = message.senderId === 'ai';
+
+                  return (
+                    <div key={message.id} className={`flex items-end gap-2 ${isUserMessage ? 'justify-end' : ''}`}>
+                      {!isUserMessage && (
+                        <Avatar>
+                          <AvatarImage src={isAiMessage ? activeCharacter?.avatarDataUri : undefined} />
+                          <AvatarFallback>{isAiMessage ? <Bot/> : message.senderUsername.charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      )}
+                      <div className={`flex flex-col space-y-1 max-w-lg ${isUserMessage ? 'items-end' : 'items-start'}`}>
+                          <div className={`px-4 py-2 rounded-lg inline-block ${isUserMessage ? 'bg-primary text-primary-foreground rounded-br-none' : isAiMessage ? 'bg-secondary rounded-bl-none' : 'bg-muted rounded-bl-none'}`}>
+                            <p className="text-sm">{message.text}</p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                              <span className="text-xs font-bold">{message.senderUsername}</span>
+                              <span className="text-xs text-muted-foreground">
+                                  {formatRelative(message.timestamp.toDate(), new Date())}
+                              </span>
+                          </div>
+                      </div>
+                       {isUserMessage && (
+                        <Avatar>
+                          <AvatarImage src={user?.avatar} />
+                          <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      )}
                     </div>
-                </div>
-                ))
+                  );
+                })
             )}
           </div>
         </ScrollArea>
@@ -212,16 +256,16 @@ export default function CollaborativeChatPage() {
         <div className="mt-4 border-t pt-4">
             <div className="relative">
                 <Textarea
-                    placeholder="Type your message..."
+                    placeholder="Type your message... use '@ai' to talk to the AI."
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                     rows={1}
                     className="pr-24 min-h-[48px] resize-none"
-                    disabled={sendingMessage}
+                    disabled={isSending}
                 />
-                <Button onClick={handleSendMessage} disabled={!inputMessage.trim() || sendingMessage} className="absolute top-1/2 right-2 -translate-y-1/2">
-                    {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                <Button onClick={handleSendMessage} disabled={!inputMessage.trim() || isSending} className="absolute top-1/2 right-2 -translate-y-1/2">
+                    {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     <span className="sr-only">Send</span>
                 </Button>
             </div>
