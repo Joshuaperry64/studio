@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   SidebarProvider,
   Sidebar,
@@ -16,17 +16,43 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useUserStore } from '@/store/user-store';
 import { useEffect } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import ProfileSettingsPage from './settings/profile/page';
+import { useToast } from '@/hooks/use-toast';
+
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  // Zustand will automatically handle initialization now
-  const { user } = useUserStore();
+  const { user, initialize, logout } = useUserStore();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Manually initialize the user store on layout mount
+    // to ensure user data is available.
+    initialize();
+  }, [initialize]);
+
+  const handleLogout = async () => {
+    try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        logout(); // Clear user from zustand store
+        toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
+        router.push('/login');
+    } catch(error) {
+        toast({ title: 'Error', description: 'Failed to log out.', variant: 'destructive' });
+    }
+  }
 
   const menuItems = [
     { href: '/chat', label: 'AI Chat', icon: MessageSquare },
@@ -38,16 +64,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const bottomMenuItems = [
       { href: '/feedback', label: 'Feedback', icon: MessageSquarePlus },
       { href: '/instructions', label: 'Instructions', icon: BookOpen },
-      { href: '/settings', label: 'Settings', icon: Settings },
+      { href: '/settings', label: 'Application', icon: Settings },
   ];
 
   const adminMenuItems = [
     { href: '/admin', label: 'Admin Panel', icon: Shield },
   ]
-  
-  const settingsSubItems = [
-      { href: '/settings/profile', label: 'Edit Profile', icon: UserCog },
-  ]
+
+  if (!user) {
+    // You can render a loading state here while the user is being initialized
+    return (
+        <div className="flex items-center justify-center h-screen w-full">
+            <p>Loading...</p>
+        </div>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -112,35 +143,32 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                         </Link>
                         </SidebarMenuButton>
-                        {item.href === '/settings' && pathname.startsWith('/settings') && (
-                             <ul className="pl-7 pt-1 space-y-1">
-                                {settingsSubItems.map((subItem) => (
-                                    <li key={subItem.href}>
-                                        <SidebarMenuButton asChild isActive={pathname === subItem.href} size="sm" className="w-full justify-start">
-                                            <Link href={subItem.href}>
-                                                 <subItem.icon className="h-4 w-4" />
-                                                <span className="group-data-[collapsible=icon]:hidden">{subItem.label}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
                     </SidebarMenuItem>
                     ))}
               </SidebarMenu>
           </SidebarContent>
         <SidebarFooter>
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.avatar} alt={user?.username} />
-              <AvatarFallback>{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-medium">{user?.username}</span>
-              <span className="text-xs text-muted-foreground capitalize">{user?.role}</span>
-            </div>
-          </div>
+          <Dialog>
+             <DialogTrigger asChild>
+                <button className="flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent w-full text-left">
+                     <Avatar className="h-9 w-9">
+                        <AvatarImage src={user?.avatar} alt={user?.username} />
+                        <AvatarFallback>{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                        <span className="text-sm font-medium">{user?.username}</span>
+                        <span className="text-xs text-muted-foreground capitalize">{user?.role}</span>
+                    </div>
+                </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+                <ProfileSettingsPage />
+                <Button variant="outline" className="mt-4 w-full" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                </Button>
+            </DialogContent>
+           </Dialog>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
@@ -148,7 +176,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <SidebarTrigger className="md:hidden" />
             <h1 className="text-lg font-semibold md:text-xl font-headline">
-              {[...menuItems, ...adminMenuItems, ...bottomMenuItems, ...settingsSubItems].find((item) => item.href === pathname)?.label || 'AlphaLink'}
+              {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => item.href === pathname)?.label || 'AlphaLink'}
             </h1>
           </header>
           {children}

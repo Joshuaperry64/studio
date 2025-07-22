@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
@@ -13,6 +14,7 @@ interface UserPayload {
 
 interface UserState {
   user: UserPayload | null;
+  isInitialized: boolean;
   login: () => Promise<void>;
   logout: () => void;
   initialize: () => void;
@@ -34,29 +36,35 @@ const fetchAndSetUser = async (set: (state: Partial<UserState>) => void) => {
         const decodedUser = decodeToken(token);
         if (decodedUser && decodedUser.exp * 1000 > Date.now()) {
             try {
+                // Fetch the full user object to get the latest data, like avatar
                 const response = await fetch('/api/user/me');
                 if (response.ok) {
                     const fullUser = await response.json();
-                     set({ user: { ...decodedUser, avatar: fullUser.avatarDataUri } });
+                     set({ user: { ...decodedUser, avatar: fullUser.avatarDataUri }, isInitialized: true });
                 } else {
-                     set({ user: decodedUser });
+                     set({ user: decodedUser, isInitialized: true });
                 }
             } catch (e) {
-                set({ user: decodedUser }); // fallback to decoded token if fetch fails
+                // Fallback to decoded token if the API call fails
+                set({ user: decodedUser, isInitialized: true }); 
             }
         } else {
+            // Token is expired or invalid
             Cookies.remove('auth_token');
-            set({ user: null });
+            set({ user: null, isInitialized: true });
         }
     } else {
-         set({ user: null });
+        // No token found
+         set({ user: null, isInitialized: true });
     }
 }
 
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>((set, get) => ({
   user: null,
+  isInitialized: false,
   login: async () => {
+    set({ isInitialized: false });
     await fetchAndSetUser(set);
   },
   logout: () => {
@@ -64,7 +72,10 @@ export const useUserStore = create<UserState>((set) => ({
     set({ user: null });
   },
   initialize: () => {
-    fetchAndSetUser(set);
+    // Only initialize if not already done
+    if (!get().isInitialized) {
+        fetchAndSetUser(set);
+    }
   },
   updateAvatar: (avatarDataUri: string) => {
     set((state) => ({
