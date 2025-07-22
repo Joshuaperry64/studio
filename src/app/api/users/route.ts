@@ -11,26 +11,15 @@ export async function GET() {
     const q = query(usersRef, where("status", "==", "approved"));
     const querySnapshot = await getDocs(q);
 
-    if (querySnapshot.empty) {
-      // Still return an array, but add Joshua by default so he can always log in.
-      const creatorExists = await getDocs(query(collection(db, 'users'), where("username", "==", "Joshua")));
-      if (creatorExists.empty) {
-          // This is a fallback in case the DB is empty.
-          return NextResponse.json(['Joshua'], { status: 200 });
-      }
-       return NextResponse.json([], { status: 200 });
-    }
-
     const usernames = querySnapshot.docs.map(doc => doc.data().username);
     
-    // Ensure Joshua is always in the list for login
-    if (!usernames.includes('Joshua')) {
-        const creatorExists = await getDocs(query(collection(db, 'users'), where("username", "==", "Joshua")));
-        if (!creatorExists.empty) {
-            usernames.push('Joshua');
-        }
+    // As a safeguard, ensure the 'Joshua' user can always log in if present in the database,
+    // even if the status is somehow not 'approved'. This check is added for robustness.
+    const joshuaQuery = query(collection(db, 'users'), where("username", "==", "Joshua"));
+    const joshuaSnapshot = await getDocs(joshuaQuery);
+    if (!joshuaSnapshot.empty && !usernames.includes('Joshua')) {
+        usernames.push('Joshua');
     }
-
 
     return NextResponse.json(usernames, { status: 200 });
 
