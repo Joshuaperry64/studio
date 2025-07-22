@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut, Map, Loader2 } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut, Map, Loader2, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -69,7 +69,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/chat', label: 'AI Chat', icon: MessageSquare },
     { href: '/character-hub', label: 'Character Hub', icon: Smile },
     { href: '/media-generation', label: 'Visual Media', icon: ImageIcon },
-    { href: '/co-pilot', label: 'Co-Pilot', icon: Users },
+    { href: '/co-pilot', label: 'AI Co-Pilot', icon: Wand2 },
     { href: '/lobby', label: 'Collaboration', icon: Users },
     { href: '/roadmap', label: 'Roadmap', icon: Map },
   ];

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -53,7 +54,8 @@ export default function CoPilotPage() {
       toast({ title: 'Success', description: 'AI analysis complete.' });
     } catch (error) {
       console.error(error);
-      toast({ title: 'Error', description: 'Failed to get AI assistance.', variant: 'destructive' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get AI assistance.';
+      toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +68,7 @@ export default function CoPilotPage() {
           <Card>
             <CardHeader>
               <CardTitle>AI Co-Pilot</CardTitle>
-              <CardDescription>Collaborate with your team and get AI-powered feedback on your project.</CardDescription>
+              <CardDescription>Get AI-powered feedback on your project in real-time with your team.</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>

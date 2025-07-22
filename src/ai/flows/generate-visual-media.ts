@@ -78,7 +78,7 @@ const generateVisualMediaFlow = ai.defineFlow(
       if (input.photoDataUri) {
         veoPrompt = [
           {
-            text: 'make the subject in the photo move',
+            text: input.prompt,
           },
           {
             media: {
