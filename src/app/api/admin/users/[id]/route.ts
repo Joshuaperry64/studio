@@ -1,5 +1,8 @@
+
 import { NextRequest, NextResponse } from 'next/server';
-import { db, User } from '@/lib/auth';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
+import { User } from '@/lib/auth';
 import { verifyAuth } from '@/lib/auth-server';
 
 interface RouteContext {
@@ -14,8 +17,8 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = parseInt(params.id, 10);
-  if (isNaN(userId)) {
+  const userId = params.id;
+  if (!userId) {
     return NextResponse.json({ message: 'Invalid user ID' }, { status: 400 });
   }
 
@@ -26,27 +29,24 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
         return NextResponse.json({ message: 'No update data provided.' }, { status: 400 });
     }
     
-    const userToUpdate = await db.users.findUnique({ where: { id: userId }});
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
 
-    if (!userToUpdate) {
+    if (!userDoc.exists()) {
         return NextResponse.json({ message: 'User not found.' }, { status: 404 });
     }
 
-    if (userToUpdate.id === auth.user.userId) {
+    if (userDoc.id === auth.user.userId) {
         return NextResponse.json({ message: 'Administrators cannot modify their own account.'}, { status: 403 });
     }
+    
+    await updateDoc(userRef, { role, status });
 
-    const updatedUser = await db.users.update({
-      where: { id: userId },
-      data: { role, status },
-    });
-
-    if (!updatedUser) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
-    }
-
-    const { pinHash, ...safeUser } = updatedUser;
-    return NextResponse.json(safeUser, { status: 200 });
+    const updatedUserDoc = await getDoc(userRef);
+    const updatedUserData = updatedUserDoc.data();
+    
+    const { pinHash, ...safeUser } = updatedUserData as User;
+    return NextResponse.json({ id: updatedUserDoc.id, ...safeUser }, { status: 200 });
 
   } catch (error) {
     console.error(error);
@@ -60,20 +60,22 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = parseInt(params.id, 10);
-    if (isNaN(userId)) {
+    const userId = params.id;
+    if (!userId) {
         return NextResponse.json({ message: 'Invalid user ID' }, { status: 400 });
     }
     
-    if (userId === auth.user.id) {
+    if (userId === auth.user.userId) {
         return NextResponse.json({ message: 'Cannot delete your own account.'}, { status: 403 });
     }
 
     try {
-        const deletedUser = await db.users.delete({ where: { id: userId } });
-        if (!deletedUser) {
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 });
         }
+        await deleteDoc(userRef);
         return NextResponse.json({ message: 'User deleted successfully.' }, { status: 200 });
     } catch (error: any) {
         console.error(error);

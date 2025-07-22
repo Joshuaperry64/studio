@@ -1,5 +1,8 @@
+
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
+import { User } from '@/lib/auth';
 import { verifyAuth } from '@/lib/auth-server';
 
 export async function GET(request: NextRequest) {
@@ -9,14 +12,15 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const user = await db.users.findUnique({ where: { id: auth.user.userId } });
+        const userRef = doc(db, 'users', auth.user.userId);
+        const userDoc = await getDoc(userRef);
 
-        if (!user) {
+        if (!userDoc.exists()) {
             return NextResponse.json({ message: 'User not found.' }, { status: 404 });
         }
 
-        const { pinHash, apiKeyEncrypted, ...safeUser } = user;
-        return NextResponse.json(safeUser, { status: 200 });
+        const { pinHash, apiKeyEncrypted, ...safeUser } = userDoc.data() as User;
+        return NextResponse.json({ id: userDoc.id, ...safeUser }, { status: 200 });
 
     } catch (error) {
         console.error(error);

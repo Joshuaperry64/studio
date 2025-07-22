@@ -1,6 +1,9 @@
+
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/auth';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
 import { verifyAuth } from '@/lib/auth-server';
+import { User } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
     const auth = await verifyAuth(request);
@@ -9,9 +12,12 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const users = await db.users.findMany();
+        const usersSnapshot = await getDocs(collection(db, 'users'));
         // Exclude sensitive data like pinHash
-        const safeUsers = users.map(({ pinHash, apiKeyEncrypted, ...user }) => user);
+        const safeUsers = usersSnapshot.docs.map(doc => {
+            const { pinHash, apiKeyEncrypted, ...user } = doc.data() as User;
+            return { id: doc.id, ...user };
+        });
         return NextResponse.json(safeUsers, { status: 200 });
     } catch (error) {
         console.error(error);

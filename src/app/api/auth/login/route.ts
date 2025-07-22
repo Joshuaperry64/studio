@@ -1,6 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/auth';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
+import { User } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -11,12 +13,17 @@ export async function POST(request: Request) {
     if (!username || !pin) {
       return NextResponse.json({ message: 'Username and PIN are required.' }, { status: 400 });
     }
+    
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where("username", "==", username));
+    const querySnapshot = await getDocs(q);
 
-    const user = await db.users.findUnique({ where: { username } });
-
-    if (!user) {
+    if (querySnapshot.empty) {
       return NextResponse.json({ message: 'Invalid credentials.' }, { status: 401 });
     }
+
+    const userDoc = querySnapshot.docs[0];
+    const user = { id: userDoc.id, ...userDoc.data() } as User;
 
     const isPinValid = await bcrypt.compare(pin, user.pinHash);
 
@@ -41,7 +48,6 @@ export async function POST(request: Request) {
         }
     );
     
-    // We send the token in the response body so the client can initialize its state without re-reading the cookie.
     const response = NextResponse.json({ message: 'Login successful.', token: token });
     
     response.cookies.set('auth_token', token, {

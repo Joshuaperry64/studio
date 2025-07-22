@@ -1,6 +1,7 @@
 
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/auth';
+import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
@@ -15,19 +16,22 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: 'PIN must be between 4 and 6 digits.' }, { status: 400 });
     }
 
-    const existingUser = await db.users.findUnique({ where: { username } });
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where("username", "==", username));
+    const querySnapshot = await getDocs(q);
 
-    if (existingUser) {
+    if (!querySnapshot.empty) {
       return NextResponse.json({ message: 'Username already exists.' }, { status: 409 });
     }
 
     const pinHash = await bcrypt.hash(pin, 10);
 
-    const user = await db.users.create({
-      data: {
+    await addDoc(usersRef, {
         username,
         pinHash,
-      },
+        role: 'user',
+        status: 'pending',
+        createdAt: serverTimestamp(),
     });
 
     return NextResponse.json({ message: "Application submitted. Your account is pending approval." }, { status: 201 });

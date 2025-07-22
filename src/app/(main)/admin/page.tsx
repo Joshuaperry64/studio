@@ -21,7 +21,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -67,14 +66,27 @@ export default function AdminPage() {
     };
 
     useEffect(() => {
-        if (user?.role === 'admin') {
-            fetchAllData();
-        } else if (user) {
-            router.push('/chat');
+        // user object might be null initially, wait for it
+        if (user) {
+            if (user.role === 'admin') {
+                fetchAllData();
+            } else {
+                router.push('/chat');
+            }
         }
     }, [user, router, toast]);
     
-    if (!user || user.role !== 'admin') {
+    // Redirect logic moved to useEffect to prevent premature redirects
+    if (!user) {
+        return (
+            <main className="p-4 sm:p-6 flex-1">
+                <div className="max-w-3xl mx-auto text-center">
+                    <p>Loading...</p>
+                </div>
+            </main>
+        );
+    }
+     if (user.role !== 'admin') {
         return (
             <main className="p-4 sm:p-6 flex-1">
                 <div className="max-w-3xl mx-auto text-center">
@@ -84,7 +96,7 @@ export default function AdminPage() {
         );
     }
     
-    const handleUpdateUser = async (userId: number, data: Partial<DisplayUser>) => {
+    const handleUpdateUser = async (userId: string, data: Partial<DisplayUser>) => {
         try {
             const response = await fetch(`/api/admin/users/${userId}`, {
                 method: 'PUT',
@@ -103,7 +115,7 @@ export default function AdminPage() {
         }
     };
     
-    const handleDeleteUser = async (userId: number) => {
+    const handleDeleteUser = async (userId: string) => {
          try {
             const response = await fetch(`/api/admin/users/${userId}`, {
                 method: 'DELETE',
@@ -177,17 +189,17 @@ export default function AdminPage() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent>
                                                     {u.status === 'pending' && (
-                                                        <DropdownMenuItem onClick={() => handleUpdateUser(u.id, { status: 'approved' })}>
+                                                        <DropdownMenuItem onClick={() => handleUpdateUser(u.id!, { status: 'approved' })}>
                                                             Approve Registration
                                                         </DropdownMenuItem>
                                                     )}
                                                     {u.role !== 'admin' && (
-                                                        <DropdownMenuItem onClick={() => handleUpdateUser(u.id, { role: 'admin' })}>
+                                                        <DropdownMenuItem onClick={() => handleUpdateUser(u.id!, { role: 'admin' })}>
                                                             Make Admin
                                                         </DropdownMenuItem>
                                                     )}
                                                     {u.role === 'admin' && (
-                                                        <DropdownMenuItem onClick={() => handleUpdateUser(u.id, { role: 'user' })}>
+                                                        <DropdownMenuItem onClick={() => handleUpdateUser(u.id!, { role: 'user' })}>
                                                             Make User
                                                         </DropdownMenuItem>
                                                     )}
@@ -207,7 +219,7 @@ export default function AdminPage() {
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => handleDeleteUser(u.id)} className="bg-destructive hover:bg-destructive/90">
+                                                <AlertDialogAction onClick={() => handleDeleteUser(u.id!)} className="bg-destructive hover:bg-destructive/90">
                                                     Delete
                                                 </AlertDialogAction>
                                                 </AlertDialogFooter>
@@ -260,5 +272,3 @@ export default function AdminPage() {
     </main>
   );
 }
-
-    

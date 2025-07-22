@@ -1,7 +1,8 @@
+
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/auth';
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
+import { verifyAuth } from '@/lib/auth-server';
 
 // In a real application, you would use a more robust encryption method 
 // and store the secret key securely (e.g., in environment variables).
@@ -20,19 +21,9 @@ function encrypt(text: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get('auth_token');
-
-    if (!token) {
-      return NextResponse.json({ message: 'Authentication required.' }, { status: 401 });
-    }
-
-    let userId;
-    try {
-      const decoded = jwt.verify(token.value, process.env.JWT_SECRET || 'your-secret-key') as { userId: number };
-      userId = decoded.userId;
-    } catch (error) {
-      return NextResponse.json({ message: 'Invalid or expired token.' }, { status: 401 });
+    const auth = await verifyAuth(request);
+    if (!auth.user) {
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
     const { apiKey } = await request.json();
@@ -40,18 +31,16 @@ export async function POST(request: NextRequest) {
     if (!apiKey || typeof apiKey !== 'string') {
       return NextResponse.json({ message: 'API key is required.' }, { status: 400 });
     }
-
-    const user = await db.users.findUnique({ where: { id: userId } });
-    if (!user) {
+    
+    const userRef = doc(db, 'users', auth.user.userId);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
         return NextResponse.json({ message: 'User not found.' }, { status: 404 });
     }
 
     const apiKeyEncrypted = encrypt(apiKey);
 
-    await db.users.update({
-        where: { id: userId },
-        data: { apiKeyEncrypted },
-    });
+    await updateDoc(userRef, { apiKeyEncrypted });
 
     return NextResponse.json({ message: 'API key saved successfully.' }, { status: 200 });
 

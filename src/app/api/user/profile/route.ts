@@ -1,8 +1,10 @@
+
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/auth';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
+import { User } from '@/lib/auth';
 import { verifyAuth } from '@/lib/auth-server';
 import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
 
 export async function PUT(request: NextRequest) {
     const auth = await verifyAuth(request);
@@ -17,14 +19,14 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ message: 'Avatar data URI is required.' }, { status: 400 });
         }
 
-        const updatedUser = await db.users.update({
-            where: { id: auth.user.userId },
-            data: { avatarDataUri },
-        });
+        const userRef = doc(db, 'users', auth.user.userId);
+        await updateDoc(userRef, { avatarDataUri });
 
-        if (!updatedUser) {
-            return NextResponse.json({ message: 'User not found.' }, { status: 404 });
+        const updatedUserDoc = await getDoc(userRef);
+        if (!updatedUserDoc.exists()) {
+             return NextResponse.json({ message: 'User not found.' }, { status: 404 });
         }
+        const updatedUser = { id: updatedUserDoc.id, ...updatedUserDoc.data() } as User;
         
         // Re-issue the auth token with the new avatar URL
         const token = jwt.sign(
