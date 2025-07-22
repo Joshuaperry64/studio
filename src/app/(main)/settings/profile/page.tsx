@@ -2,11 +2,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Loader2, Save, Trash2 } from 'lucide-react';
+import { Camera, Loader2, LogOut, Save, Trash2 } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { fileToDataUri } from '@/lib/utils';
@@ -147,11 +147,7 @@ export default function ProfileSettingsPage() {
             </Card>
 
              <Card>
-                <CardHeader>
-                    <CardTitle className="text-destructive">Account Management</CardTitle>
-                    <CardDescription>Advanced account actions. Be careful, some of these are permanent.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="pt-6 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border p-4 gap-4">
                         <div>
                             <p className="font-medium">Export Your Data</p>

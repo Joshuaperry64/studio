@@ -67,7 +67,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        toast({ title: 'Login Successful', description: "Welcome back!" });
+        toast({ title: 'Login Successful', description: "Welcome back!", duration: 3000 });
         login(data.token);
         router.push('/chat');
       } else {
