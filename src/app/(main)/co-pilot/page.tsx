@@ -67,7 +67,7 @@ export default function CoPilotLobbyPage() {
 
   useEffect(() => {
     fetchSessions();
-  }, []);
+  }, [toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user) {
@@ -83,8 +83,7 @@ export default function CoPilotLobbyPage() {
       toast({ title: 'Success', description: `Session "${values.sessionName}" created!` });
       form.reset();
       fetchSessions(); // Refresh the list
-      // TODO: Uncomment the line below when the session page is ready
-      // router.push(`/co-pilot/${sessionId}`);
+      router.push(`/co-pilot/${sessionId}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create session.';
       toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
@@ -94,9 +93,7 @@ export default function CoPilotLobbyPage() {
   }
 
   const handleJoinSession = (sessionId: string) => {
-    // TODO: Implement joining logic, for now it will just navigate
-    toast({ title: 'Coming Soon!', description: 'Joining a session is not yet implemented.' });
-    // router.push(`/co-pilot/${sessionId}`);
+    router.push(`/co-pilot/${sessionId}`);
   }
 
   return (
