@@ -43,7 +43,7 @@ export const db = {
       users.push(newUser);
       return newUser;
     },
-    update: async ({ where: { id }, data }: { where: { id: number }, data: { apiKeyEncrypted: string }}) => {
+    update: async ({ where: { id }, data }: { where: { id: number }, data: Partial<User>}) => {
         const userIndex = users.findIndex(user => user.id === id);
         if (userIndex > -1) {
             users[userIndex] = { ...users[userIndex], ...data };
@@ -53,4 +53,3 @@ export const db = {
     }
   }
 };
-    

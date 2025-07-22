@@ -30,7 +30,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/chat', label: 'AI Chat', icon: MessageSquare },
     { href: '/media-generation', label: 'Visual Media', icon: ImageIcon },
     { href: '/co-pilot', label: 'Co-Pilot', icon: Users },
-    { href: '/settings', label: 'Settings', icon: Settings },
+  ];
+
+  const bottomMenuItems = [
+      { href: '/settings', label: 'Settings', icon: Settings },
   ];
 
   const adminMenuItems = [
@@ -85,6 +88,25 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </SidebarMenu>
         </SidebarContent>
         <Separator className="my-2" />
+          <SidebarContent>
+              <SidebarMenu>
+                 {bottomMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.href}
+                        tooltip={{ children: item.label }}
+                        className="justify-start"
+                        >
+                        <Link href={item.href}>
+                            <item.icon className="h-5 w-5" />
+                            <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                        </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    ))}
+              </SidebarMenu>
+          </SidebarContent>
         <SidebarFooter>
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
@@ -103,7 +125,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <SidebarTrigger className="md:hidden" />
             <h1 className="text-lg font-semibold md:text-xl font-headline">
-              {[...menuItems, ...adminMenuItems].find((item) => item.href === pathname)?.label || 'AlphaLink'}
+              {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => item.href === pathname)?.label || 'AlphaLink'}
             </h1>
           </header>
           {children}
