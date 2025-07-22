@@ -79,12 +79,12 @@ export default function LoginPage() {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="login">Login</TabsTrigger>
-        <TabsTrigger value="register">Register</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-2 bg-transparent p-0">
+        <TabsTrigger value="login" className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=inactive]:text-muted-foreground rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-none">Login</TabsTrigger>
+        <TabsTrigger value="register" className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=inactive]:text-muted-foreground rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-none">Register</TabsTrigger>
       </TabsList>
       <TabsContent value="login">
-        <Card className="bg-background/80 backdrop-blur-sm">
+        <Card className="bg-transparent border-none shadow-none">
           <form onSubmit={handleLogin}>
             <CardHeader>
               <CardTitle className="text-2xl">Login to AlphaLink</CardTitle>
@@ -93,11 +93,11 @@ export default function LoginPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="login-username">Username</Label>
-                <Input id="login-username" required placeholder="alphatester" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} />
+                <Input id="login-username" required placeholder="alphatester" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="login-pin">PIN</Label>
-                <Input id="login-pin" type="password" required placeholder="&#9679;&#9679;&#9679;&#9679;" value={loginPin} onChange={(e) => setLoginPin(e.target.value)} />
+                <Input id="login-pin" type="password" required placeholder="&#9679;&#9679;&#9679;&#9679;" value={loginPin} onChange={(e) => setLoginPin(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
             </CardContent>
             <CardFooter>
@@ -110,7 +110,7 @@ export default function LoginPage() {
         </Card>
       </TabsContent>
       <TabsContent value="register">
-        <Card className="bg-background/80 backdrop-blur-sm">
+        <Card className="bg-transparent border-none shadow-none">
           <form onSubmit={handleRegister}>
             <CardHeader>
               <CardTitle className="text-2xl">Create an Account</CardTitle>
@@ -119,15 +119,15 @@ export default function LoginPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="register-username">Username</Label>
-                <Input id="register-username" required value={registerUsername} onChange={(e) => setRegisterUsername(e.target.value)} />
+                <Input id="register-username" required value={registerUsername} onChange={(e) => setRegisterUsername(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="register-pin">PIN</Label>
-                <Input id="register-pin" type="password" required minLength={4} maxLength={6} value={registerPin} onChange={(e) => setRegisterPin(e.target.value)} />
+                <Input id="register-pin" type="password" required minLength={4} maxLength={6} value={registerPin} onChange={(e) => setRegisterPin(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
                <div className="space-y-2">
                 <Label htmlFor="register-pin-confirm">Confirm PIN</Label>
-                <Input id="register-pin-confirm" type="password" required minLength={4} maxLength={6} value={registerPinConfirm} onChange={(e) => setRegisterPinConfirm(e.target.value)} />
+                <Input id="register-pin-confirm" type="password" required minLength={4} maxLength={6} value={registerPinConfirm} onChange={(e) => setRegisterPinConfirm(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
             </CardContent>
             <CardFooter>
