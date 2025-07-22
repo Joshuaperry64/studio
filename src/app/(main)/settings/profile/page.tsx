@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -10,7 +10,6 @@ import { Camera, Loader2, Save, Trash2 } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { fileToDataUri } from '@/lib/utils';
-import { DialogHeader } from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -107,68 +106,70 @@ export default function ProfileSettingsPage() {
     }
 
     return (
-        <div className="w-full space-y-6">
-            <DialogHeader>
-                <CardTitle>Edit Profile</CardTitle>
-                <CardDescription>Manage your public profile information.</CardDescription>
-            </DialogHeader>
-            <div className="space-y-6 pt-4">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="relative">
-                        <Avatar className="h-32 w-32">
-                            <AvatarImage src={avatarPreview || undefined} alt={user.username} />
-                            <AvatarFallback className="text-4xl">
-                                {user.username?.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                        </Avatar>
-                        <Button 
-                            size="icon" 
-                            className="absolute bottom-1 right-1 rounded-full"
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            <Camera className="h-5 w-5"/>
-                        </Button>
-                        <Input 
-                            type="file" 
-                            ref={fileInputRef} 
-                            className="hidden" 
-                            accept="image/png, image/jpeg, image/gif"
-                            onChange={handleAvatarChange}
-                        />
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Edit Profile</CardTitle>
+                    <CardDescription>Manage your public profile information.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col items-center gap-4 text-center">
+                        <div className="relative">
+                            <Avatar className="h-32 w-32">
+                                <AvatarImage src={avatarPreview || undefined} alt={user.username} />
+                                <AvatarFallback className="text-4xl">
+                                    {user.username?.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                            </Avatar>
+                            <Button 
+                                size="icon" 
+                                className="absolute bottom-1 right-1 rounded-full"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <Camera className="h-5 w-5"/>
+                            </Button>
+                            <Input 
+                                type="file" 
+                                ref={fileInputRef} 
+                                className="hidden" 
+                                accept="image/png, image/jpeg, image/gif"
+                                onChange={handleAvatarChange}
+                            />
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold">{user.username}</p>
+                            <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
+                        </div>
                     </div>
-                     <div className="text-center">
-                        <p className="text-2xl font-bold">{user.username}</p>
-                        <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
-                    </div>
-                </div>
-
-                 <div className="flex justify-end pt-4">
-                     <Button onClick={handleSaveProfile} disabled={isLoading || !avatarFile}>
+                </CardContent>
+                <CardFooter className="justify-end">
+                    <Button onClick={handleSaveProfile} disabled={isLoading || !avatarFile}>
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                         Save Changes
-                     </Button>
-                 </div>
-            </div>
+                    </Button>
+                </CardFooter>
+            </Card>
+
              <Card>
                 <CardHeader>
                     <CardTitle className="text-destructive">Account Management</CardTitle>
-                    <CardDescription>Advanced account actions.</CardDescription>
+                    <CardDescription>Advanced account actions. Be careful, some of these are permanent.</CardDescription>
                 </CardHeader>
-                <CardContent>
-                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border p-4 gap-4">
+                <CardContent className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border p-4 gap-4">
                         <div>
                             <p className="font-medium">Export Your Data</p>
                             <p className="text-sm text-muted-foreground">
-                            Download a copy of all your conversations.
+                                Download a copy of all your conversations. (Not yet implemented)
                             </p>
                         </div>
                         <Button variant="outline" disabled>Export Data</Button>
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border border-destructive/50 p-4 gap-4 mt-4">
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border border-destructive/50 p-4 gap-4">
                         <div>
                             <p className="font-medium text-destructive">Delete Account</p>
                             <p className="text-sm text-muted-foreground">
-                            Permanently delete your account and all associated data. This action cannot be undone.
+                                Permanently delete your account and all associated data. This action cannot be undone.
                             </p>
                         </div>
                         <AlertDialog>

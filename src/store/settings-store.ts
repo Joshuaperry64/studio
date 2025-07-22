@@ -1,5 +1,14 @@
+
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+
+export interface MemorySettings {
+    enabled: boolean;
+    host: string;
+    shareName: string;
+    username: string;
+    password?: string;
+}
 
 interface SettingsState {
   apiKey: string;
@@ -12,7 +21,17 @@ interface SettingsState {
   toggleNotifications: () => void;
   hasSeenWelcomeScreen: boolean;
   setHasSeenWelcomeScreen: (hasSeen: boolean) => void;
+  memorySettings: MemorySettings;
+  saveMemorySettings: (settings: MemorySettings) => Promise<void>;
 }
+
+const initialMemorySettings: MemorySettings = {
+    enabled: false,
+    host: '',
+    shareName: '',
+    username: '',
+    password: '',
+};
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
@@ -38,6 +57,19 @@ export const useSettingsStore = create<SettingsState>()(
       toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
       hasSeenWelcomeScreen: false,
       setHasSeenWelcomeScreen: (hasSeen: boolean) => set({ hasSeenWelcomeScreen: hasSeen }),
+      memorySettings: initialMemorySettings,
+      saveMemorySettings: async (settings) => {
+        const response = await fetch('/api/settings/memory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(settings),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to save memory settings.');
+        }
+        set({ memorySettings: settings });
+      },
     }),
     {
       name: 'settings-storage',
@@ -47,6 +79,10 @@ export const useSettingsStore = create<SettingsState>()(
         nsfwMode: state.nsfwMode,
         notifications: state.notifications,
         hasSeenWelcomeScreen: state.hasSeenWelcomeScreen,
+        memorySettings: {
+            ...state.memorySettings,
+            password: '', // Do not persist password
+        },
       }),
     }
   )

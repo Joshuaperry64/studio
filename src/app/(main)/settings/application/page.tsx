@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -91,115 +92,111 @@ export default function ApplicationSettingsPage() {
   }
 
   return (
-    <main className="p-4 sm:p-6 flex-1">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Application Settings</CardTitle>
-            <CardDescription>Manage your preferences for AlphaLink.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex flex-col gap-4 rounded-lg border p-4">
-               <div>
-                <Label htmlFor="api-key" className="font-semibold">
-                  Gemini API Key
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Your API key is stored securely and is only used to interact with the Gemini API.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                 <Input 
-                    id="api-key" 
-                    type="password"
-                    placeholder="Enter your Gemini API Key"
-                    value={localApiKey}
-                    onChange={(e) => setLocalApiKey(e.target.value)}
-                    />
-                  <Button asChild variant="outline">
-                    <Link href="https://aistudio.google.com/app/apikey" target="_blank">Get API Key</Link>
-                  </Button>
-                 <Button onClick={handleSaveApiKey} disabled={isLoading}>
-                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
-                 </Button>
-              </div>
+    <Card>
+        <CardHeader>
+        <CardTitle>Application Settings</CardTitle>
+        <CardDescription>Manage your preferences for AlphaLink.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+        <div className="flex flex-col gap-4 rounded-lg border p-4">
+            <div>
+            <Label htmlFor="api-key" className="font-semibold">
+                Gemini API Key
+            </Label>
+            <p className="text-sm text-muted-foreground">
+                Your API key is stored securely and is only used to interact with the Gemini API.
+            </p>
             </div>
+            <div className="flex items-center gap-2">
+                <Input 
+                id="api-key" 
+                type="password"
+                placeholder="Enter your Gemini API Key"
+                value={localApiKey}
+                onChange={(e) => setLocalApiKey(e.target.value)}
+                />
+                <Button asChild variant="outline">
+                <Link href="https://aistudio.google.com/app/apikey" target="_blank">Get API Key</Link>
+                </Button>
+                <Button onClick={handleSaveApiKey} disabled={isLoading}>
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
+                </Button>
+            </div>
+        </div>
+
+        <div className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+            <Label htmlFor="nsfw-mode" className="font-semibold">
+                NSFW Mode
+            </Label>
+            <p className="text-sm text-muted-foreground">
+                Enable adults-only, private communication mode.
+            </p>
+            </div>
+            <Switch
+            id="nsfw-mode"
+            checked={nsfwMode}
+            onCheckedChange={handleNsfwToggle}
+            aria-label="Toggle NSFW mode"
+            />
+        </div>
 
             <div className="flex items-center justify-between rounded-lg border p-4">
-              <div>
-                <Label htmlFor="nsfw-mode" className="font-semibold">
-                  NSFW Mode
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Enable adults-only, private communication mode.
-                </p>
-              </div>
-              <Switch
-                id="nsfw-mode"
-                checked={nsfwMode}
-                onCheckedChange={handleNsfwToggle}
-                aria-label="Toggle NSFW mode"
-              />
+            <div>
+            <Label htmlFor="notifications" className="font-semibold">
+                Push Notifications
+            </Label>
+            <p className="text-sm text-muted-foreground">
+                Receive notifications for important updates.
+            </p>
             </div>
-
-             <div className="flex items-center justify-between rounded-lg border p-4">
-              <div>
-                <Label htmlFor="notifications" className="font-semibold">
-                  Push Notifications
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Receive notifications for important updates.
-                </p>
-              </div>
-              <Switch
-                id="notifications"
-                checked={notifications}
-                onCheckedChange={toggleNotifications}
-                aria-label="Toggle push notifications"
-              />
-            </div>
-            
-            <Separator />
-            
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border p-4 gap-4">
-              <div>
-                <p className="font-medium">Show Welcome Screen</p>
-                <p className="text-sm text-muted-foreground">
-                  Display the initial welcome guide on your next visit.
-                </p>
-              </div>
-              <Button variant="outline" onClick={handleShowWelcome}>Show Again</Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      <AlertDialog open={isNsfwDialogOpen} onOpenChange={setIsNsfwDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Enter Access Code</AlertDialogTitle>
-            <AlertDialogDescription>
-              To enable NSFW mode, please enter the 4-digit access code.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="py-2">
-            <Input
-              id="nsfw-code"
-              type="password"
-              maxLength={4}
-              placeholder="●●●●"
-              value={nsfwAccessCode}
-              onChange={(e) => setNsfwAccessCode(e.target.value)}
-              className="text-center text-lg tracking-[0.5em]"
+            <Switch
+            id="notifications"
+            checked={notifications}
+            onCheckedChange={toggleNotifications}
+            aria-label="Toggle push notifications"
             />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleNsfwAccessCodeSubmit}>
-              Submit
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </main>
+        </div>
+        
+        <Separator />
+        
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border p-4 gap-4">
+            <div>
+            <p className="font-medium">Show Welcome Screen</p>
+            <p className="text-sm text-muted-foreground">
+                Display the initial welcome guide on your next visit.
+            </p>
+            </div>
+            <Button variant="outline" onClick={handleShowWelcome}>Show Again</Button>
+        </div>
+        </CardContent>
+        <AlertDialog open={isNsfwDialogOpen} onOpenChange={setIsNsfwDialogOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                <AlertDialogTitle>Enter Access Code</AlertDialogTitle>
+                <AlertDialogDescription>
+                    To enable NSFW mode, please enter the 4-digit access code.
+                </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="py-2">
+                <Input
+                    id="nsfw-code"
+                    type="password"
+                    maxLength={4}
+                    placeholder="●●●●"
+                    value={nsfwAccessCode}
+                    onChange={(e) => setNsfwAccessCode(e.target.value)}
+                    className="text-center text-lg tracking-[0.5em]"
+                />
+                </div>
+                <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleNsfwAccessCodeSubmit}>
+                    Submit
+                </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    </Card>
   );
 }

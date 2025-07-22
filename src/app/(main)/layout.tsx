@@ -74,7 +74,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const bottomMenuItems = [
       { href: '/feedback', label: 'Feedback', icon: MessageSquarePlus },
       { href: '/instructions', label: 'Instructions', icon: BookOpen },
-      { href: '/settings', label: 'Application', icon: Settings },
+      { href: '/settings', label: 'Application', icon: Settings, subpath: '/settings/application' },
   ];
 
   const adminMenuItems = [
@@ -149,7 +149,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         tooltip={{ children: item.label }}
                         className="justify-start"
                         >
-                        <Link href={item.href}>
+                        <Link href={item.subpath || item.href}>
                             <item.icon className="h-5 w-5" />
                             <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                         </Link>
