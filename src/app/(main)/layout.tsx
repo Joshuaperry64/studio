@@ -117,7 +117,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
               <span className="text-sm font-medium">{user?.username}</span>
-              <span className="text-xs text-muted-foreground">{user?.role === 'admin' ? 'Administrator' : 'User'}</span>
+              <span className="text-xs text-muted-foreground capitalize">{user?.role}</span>
             </div>
           </div>
         </SidebarFooter>
