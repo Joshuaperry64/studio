@@ -50,20 +50,6 @@ The group has provided the following suggestions:
 Analyze each suggestion and determine whether it should be incorporated into the project.
 Provide a rationale for each decision. Return a list of analyzed suggestions including incorporation rationale and whether each suggestion is incorporated.
 Finally, revise the project description to reflect the incorporated suggestions.
-
-Output should be in the following JSON format:
-
-{
-  "analyzedSuggestions": [
-    {
-      "suggestion": "The original suggestion.",
-      "incorporationRationale": "The AI rationale for incorporating or rejecting the suggestion.",
-      "isIncorporated": true/false
-    },
-    ...
-  ],
-  "revisedProjectDescription": "The revised description of the collaborative project after incorporating suggestions."
-}
 `,
 });
 
