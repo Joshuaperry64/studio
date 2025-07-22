@@ -34,23 +34,24 @@ export const useUserStore = create<UserState>((set, get) => ({
   user: null,
   isInitialized: false,
   login: () => {
-    // This function is called after a successful login API call.
-    // We can now assume the cookie is set. We just need to update the state.
     const token = Cookies.get('auth_token');
     if (token) {
         const decodedUser = decodeToken(token);
         if (decodedUser) {
             set({ user: decodedUser, isInitialized: true });
+        } else {
+             set({ user: null, isInitialized: true });
         }
+    } else {
+         set({ user: null, isInitialized: true });
     }
   },
   logout: () => {
     Cookies.remove('auth_token');
-    set({ user: null, isInitialized: true }); // Mark as initialized after logout
+    set({ user: null, isInitialized: true });
   },
   initialize: () => {
-    // This function is for initializing the state on app load / page refresh.
-    if (get().isInitialized) return; // Prevent re-initialization
+    if (get().isInitialized) return;
 
     const token = Cookies.get('auth_token');
     if (token) {
@@ -58,12 +59,10 @@ export const useUserStore = create<UserState>((set, get) => ({
         if (decodedUser && decodedUser.exp * 1000 > Date.now()) {
             set({ user: decodedUser, isInitialized: true });
         } else {
-            // Token is expired or invalid
             Cookies.remove('auth_token');
             set({ user: null, isInitialized: true });
         }
     } else {
-        // No token found
          set({ user: null, isInitialized: true });
     }
   },

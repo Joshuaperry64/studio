@@ -81,8 +81,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/admin', label: 'Admin Panel', icon: Shield },
   ]
 
-  if (!isInitialized) {
-    // Render a full-page loading indicator while the user state is being initialized.
+  if (!isInitialized || !user) {
+    // Render a full-page loading indicator while the user state is being initialized
+    // or if the user is not yet available (which can happen briefly during redirects).
     return (
         <div className="flex items-center justify-center h-screen w-full bg-background">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
