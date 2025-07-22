@@ -42,18 +42,18 @@ const roadmapData = {
     { title: 'Admin Dashboard', status: 'complete', description: 'Comprehensive user management and feedback review for administrators.' },
     { title: 'Profile Customization', status: 'complete', description: 'Users can upload their own profile pictures.' },
     { title: 'AI Character Hub', status: 'complete', description: 'Create, manage, and interact with unique AI personas.' },
+    { title: 'Customizable AI Personas', status: 'complete', description: 'Allow users to edit the AI-generated backstories and personalities of their characters.' },
     { title: 'Visual Media Generation', status: 'complete', description: 'Generate images and videos from text prompts.' },
-    { title: 'AI Co-Pilot', status: 'complete', description: 'Collaborative tool for AI-powered project feedback.' },
     { title: 'Persistent Chat History', status: 'complete', description: 'Conversations are saved locally and persist between sessions.' },
     { title: 'Real-time Collaboration', status: 'complete', description: 'Real-time chat sessions with live updates for messages and participants.' },
-    { title: 'Expanded AI Toolset', status: 'complete', description: 'Integrate more advanced Genkit tools for functions like web searches, data analysis, and more.' },
+    { title: 'Expanded AI Toolset', status: 'complete', description: 'Integrated more advanced Genkit tools for functions like web searches.' },
     { title: 'Voice-to-Voice Chat', status: 'complete', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
-    { title: 'Customizable AI Personas', status: 'complete', description: 'Allow users to edit the AI-generated backstories and personalities of their characters.' },
+    { title: 'AI Co-Pilot', status: 'complete', description: 'Collaborative tool for AI-powered project feedback.' },
+    { title: 'Gamification & Co-op Features', status: 'complete', description: 'Introduce cooperative goals, like the AI Co-Pilot, to enhance user engagement.' },
   ],
   upcoming: [
     { title: 'AI-Powered Code Modification', status: 'pending', description: 'Allow the AI to directly suggest and apply code changes to the application codebase.' },
     { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
-    { title: 'Gamification & Co-op Features', status: 'pending', description: 'Introduce cooperative goals, leaderboards, or shared achievements to enhance user engagement.' },
   ],
 };
 
