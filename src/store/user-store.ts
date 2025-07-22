@@ -34,32 +34,29 @@ export const useUserStore = create<UserState>((set, get) => ({
   user: null,
   isInitialized: false,
   login: () => {
-    // The login process is handled by setting the cookie and then re-initializing.
-    get().initialize();
+    // This function is called after a successful login API call.
+    // We can now assume the cookie is set. We just need to update the state.
+    const token = Cookies.get('auth_token');
+    if (token) {
+        const decodedUser = decodeToken(token);
+        if (decodedUser) {
+            set({ user: decodedUser, isInitialized: true });
+        }
+    }
   },
   logout: () => {
     Cookies.remove('auth_token');
     set({ user: null, isInitialized: true }); // Mark as initialized after logout
   },
-  initialize: async () => {
+  initialize: () => {
+    // This function is for initializing the state on app load / page refresh.
+    if (get().isInitialized) return; // Prevent re-initialization
+
     const token = Cookies.get('auth_token');
     if (token) {
         const decodedUser = decodeToken(token);
         if (decodedUser && decodedUser.exp * 1000 > Date.now()) {
-            try {
-                // Fetch the full user object to get the latest data, like avatar
-                const response = await fetch('/api/user/me');
-                if (response.ok) {
-                    const fullUser = await response.json();
-                     set({ user: { ...decodedUser, avatar: fullUser.avatarDataUri }, isInitialized: true });
-                } else {
-                    // If fetching fails, still set user from token but mark as initialized
-                    set({ user: decodedUser, isInitialized: true });
-                }
-            } catch (e) {
-                // Fallback to decoded token if the API call fails
-                set({ user: decodedUser, isInitialized: true }); 
-            }
+            set({ user: decodedUser, isInitialized: true });
         } else {
             // Token is expired or invalid
             Cookies.remove('auth_token');
@@ -76,6 +73,3 @@ export const useUserStore = create<UserState>((set, get) => ({
     }));
   }
 }));
-
-// Initialize the store on app load by calling initialize in the main layout.
-// This prevents race conditions and ensures a predictable loading sequence.

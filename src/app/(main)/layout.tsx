@@ -38,18 +38,18 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const { toast } = useToast();
 
   useEffect(() => {
-    // This effect runs once on mount to initialize the user state.
+    // This effect runs once on mount to initialize the user state from cookies.
     if (!isInitialized) {
         initialize();
     }
   }, [initialize, isInitialized]);
 
    useEffect(() => {
-    // This effect redirects to login if initialization is complete and there's no user.
-    if (isInitialized && !user && pathname !== '/login') {
+    // This effect redirects to login if initialization is complete and there's still no user.
+    if (isInitialized && !user) {
         router.push('/login');
     }
-  }, [isInitialized, user, router, pathname]);
+  }, [isInitialized, user, router]);
 
 
   const handleLogout = async () => {
@@ -81,7 +81,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/admin', label: 'Admin Panel', icon: Shield },
   ]
 
-  if (!isInitialized || !user) {
+  if (!isInitialized) {
     // Render a full-page loading indicator while the user state is being initialized.
     return (
         <div className="flex items-center justify-center h-screen w-full bg-background">
@@ -186,7 +186,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <SidebarTrigger className="md:hidden" />
             <h1 className="text-lg font-semibold md:text-xl font-headline">
-              {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => item.href === pathname)?.label || 'AlphaLink'}
+              {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => pathname.startsWith(item.href))?.label || 'AlphaLink'}
             </h1>
           </header>
           {children}

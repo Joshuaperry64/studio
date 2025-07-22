@@ -40,7 +40,7 @@ export default function LoginPage() {
 
       if (response.ok) {
         toast({ title: 'Login Successful', description: "Welcome back!" });
-        login(); // Update user state
+        login(); // Update user state from new cookie
         router.push('/chat');
       } else {
         toast({ title: 'Login Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
