@@ -44,6 +44,7 @@ const roadmapData = {
     { title: 'AI Character Hub', status: 'complete', description: 'Create, manage, and interact with unique AI personas.' },
     { title: 'Customizable AI Personas', status: 'complete', description: 'Allow users to edit the AI-generated backstories and personalities of their characters.' },
     { title: 'Visual Media Generation', status: 'complete', description: 'Generate images and videos from text prompts.' },
+    { title: 'AI Control Settings', status: 'complete', description: 'Granular control over AI models and safety filter configurations.' },
     { title: 'Persistent Chat History', status: 'complete', description: 'Conversations are saved locally and persist between sessions.' },
     { title: 'Real-time Collaboration', status: 'complete', description: 'Real-time chat sessions with live updates for messages and participants.' },
     { title: 'Expanded AI Toolset', status: 'complete', description: 'Integrated more advanced Genkit tools for functions like web searches.' },
