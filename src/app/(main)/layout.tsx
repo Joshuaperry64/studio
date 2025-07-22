@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -59,6 +59,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/character-hub', label: 'Character Hub', icon: Smile },
     { href: '/media-generation', label: 'Visual Media', icon: ImageIcon },
     { href: '/co-pilot', label: 'Co-Pilot', icon: Users },
+    { href: '/roadmap', label: 'Roadmap', icon: Map },
   ];
 
   const bottomMenuItems = [
