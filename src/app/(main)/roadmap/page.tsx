@@ -48,6 +48,7 @@ const roadmapData = {
     { title: 'Real-time Collaboration', status: 'complete', description: 'Real-time chat sessions with live updates for messages and participants.' },
   ],
   upcoming: [
+    { title: 'AI-Powered Code Modification', status: 'pending', description: 'Allow the AI to directly suggest and apply code changes to the application codebase.' },
     { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
     { title: 'Real-time Co-Pilot', status: 'pending', description: 'Enable multiple users to interact with the AI Co-Pilot simultaneously.' },
     { title: 'Voice-to-Voice Chat', status: 'pending', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
