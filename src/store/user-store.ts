@@ -6,15 +6,17 @@ interface UserPayload {
   userId: number;
   username: string;
   role: 'admin' | 'user';
+  avatar?: string;
   iat: number;
   exp: number;
 }
 
 interface UserState {
   user: UserPayload | null;
-  login: () => void;
+  login: () => Promise<void>;
   logout: () => void;
   initialize: () => void;
+  updateAvatar: (avatarDataUri: string) => void;
 }
 
 const decodeToken = (token: string): UserPayload | null => {
@@ -26,31 +28,49 @@ const decodeToken = (token: string): UserPayload | null => {
   }
 };
 
-export const useUserStore = create<UserState>((set) => ({
-  user: null,
-  login: () => {
+const fetchAndSetUser = async (set: (state: Partial<UserState>) => void) => {
     const token = Cookies.get('auth_token');
     if (token) {
-      set({ user: decodeToken(token) });
+        const decodedUser = decodeToken(token);
+        if (decodedUser && decodedUser.exp * 1000 > Date.now()) {
+            try {
+                const response = await fetch('/api/user/me');
+                if (response.ok) {
+                    const fullUser = await response.json();
+                     set({ user: { ...decodedUser, avatar: fullUser.avatarDataUri } });
+                } else {
+                     set({ user: decodedUser });
+                }
+            } catch (e) {
+                set({ user: decodedUser }); // fallback to decoded token if fetch fails
+            }
+        } else {
+            Cookies.remove('auth_token');
+            set({ user: null });
+        }
+    } else {
+         set({ user: null });
     }
+}
+
+
+export const useUserStore = create<UserState>((set) => ({
+  user: null,
+  login: async () => {
+    await fetchAndSetUser(set);
   },
   logout: () => {
     Cookies.remove('auth_token');
     set({ user: null });
   },
   initialize: () => {
-    const token = Cookies.get('auth_token');
-    if (token) {
-      const user = decodeToken(token);
-      // Check if token is expired
-      if (user && user.exp * 1000 > Date.now()) {
-        set({ user });
-      } else {
-        Cookies.remove('auth_token');
-        set({ user: null });
-      }
-    }
+    fetchAndSetUser(set);
   },
+  updateAvatar: (avatarDataUri: string) => {
+    set((state) => ({
+        user: state.user ? { ...state.user, avatar: avatarDataUri } : null,
+    }));
+  }
 }));
 
 // Initialize the store on app load

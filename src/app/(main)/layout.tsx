@@ -21,18 +21,12 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useUserStore } from '@/store/user-store';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, initialize } = useUserStore();
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    initialize();
-    setIsInitialized(true);
-  }, [initialize]);
-
+  // Zustand will automatically handle initialization now
+  const { user } = useUserStore();
 
   const menuItems = [
     { href: '/chat', label: 'AI Chat', icon: MessageSquare },
@@ -49,12 +43,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const adminMenuItems = [
     { href: '/admin', label: 'Admin Panel', icon: Shield },
-    { href: '/admin', label: 'Profile Management', icon: UserCog },
   ]
   
-  if (!isInitialized) {
-      return null; // Or a loading spinner
-  }
+  const settingsSubItems = [
+      { href: '/settings/profile', label: 'Edit Profile', icon: UserCog },
+  ]
 
   return (
     <SidebarProvider>
@@ -110,7 +103,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <SidebarMenuItem key={item.href}>
                         <SidebarMenuButton
                         asChild
-                        isActive={pathname === item.href}
+                        isActive={pathname.startsWith(item.href)}
                         tooltip={{ children: item.label }}
                         className="justify-start"
                         >
@@ -119,6 +112,20 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                         </Link>
                         </SidebarMenuButton>
+                        {item.href === '/settings' && pathname.startsWith('/settings') && (
+                             <ul className="pl-7 pt-1 space-y-1">
+                                {settingsSubItems.map((subItem) => (
+                                    <li key={subItem.href}>
+                                        <SidebarMenuButton asChild isActive={pathname === subItem.href} size="sm" className="w-full justify-start">
+                                            <Link href={subItem.href}>
+                                                 <subItem.icon className="h-4 w-4" />
+                                                <span className="group-data-[collapsible=icon]:hidden">{subItem.label}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </SidebarMenuItem>
                     ))}
               </SidebarMenu>
@@ -126,7 +133,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <SidebarFooter>
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://placehold.co/40x40" alt={user?.username} />
+              <AvatarImage src={user?.avatar} alt={user?.username} />
               <AvatarFallback>{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
@@ -141,7 +148,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <SidebarTrigger className="md:hidden" />
             <h1 className="text-lg font-semibold md:text-xl font-headline">
-              {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => item.href === pathname)?.label || 'AlphaLink'}
+              {[...menuItems, ...adminMenuItems, ...bottomMenuItems, ...settingsSubItems].find((item) => item.href === pathname)?.label || 'AlphaLink'}
             </h1>
           </header>
           {children}

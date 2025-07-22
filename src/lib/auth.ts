@@ -9,6 +9,7 @@ export interface User {
   apiKeyEncrypted?: string;
   role: 'admin' | 'user';
   status: 'approved' | 'pending';
+  avatarDataUri?: string;
 }
 
 export interface Feedback {

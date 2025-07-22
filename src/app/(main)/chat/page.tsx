@@ -201,9 +201,9 @@ export default function ChatPage() {
                 </div>
                 {message.sender === 'user' && (
                   <Avatar>
-                    <AvatarImage src="https://placehold.co/40x40" alt={user?.username} />
+                    <AvatarImage src={user?.avatar} alt={user?.username} />
                     <AvatarFallback>
-                      <User />
+                      {user?.username?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 )}
