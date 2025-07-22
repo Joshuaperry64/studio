@@ -7,3 +7,4 @@ import '@/ai/flows/enable-voice-input.ts';
 import '@/ai/flows/collaborative-ai-assistance.ts';
 import '@/ai/flows/generate-character.ts';
 import '@/ai/flows/generate-audio.ts';
+import '@/ai/flows/voice-biometrics.ts';
