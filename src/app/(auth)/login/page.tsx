@@ -78,14 +78,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
+    <div className="flex items-center justify-center min-h-screen bg-background hud-background">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md z-10">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="register">Register</TabsTrigger>
         </TabsList>
         <TabsContent value="login">
-          <Card>
+          <Card className="bg-background/80">
             <form onSubmit={handleLogin}>
               <CardHeader>
                 <CardTitle className="text-2xl">Login to AlphaLink</CardTitle>
@@ -111,7 +112,7 @@ export default function LoginPage() {
           </Card>
         </TabsContent>
         <TabsContent value="register">
-          <Card>
+          <Card className="bg-background/80">
             <form onSubmit={handleRegister}>
               <CardHeader>
                 <CardTitle className="text-2xl">Create an Account</CardTitle>

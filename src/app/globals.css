@@ -4,48 +4,48 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 210 40% 9.8%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 217.2 91.2% 59.8%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 262.1 83.3% 57.8%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 263.4 95.2% 66.3%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 276, 95%, 51%; /* Deep Violet */
+    --primary-foreground: 0 0% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 91.2% 59.8%;
+    --accent: 240, 100%, 50%; /* Blue */
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 263.4 95.2% 66.3%;
+    --ring: 276, 95%, 51%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224, 13%, 13%; /* Dark Gray */
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 276, 95%, 61%; /* Deep Violet */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 240, 100%, 60%; /* Blue */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 276, 95%, 61%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -53,12 +53,12 @@
     --chart-5: 340 75% 55%;
     --sidebar-background: 222.2 84% 4.9%;
     --sidebar-foreground: 0 0% 95.9%;
-    --sidebar-primary: 263.4 95.2% 66.3%;
+    --sidebar-primary: 276, 95%, 61%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 217.2 32.6% 17.5%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 217.2 32.6% 23.5%;
-    --sidebar-ring: 263.4 95.2% 66.3%;
+    --sidebar-ring: 276, 95%, 61%;
   }
 }
 
@@ -71,8 +71,69 @@
   }
 }
 
-@keyframes gradient-animation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* Animations and Backgrounds */
+@keyframes tech-background-animation {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+.tech-background {
+  min-height: calc(100vh - 4rem); /* Adjust based on header height */
+  background-color: hsl(var(--background));
+  background-image:
+    linear-gradient(45deg, hsl(var(--primary) / 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, hsl(var(--primary) / 0.05) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, hsl(var(--primary) / 0.05) 75%),
+    linear-gradient(-45deg, transparent 75%, hsl(var(--primary) / 0.05) 75%);
+  background-size: 20px 20px;
+  animation: tech-background-animation 30s linear infinite;
+}
+
+@keyframes hud-grid-animation {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50px); }
+}
+
+@keyframes hud-scanline-animation {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+@keyframes hud-glow-animation {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.5; }
+}
+
+.hud-background {
+  position: relative;
+  overflow: hidden;
+  background-color: hsl(var(--background));
+}
+
+.hud-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(hsl(var(--accent) / 0.15) 1px, transparent 1px),
+    linear-gradient(to right, hsl(var(--accent) / 0.15) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: hud-grid-animation 5s linear infinite;
+  z-index: 1;
+}
+
+.hud-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to bottom, hsl(var(--accent) / 0.5), transparent);
+  animation: hud-scanline-animation 8s linear infinite;
+  z-index: 2;
 }
