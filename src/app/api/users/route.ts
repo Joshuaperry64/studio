@@ -26,6 +26,6 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching users:', error);
     // Fallback to a default user if there's a DB error to prevent total lockout
-    return NextResponse.json({ error: 'Failed to fetch users', fallbackUsers: ['Joshua'] }, { status: 500 });
+    return NextResponse.json(['Joshua'], { status: 500 });
   }
 }
