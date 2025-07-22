@@ -11,6 +11,14 @@ export interface User {
   status: 'approved' | 'pending';
 }
 
+export interface Feedback {
+    id: number;
+    userId: number;
+    username: string;
+    feedback: string;
+    createdAt: Date;
+}
+
 // Pre-seed the master admin user
 const adminPinHash = bcrypt.hashSync('14235', 10);
 let users: User[] = [
@@ -23,6 +31,9 @@ let users: User[] = [
   }
 ];
 let userIdCounter = 2; // Start after the admin user
+let feedback: Feedback[] = [];
+let feedbackIdCounter = 1;
+
 
 export const db = {
   users: {
@@ -70,5 +81,21 @@ export const db = {
         }
         return undefined;
     }
+  },
+  feedback: {
+      create: async ({ data }: { data: { userId: number, username: string, feedback: string }}) => {
+          const newFeedback: Feedback = {
+              id: feedbackIdCounter++,
+              userId: data.userId,
+              username: data.username,
+              feedback: data.feedback,
+              createdAt: new Date(),
+          };
+          feedback.push(newFeedback);
+          return newFeedback;
+      },
+      findMany: async () => {
+          return feedback;
+      }
   }
 };
