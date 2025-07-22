@@ -17,7 +17,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Application Settings</CardTitle>
-            <CardDescription>Manage your preferences for GenesisAI.</CardDescription>
+            <CardDescription>Manage your preferences for AlphaLink.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between rounded-lg border p-4">

@@ -3,7 +3,7 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GenesisAI',
+  title: 'AlphaLink',
   description: 'The beginning of a new era in AI collaboration.',
 };
 

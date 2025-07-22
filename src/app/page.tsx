@@ -31,7 +31,7 @@ export default function LoginPage() {
         <form onSubmit={handleLogin}>
           <CardHeader>
             <CardTitle className="text-3xl font-headline text-center bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-              GenesisAI
+              AlphaLink
             </CardTitle>
             <CardDescription className="text-center">Enter your credentials to begin.</CardDescription>
           </CardHeader>

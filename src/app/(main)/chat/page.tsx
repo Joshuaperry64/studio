@@ -135,7 +135,7 @@ export default function ChatPage() {
           {messages.length === 0 && (
             <div className="text-center text-muted-foreground pt-16">
               <Bot size={48} className="mx-auto" />
-              <h2 className="text-2xl font-headline mt-4">Welcome to GenesisAI</h2>
+              <h2 className="text-2xl font-headline mt-4">Welcome to AlphaLink</h2>
               <p>Start the conversation by typing a message below.</p>
             </div>
           )}

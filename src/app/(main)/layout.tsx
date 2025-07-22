@@ -39,7 +39,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               <Bot className="h-5 w-5" />
             </Button>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <h2 className="font-headline text-lg tracking-tight">GenesisAI</h2>
+              <h2 className="font-headline text-lg tracking-tight">AlphaLink</h2>
             </div>
           </div>
         </SidebarHeader>
@@ -79,7 +79,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
           <SidebarTrigger className="md:hidden" />
           <h1 className="text-lg font-semibold md:text-xl font-headline">
-            {menuItems.find((item) => item.href === pathname)?.label || 'GenesisAI'}
+            {menuItems.find((item) => item.href === pathname)?.label || 'AlphaLink'}
           </h1>
         </header>
         {children}
