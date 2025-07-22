@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ message: "User registered successfully." }, { status: 201 });
+    return NextResponse.json({ message: "Registration successful. Your account is pending approval." }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: 'An internal server error occurred.' }, { status: 500 });

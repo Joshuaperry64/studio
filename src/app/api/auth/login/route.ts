@@ -23,6 +23,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid credentials.' }, { status: 401 });
     }
 
+    if (user.status !== 'approved') {
+        return NextResponse.json({ message: 'Account not approved. Please contact an administrator.' }, { status: 403 });
+    }
+
     const token = jwt.sign({ userId: user.id, role: user.role, username: user.username }, process.env.JWT_SECRET || 'your-secret-key', {
       expiresIn: '7d',
     });
