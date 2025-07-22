@@ -1,1 +1,7 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/generate-visual-media.ts';
+import '@/ai/flows/analyze-user-input.ts';
+import '@/ai/flows/enable-voice-input.ts';
+import '@/ai/flows/collaborative-ai-assistance.ts';
