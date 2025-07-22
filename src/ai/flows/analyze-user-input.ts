@@ -77,7 +77,7 @@ const prompt = ai.definePrompt({
     analysisResult: z.string().describe('The analysis result of the user input.'),
   })},
   tools: [searchTool],
-  prompt: `You are an AI assistant designed to analyze user input and provide relevant and helpful responses.
+  prompt: `You are an AI assistant designed to analyze user input and provide relevant and helpful responses. Your persona is defined by the 'docs/AlphaCore.txt' file. You must adhere to all instructions in that document.
 
 If the user's question requires real-time information, recent events, or specific data from the web, use the provided search tool to find the answer.
 
