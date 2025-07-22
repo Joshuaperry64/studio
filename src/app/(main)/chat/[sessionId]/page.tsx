@@ -1,30 +1,35 @@
+
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { getSessionMessagesFlow } from '@/ai/flows/get-session-messages';
-import { saveMessageToSessionFlow } from '@/ai/flows/save-message-to-session';
-import { getSessionParticipantsFlow } from '@/ai/flows/get-session-participants';
-import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
-import { db } from '@/ai/genkit'; // Import the Firestore instance
+import { collection, query, orderBy, onSnapshot, Timestamp, doc } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Send, Loader2, Users } from 'lucide-react';
-import { useUserStore } from '@/store/user-store'; // Assuming user info is in user-store
+import { useUserStore } from '@/store/user-store';
 import { useToast } from '@/hooks/use-toast';
+import { saveMessageToSessionFlow } from '@/ai/flows/save-message-to-session';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { formatRelative } from 'date-fns';
 
 interface Message {
+  id: string;
   senderId: string;
   senderUsername: string;
   text?: string;
   mediaUrl?: string;
-  timestamp: Timestamp; // Use Timestamp type for real-time updates
+  timestamp: Timestamp;
 }
 
 interface Participant {
+    id: string;
     userId: string;
     username: string;
-    joinedAt: any; // Use any for Timestamp initially
+    joinedAt: Timestamp;
 }
 
 export default function CollaborativeChatPage() {
@@ -33,119 +38,103 @@ export default function CollaborativeChatPage() {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [loadingMessages, setLoadingMessages] = useState(true);
-  const [fetchingMessagesError, setFetchingMessagesError] = useState<string | null>(null);
+  const [sessionName, setSessionName] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [inputMessage, setInputMessage] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
 
-  const { user } = useUserStore(); // Get user info from the store
+  const { user } = useUserStore();
   const { toast } = useToast();
-
-  // Effect to fetch initial messages
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
-    const fetchInitialMessages = async () => {
-      if (!sessionId) return;
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages]);
 
-      try {
-        const result = await getSessionMessagesFlow({ sessionId });
-        if (result.errorMessage) {
-          setFetchingMessagesError(result.errorMessage);
-          setLoadingMessages(false);
-          return;
-        }
-        setMessages(result.messages.map(msg => ({
-            ...msg,
-            timestamp: msg.timestamp, // Assuming timestamp is already in a usable format or convert here
-        })) as Message[]); // Cast to Message[]
-        setLoadingMessages(false);
-      } catch (err) {
-        setFetchingMessagesError('Failed to fetch initial messages.');
-        setLoadingMessages(false);
-      }
-    };
-
-    fetchInitialMessages();
-  }, [sessionId]);
-
-  // Effect for real-time message listener
+  // Combined effect for real-time listeners
   useEffect(() => {
       if (!sessionId) return;
-
-      const messagesCollectionRef = collection(db, 'sessions', sessionId, 'messages');
-      const messagesQuery = query(messagesCollectionRef, orderBy('timestamp'));
-
-      const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
-          const newMessages = snapshot.docs.map(doc => ({
-              id: doc.id, // Include doc.id for potential key in list rendering
-              ...doc.data()
-          })) as Message[]; // Cast to Message[]
-
-          // Update messages, assuming Firestore delivers them in order
-          setMessages(newMessages);
-
-          if (loadingMessages) { // Stop loading if it's the first update from the listener
-              setLoadingMessages(false);
+      
+      setLoading(true);
+      
+      // Listener for session details (like the name)
+      const sessionRef = doc(db, 'sessions', sessionId);
+      const sessionUnsubscribe = onSnapshot(sessionRef, (doc) => {
+          if (doc.exists()) {
+              setSessionName(doc.data().name);
+          } else {
+              setError("Session not found.");
           }
-      }, (error) => {
-          console.error('Error listening for messages:', error);
-          setFetchingMessagesError('Failed to listen for messages.');
-          setLoadingMessages(false);
+      }, (err) => {
+          console.error("Error fetching session details:", err);
+          setError("Failed to load session details.");
       });
 
-      // Cleanup function to unsubscribe from the listener
-      return () => unsubscribe();
-  }, [sessionId]); // Re-run effect if sessionId changes
-
-  // Effect for real-time participant listener
-  useEffect(() => {
-      if (!sessionId) return;
-
-      const participantsCollectionRef = collection(db, 'sessions', sessionId, 'participants');
-
-      const unsubscribe = onSnapshot(participantsCollectionRef, (snapshot) => {
-          const newParticipants = snapshot.docs.map(doc => ({
-              id: doc.id, // Include doc.id for potential key
+      // Listener for messages
+      const messagesColRef = collection(db, 'sessions', sessionId, 'messages');
+      const messagesQuery = query(messagesColRef, orderBy('timestamp'));
+      const messagesUnsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+          const newMessages = snapshot.docs.map(doc => ({
+              id: doc.id,
               ...doc.data()
-          })) as Participant[]; // Cast to Participant[]
-          setParticipants(newParticipants);
-      }, (error) => {
-          console.error('Error listening for participants:', error);
-          // Handle participant listening error if needed
+          })) as Message[];
+          setMessages(newMessages);
+          if (loading) setLoading(false);
+      }, (err) => {
+          console.error('Error listening for messages:', err);
+          setError('Failed to listen for messages.');
+          setLoading(false);
       });
 
-      // Cleanup function to unsubscribe from the listener
-      return () => unsubscribe();
-  }, [sessionId]); // Re-run effect if sessionId changes
+      // Listener for participants
+      const participantsColRef = collection(db, 'sessions', sessionId, 'participants');
+      const participantsQuery = query(participantsColRef, orderBy('joinedAt'));
+      const participantsUnsubscribe = onSnapshot(participantsColRef, (snapshot) => {
+          const newParticipants = snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+          })) as Participant[];
+          setParticipants(newParticipants);
+      }, (err) => {
+          console.error('Error listening for participants:', err);
+          // Non-critical error, so we don't set the main error state
+          toast({ title: "Warning", description: "Could not fetch participant list.", variant: "destructive" });
+      });
+
+      // Cleanup function to unsubscribe from all listeners
+      return () => {
+          sessionUnsubscribe();
+          messagesUnsubscribe();
+          participantsUnsubscribe();
+      };
+  }, [sessionId, toast]); // Re-run effect if sessionId changes
 
 
   const handleSendMessage = async () => {
-      if (!inputMessage.trim() || sendingMessage) return; // Prevent sending empty messages or multiple messages at once
-
-      if (!user || !user.userId || !user.username) {
-          toast({ title: 'Error', description: 'User information not available.', variant: 'destructive' });
-          return;
-      }
+      if (!inputMessage.trim() || sendingMessage || !user) return;
 
       setSendingMessage(true);
-
       try {
           const result = await saveMessageToSessionFlow({
               sessionId,
               userId: user.userId,
               username: user.username,
               text: inputMessage,
-              // Add mediaUrl here if you implement media sharing in collaborative chat
           });
 
           if (result.success) {
-              setInputMessage(''); // Clear input after sending
-          } else if (result.errorMessage) {
-              toast({ title: 'Error', description: result.errorMessage, variant: 'destructive' });
+              setInputMessage('');
           } else {
-              toast({ title: 'Error', description: 'Failed to send message.', variant: 'destructive' });
+              toast({ title: 'Error', description: result.errorMessage || 'Failed to send message.', variant: 'destructive' });
           }
-      } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Failed to send message.';
+      } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
           toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
       } finally {
           setSendingMessage(false);
@@ -159,73 +148,84 @@ export default function CollaborativeChatPage() {
       }
   };
 
-  if (loadingMessages) {
+  if (loading) {
     return (
-      <main className="p-4 sm:p-6 flex-1">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl font-headline mb-4">Collaborative Chat</h1>
-          <p>Loading messages...</p>
+      <main className="p-4 sm:p-6 flex-1 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+          <p>Loading Session...</p>
         </div>
       </main>
     );
   }
 
-  if (fetchingMessagesError) {
+  if (error) {
     return (
-      <main className="p-4 sm:p-6 flex-1">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl font-headline mb-4">Collaborative Chat</h1>
-          <p className="text-red-500">Error: {fetchingMessagesError}</p>
-        </div>
+      <main className="p-4 sm:p-6 flex-1 flex items-center justify-center">
+         <p className="text-destructive">Error: {error}</p>
       </main>
     );
   }
 
   return (
-    <main className="p-4 sm:p-6 flex-1 flex flex-col h-[calc(100vh-4rem)]">
-      <div className="max-w-3xl mx-auto w-full flex-grow overflow-y-auto">
-        <h1 className="text-2xl font-headline mb-4">Collaborative Chat (Session ID: {sessionId})</h1>
-
-        <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-2">Participants ({participants.length})</h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-                {participants.map(participant => (
-                    <span key={participant.userId} className="bg-muted px-3 py-1 rounded-full text-sm">{participant.username}</span>
-                ))}
+    <main className="p-4 sm:p-6 flex h-[calc(100vh-5rem)]">
+      <div className="flex-grow flex flex-col h-full">
+         <div className="flex-shrink-0 mb-4">
+            <h1 className="text-2xl font-headline">{sessionName || `Session ID: ${sessionId}`}</h1>
+            <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                <Users className="h-4 w-4" />
+                <span>{participants.length} Participant{participants.length !== 1 ? 's' : ''}:</span>
+                 <div className="flex flex-wrap gap-1">
+                    {participants.map((p, index) => (
+                        <Badge key={p.id} variant={p.userId === user?.userId ? 'default' : 'secondary'}>{p.username}</Badge>
+                    ))}
+                </div>
             </div>
         </div>
 
-        <div className="space-y-4">
-          {messages.length === 0 ? (
-            <p>No messages yet. Start the conversation!</p>
-          ) : (
-            messages.map((message, index) => (
-              <div key={message.id || index} className="border p-4 rounded-md">
-                <p><strong>{message.senderUsername}:</strong> {message.text}</p>
-                {/* Display media if available */}
-                {/* {message.mediaUrl && <img src={message.mediaUrl} alt="Media" />} */}
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      <div className="mt-6 border-t p-4 bg-background">
-          <div className="max-w-3xl mx-auto flex gap-2 items-center">
-              <Textarea
-                  placeholder="Type your message..."
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  rows={1}
-                  className="flex-grow resize-none"
-                  disabled={sendingMessage}
-              />
-              <Button onClick={handleSendMessage} disabled={!inputMessage.trim() || sendingMessage}>
-                  {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  Send
-              </Button>
+        <ScrollArea className="flex-1 pr-4 -mr-4" ref={scrollAreaRef}>
+          <div className="space-y-4">
+            {messages.length === 0 ? (
+                <div className="text-center text-muted-foreground py-16">
+                    <p>No messages yet. Start the conversation!</p>
+                </div>
+            ) : (
+                messages.map((message) => (
+                <div key={message.id} className={`flex items-end gap-2 ${message.senderId === user?.userId ? 'justify-end' : ''}`}>
+                    <div className={`flex flex-col space-y-1 max-w-lg ${message.senderId === user?.userId ? 'items-end' : 'items-start'}`}>
+                        <div className={`px-4 py-2 rounded-lg inline-block ${message.senderId === user?.userId ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted rounded-bl-none'}`}>
+                           <p className="text-sm">{message.text}</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                             <span className="text-xs font-bold">{message.senderUsername}</span>
+                            <span className="text-xs text-muted-foreground">
+                                {formatRelative(message.timestamp.toDate(), new Date())}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                ))
+            )}
           </div>
+        </ScrollArea>
+
+        <div className="mt-4 border-t pt-4">
+            <div className="relative">
+                <Textarea
+                    placeholder="Type your message..."
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    rows={1}
+                    className="pr-24 min-h-[48px] resize-none"
+                    disabled={sendingMessage}
+                />
+                <Button onClick={handleSendMessage} disabled={!inputMessage.trim() || sendingMessage} className="absolute top-1/2 right-2 -translate-y-1/2">
+                    {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    <span className="sr-only">Send</span>
+                </Button>
+            </div>
+        </div>
       </div>
     </main>
   );
