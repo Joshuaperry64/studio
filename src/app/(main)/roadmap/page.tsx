@@ -47,11 +47,11 @@ const roadmapData = {
     { title: 'Persistent Chat History', status: 'complete', description: 'Conversations are saved locally and persist between sessions.' },
     { title: 'Real-time Collaboration', status: 'complete', description: 'Real-time chat sessions with live updates for messages and participants.' },
     { title: 'Expanded AI Toolset', status: 'complete', description: 'Integrate more advanced Genkit tools for functions like web searches, data analysis, and more.' },
+    { title: 'Voice-to-Voice Chat', status: 'complete', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
   ],
   upcoming: [
     { title: 'AI-Powered Code Modification', status: 'pending', description: 'Allow the AI to directly suggest and apply code changes to the application codebase.' },
     { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
-    { title: 'Voice-to-Voice Chat', status: 'pending', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
     { title: 'Gamification & Co-op Features', status: 'pending', description: 'Introduce cooperative goals, leaderboards, or shared achievements to enhance user engagement.' },
   ],
 };
