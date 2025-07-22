@@ -108,11 +108,7 @@ export default function ProfileSettingsPage() {
     return (
         <div className="space-y-6">
             <Card>
-                <CardHeader>
-                    <CardTitle>Edit Profile</CardTitle>
-                    <CardDescription>Manage your public profile information.</CardDescription>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                     <div className="flex flex-col items-center gap-4 text-center">
                         <div className="relative">
                             <Avatar className="h-32 w-32">

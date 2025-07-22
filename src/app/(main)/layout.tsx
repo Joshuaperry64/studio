@@ -25,6 +25,8 @@ import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import ProfileSettingsPage from './settings/profile/page';
@@ -175,6 +177,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                    <DialogTitle>Profile Settings</DialogTitle>
+                </DialogHeader>
                 <ProfileSettingsPage />
                 <Button variant="outline" className="mt-4 w-full" onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
