@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -48,7 +48,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   ];
 
   const adminMenuItems = [
-    { href: '/admin', label: 'Admin', icon: Shield },
+    { href: '/admin', label: 'Admin Panel', icon: Shield },
+    { href: '/admin', label: 'Profile Management', icon: UserCog },
   ]
   
   if (!isInitialized) {
@@ -86,10 +87,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               </SidebarMenuItem>
             ))}
             {user?.role === 'admin' && adminMenuItems.map((item) => (
-               <SidebarMenuItem key={item.href}>
+               <SidebarMenuItem key={item.label}>
                <SidebarMenuButton
                  asChild
-                 isActive={pathname === item.href}
+                 isActive={pathname === item.href && item.label === 'Admin Panel'}
                  tooltip={{ children: item.label }}
                  className="justify-start"
                >
