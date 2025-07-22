@@ -52,6 +52,7 @@ const roadmapData = {
   upcoming: [
     { title: 'AI-Powered Code Modification', status: 'pending', description: 'Allow the AI to directly suggest and apply code changes to the application codebase.' },
     { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
+    { title: 'Customizable AI Personas', status: 'pending', description: 'Allow users to edit the AI-generated backstories and personalities of their characters.' },
     { title: 'Gamification & Co-op Features', status: 'pending', description: 'Introduce cooperative goals, leaderboards, or shared achievements to enhance user engagement.' },
   ],
 };
