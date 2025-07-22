@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 interface UserPayload extends JwtPayload {
-    userId: number;
+    userId: string;
     username: string;
     role: 'admin' | 'user';
 }

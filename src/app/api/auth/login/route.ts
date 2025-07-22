@@ -21,7 +21,7 @@ export async function POST(request: Request) {
                 userId: 'creator-joshua', // Special static ID for the creator
                 role: 'admin', 
                 username: 'Joshua',
-                avatar: '' // Default avatar
+                avatar: '/joshua-avatar.jpg' // Default avatar
             }, 
             process.env.JWT_SECRET || 'your-secret-key', 
             {

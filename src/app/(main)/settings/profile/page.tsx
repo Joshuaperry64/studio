@@ -125,6 +125,8 @@ export default function ProfileSettingsPage() {
         return <p>Loading...</p>;
     }
 
+    const isCreator = user.username === 'Joshua';
+
     return (
         <div className="space-y-6">
             <Card>
@@ -154,12 +156,12 @@ export default function ProfileSettingsPage() {
                         </div>
                         <div>
                             <p className="text-2xl font-bold">{user.username}</p>
-                            <p className="text-sm text-muted-foreground capitalize">{user.username === 'Joshua' ? 'Creator' : user.role}</p>
+                            <p className="text-sm text-muted-foreground capitalize">{isCreator ? 'Creator' : user.role}</p>
                         </div>
                     </div>
                 </CardContent>
                 <CardFooter className="justify-end">
-                    <Button onClick={handleSaveProfile} disabled={isLoading || !avatarFile}>
+                    <Button onClick={handleSaveProfile} disabled={isLoading || !avatarFile || isCreator}>
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                         Save Changes
                     </Button>
@@ -189,7 +191,7 @@ export default function ProfileSettingsPage() {
                         </div>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
-                                <Button variant="destructive" disabled={isDeleting}>
+                                <Button variant="destructive" disabled={isDeleting || isCreator}>
                                      {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
                                     Delete My Account
                                 </Button>
