@@ -60,8 +60,7 @@ export default function LoginPage() {
 
       if (response.ok) {
         toast({ title: 'Login Successful', description: "Welcome back!" });
-        // The token is in the httpOnly cookie, but the response body contains it for client-side state update.
-        login(data.token); // Update user state immediately
+        login(data.token);
         router.push('/chat');
       } else {
         toast({ title: 'Login Failed', description: data.message || 'An error occurred.', variant: 'destructive' });
@@ -78,6 +77,10 @@ export default function LoginPage() {
     event.preventDefault();
     if (registerPin !== registerPinConfirm) {
       toast({ title: 'Application Failed', description: 'PINs do not match.', variant: 'destructive' });
+      return;
+    }
+     if (registerPin.length < 4 || registerPin.length > 6) {
+      toast({ title: 'Application Failed', description: 'PIN must be between 4 and 6 digits.', variant: 'destructive' });
       return;
     }
     setIsLoading(true);
