@@ -1,7 +1,7 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { listSessionsFlow } from '@/ai/flows/list-sessions';
 import { createSessionFlow } from '@/ai/flows/create-session';
 import { addParticipantToSessionFlow } from '@/ai/flows/add-participant-to-session';
 import { Input } from '@/components/ui/input';
@@ -9,12 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useUserStore } from '@/store/user-store'; // Assuming user info is in user-store
+import { useUserStore } from '@/store/user-store';
+import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { db } from '@/ai/genkit';
 
 interface Session {
   id: string;
   name: string;
-  createdAt: any; // Use any for Timestamp initially
+  createdAt: any; 
 }
 
 export default function LobbyPage() {
@@ -27,26 +29,27 @@ export default function LobbyPage() {
 
   const { toast } = useToast();
   const router = useRouter();
-  const { user } = useUserStore(); // Get user info from the store
-
-  const fetchSessions = async () => {
-    try {
-      const result = await listSessionsFlow({});
-      if (result.errorMessage) {
-        setFetchingSessionsError(result.errorMessage);
-        setLoadingSessions(false);
-        return;
-      }
-      setSessions(result.sessions);
-      setLoadingSessions(false);
-    } catch (err) {
-      setFetchingSessionsError('Failed to fetch sessions.');
-      setLoadingSessions(false);
-    }
-  };
+  const { user } = useUserStore(); 
 
   useEffect(() => {
-    fetchSessions();
+    const sessionsCollectionRef = collection(db, 'sessions');
+    const q = query(sessionsCollectionRef, orderBy('createdAt', 'desc'));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const sessionsData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as Session[];
+        setSessions(sessionsData);
+        setLoadingSessions(false);
+    }, (error) => {
+        console.error("Error fetching sessions in real-time:", error);
+        setFetchingSessionsError('Failed to fetch sessions.');
+        setLoadingSessions(false);
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   const handleCreateSession = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -56,21 +59,19 @@ export default function LobbyPage() {
       return;
     }
 
+    if (!user) {
+        toast({ title: 'Error', description: 'You must be logged in to create a session.', variant: 'destructive' });
+        return;
+    }
+
     setCreatingSession(true);
     setCreatingSessionError(null);
 
     try {
       const result = await createSessionFlow({ sessionName: newSessionName });
-      if (result.errorMessage) {
-        setCreatingSessionError(result.errorMessage);
-        toast({ title: 'Error', description: result.errorMessage, variant: 'destructive' });
-        setCreatingSession(false);
-        return;
-      }
-
+      
       toast({ title: 'Session Created', description: `Session "${newSessionName}" created successfully.` });
-      setNewSessionName(''); // Clear input
-      fetchSessions(); // Refresh session list
+      setNewSessionName('');
 
     } catch (err) {
       setCreatingSessionError('Failed to create session.');
@@ -86,15 +87,12 @@ export default function LobbyPage() {
           return;
       }
 
-      // You might want to add a loading state specifically for joining a session
-      // For simplicity, we'll just use a toast for feedback for now.
-
       try {
           const result = await addParticipantToSessionFlow({ sessionId, userId: user.userId, username: user.username });
 
           if (result.success) {
               toast({ title: 'Joined Session', description: result.message });
-              router.push(`/chat/${sessionId}`); // Redirect to the session's chat page
+              router.push(`/chat/${sessionId}`); 
           } else {
               toast({ title: 'Joining Failed', description: result.message, variant: 'destructive' });
           }
@@ -153,13 +151,15 @@ export default function LobbyPage() {
         <div className="mt-6 space-y-4">
           <h2 className="text-xl font-semibold">Available Sessions</h2>
           {sessions.length === 0 ? (
-            <p>No active sessions found.</p>
+            <p>No active sessions found. Why not create one?</p>
           ) : (
             sessions.map((session) => (
               <div key={session.id} className="border p-4 rounded-md flex justify-between items-center">
                 <div>
                     <h2 className="text-xl font-semibold">{session.name}</h2>
-                    <p className="text-sm text-muted-foreground">Created At: {new Date(session.createdAt.seconds * 1000).toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">
+                        Created At: {session.createdAt?.seconds ? new Date(session.createdAt.seconds * 1000).toLocaleString() : 'Just now'}
+                    </p>
                 </div>
                 <Button onClick={() => handleJoinSession(session.id)}>Join</Button>
               </div>
