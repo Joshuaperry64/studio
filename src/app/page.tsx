@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
 export default function RootPage() {
-  redirect('/chat');
+  // Redirect to the login page by default
+  redirect('/login');
 }
