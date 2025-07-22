@@ -80,13 +80,20 @@ export default function ChatPage() {
 
     try {
       // Use the character's assigned voice, or a default voice if no character is active.
-      const voiceName = activeCharacter?.voiceName || 'Algenib';
+      const voiceName = activeCharacter?.voiceName;
+      const characterDetails = activeCharacter ? {
+        name: activeCharacter.name,
+        personality: activeCharacter.personality,
+        backstory: activeCharacter.backstory,
+      } : undefined;
+
 
       const result = await analyzeUserInput({
         textPrompt: input,
         photoDataUri,
         videoDataUri,
         voiceName,
+        characterDetails,
       });
       const aiMessage = {
         id: Date.now() + 1,

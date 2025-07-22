@@ -8,6 +8,7 @@ interface CharacterStoreState {
   characters: Character[];
   activeCharacter: Character | null;
   addCharacter: (character: Character) => void;
+  updateCharacter: (originalName: string, updatedCharacter: Character) => void;
   removeCharacter: (name: string) => void;
   setActiveCharacter: (name: string | null) => void;
 }
@@ -20,6 +21,13 @@ export const useCharacterStore = create<CharacterStoreState>()(
       addCharacter: (character) =>
         set((state) => ({
           characters: [...state.characters, character],
+        })),
+      updateCharacter: (originalName, updatedCharacter) =>
+        set((state) => ({
+            characters: state.characters.map((c) =>
+                c.name === originalName ? updatedCharacter : c
+            ),
+            activeCharacter: state.activeCharacter?.name === originalName ? updatedCharacter : state.activeCharacter,
         })),
       removeCharacter: (name) =>
         set((state) => ({

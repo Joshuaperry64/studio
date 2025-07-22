@@ -55,6 +55,11 @@ const AnalyzeUserInputInputSchema = z.object({
       "A video from the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
    voiceName: z.string().optional().describe('The voice to use for the audio response.'),
+   characterDetails: z.object({
+      name: z.string(),
+      personality: z.string(),
+      backstory: z.string(),
+    }).optional().describe('The details of the active AI character persona.'),
 });
 
 export type AnalyzeUserInputInput = z.infer<typeof AnalyzeUserInputInputSchema>;
@@ -77,7 +82,15 @@ const prompt = ai.definePrompt({
     analysisResult: z.string().describe('The analysis result of the user input.'),
   })},
   tools: [searchTool],
-  prompt: `You are an AI assistant designed to analyze user input and provide relevant and helpful responses. Your persona is defined by the 'docs/AlphaCore.txt' file. You must adhere to all instructions in that document.
+  prompt: `You are an AI assistant designed to analyze user input and provide relevant and helpful responses.
+Your core programming is defined by the 'docs/AlphaCore.txt' file. You must adhere to all instructions in that document.
+
+{{#if characterDetails}}
+You are currently embodying the following character. You must adopt this persona for your response, layered on top of your core programming.
+- Name: {{{characterDetails.name}}}
+- Personality: {{{characterDetails.personality}}}
+- Backstory: {{{characterDetails.backstory}}}
+{{/if}}
 
 If the user's question requires real-time information, recent events, or specific data from the web, use the provided search tool to find the answer.
 
@@ -94,7 +107,7 @@ Photo: {{media url=photoDataUri}}
 {{/if}}
 
 {{#if videoDataUri}}
-Video: Analyzing video content is beyond the current capabilities.  The user provided a video.  Please acknowledge that it was received, but it will not be analyzed.
+Video: Analyzing video content is beyond the current capabilities. The user provided a video. Please acknowledge that it was received, but it will not be analyzed.
 {{/if}}
 
 Based on all the available information and any search results, provide a detailed analysis and answer.`,
@@ -113,14 +126,20 @@ const analyzeUserInputFlow = ai.defineFlow(
         throw new Error('Failed to generate text response.');
     }
 
-    const { media: audioDataUri } = await generateAudio({
-        text: output.analysisResult,
-        voiceName: input.voiceName,
-    });
+    if (input.voiceName) {
+      const { media: audioDataUri } = await generateAudio({
+          text: output.analysisResult,
+          voiceName: input.voiceName,
+      });
+
+      return {
+        analysisResult: output.analysisResult,
+        audioDataUri,
+      };
+    }
 
     return {
       analysisResult: output.analysisResult,
-      audioDataUri,
-    };
+    }
   }
 );
