@@ -12,15 +12,42 @@ import copy from 'copy-to-clipboard';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Message } from '@/store/chat-store';
+import { Timestamp } from 'firebase/firestore';
 
-interface ChatMessageProps {
-  message: Message;
-  userAvatar?: string;
-  userName?: string;
+interface MessagePayload {
+  id: string | number;
+  text?: string;
+  photo?: string; 
+  video?: string;
+  timestamp?: Timestamp;
+}
+export interface SoloChatMessage extends MessagePayload {
+    sender: 'user' | 'ai';
+    character?: {
+        name: string;
+        avatar: string;
+    };
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, userName }) => {
+export interface CollaborativeMessage extends MessagePayload {
+    senderId: string;
+    senderUsername: string;
+    isAiMessage?: boolean;
+}
+
+
+interface ChatMessageProps {
+  message: SoloChatMessage | CollaborativeMessage;
+  currentUserId?: string;
+  userAvatar?: string;
+  userName?: string;
+  activeCharacter?: {
+      name: string;
+      avatarDataUri: string;
+  } | null;
+}
+
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, currentUserId, userAvatar, userName, activeCharacter }) => {
   const { toast } = useToast();
 
   const handleCopy = (text: string) => {
@@ -30,8 +57,32 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, userName
     }
   };
 
+  const isSoloChatMessage = 'sender' in message;
+  const isUserMessage = isSoloChatMessage ? message.sender === 'user' : message.senderId === currentUserId;
+  const isAiMessage = isSoloChatMessage ? message.sender === 'ai' : message.isAiMessage;
+
+  const getSenderName = () => {
+      if (isUserMessage) return userName;
+      if (isAiMessage) return isSoloChatMessage ? message.character?.name : activeCharacter?.name || 'AI';
+      if (!isSoloChatMessage) return message.senderUsername;
+      return 'AI';
+  }
+
+  const getAvatarSrc = () => {
+      if (isUserMessage) return userAvatar;
+      if (isAiMessage) return isSoloChatMessage ? message.character?.avatar : activeCharacter?.avatarDataUri;
+      return undefined; // Other users in collab chat don't have avatars in this component yet
+  }
+
+  const getAvatarFallback = () => {
+      if (isUserMessage) return userName?.charAt(0).toUpperCase();
+      if (isAiMessage) return <Bot />;
+      if (!isSoloChatMessage) return message.senderUsername.charAt(0).toUpperCase();
+      return '?';
+  }
+
   const renderMedia = () => {
-    if (message.photo) {
+    if ('photo' in message && message.photo) {
       return (
         <div className="mt-2 rounded-md overflow-hidden relative max-w-xs">
           <Image
@@ -44,7 +95,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, userName
         </div>
       );
     }
-    if (message.video) {
+    if ('video' in message && message.video) {
         return (
             <div className="mt-2 rounded-md overflow-hidden relative max-w-xs">
                  <video src={message.video} controls className="max-w-full h-auto" />
@@ -54,8 +105,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, userName
     return null;
   };
 
-  const isUserMessage = message.sender === 'user';
-
   return (
     <div
       key={message.id}
@@ -63,18 +112,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, userName
     >
       {!isUserMessage && (
         <Avatar>
-          <AvatarImage src={message.character?.avatar} alt={message.character?.name || 'AI'} />
-          <AvatarFallback>
-            <Bot />
-          </AvatarFallback>
+          <AvatarImage src={getAvatarSrc()} />
+          <AvatarFallback>{getAvatarFallback()}</AvatarFallback>
         </Avatar>
       )}
       <div
         className={`max-w-[75%] rounded-lg p-3 ${
-          isUserMessage ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+          isUserMessage ? 'bg-primary text-primary-foreground' : isAiMessage ? 'bg-secondary' : 'bg-muted'
         }`}
       >
-        <p className={`text-xs font-bold mb-1 ${isUserMessage ? 'text-right' : 'text-left'}`}>{isUserMessage ? userName : (message.character?.name || 'AI')}</p>
+        <p className={`text-xs font-bold mb-1 ${isUserMessage ? 'text-right' : 'text-left'}`}>{getSenderName()}</p>
 
         {message.text && (
           <ReactMarkdown
@@ -123,10 +170,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userAvatar, userName
       </div>
       {isUserMessage && (
         <Avatar>
-          <AvatarImage src={userAvatar} alt={userName} />
-          <AvatarFallback>
-            {userName?.charAt(0).toUpperCase()}
-          </AvatarFallback>
+          <AvatarImage src={getAvatarSrc()} />
+          <AvatarFallback>{getAvatarFallback()}</AvatarFallback>
         </Avatar>
       )}
     </div>

@@ -2,13 +2,12 @@
 
 import { analyzeUserInput } from '@/ai/flows/analyze-user-input';
 import { enableVoiceInput } from '@/ai/flows/enable-voice-input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { fileToDataUri } from '@/lib/utils';
-import { Bot, Loader2, Mic, Paperclip, Send, User, X } from 'lucide-react';
+import { Bot, Loader2, Mic, Paperclip, Send, X } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -18,6 +17,8 @@ import { WelcomeDialog } from '@/components/welcome-dialog';
 import { useSettingsStore } from '@/store/settings-store';
 import { useChatStore } from '@/store/chat-store';
 import ChatMessage from '@/components/ChatMessage';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 
 export default function ChatPage() {
   const { messages, addMessage, removeLastMessage, startLoading, stopLoading, isLoading } = useChatStore();

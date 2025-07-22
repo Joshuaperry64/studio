@@ -18,6 +18,8 @@ import { Badge } from '@/components/ui/badge';
 import { formatRelative } from 'date-fns';
 import { useCharacterStore } from '@/store/character-store';
 import ChatMessage from '@/components/ChatMessage';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 
 interface Message {
   id: string;
@@ -217,38 +219,15 @@ export default function CollaborativeChatPage() {
                     <p>No messages yet. Start the conversation! Mention <code className="bg-muted px-1.5 py-1 rounded-sm">@ai</code> to talk to the AI.</p>
                 </div>
             ) : (
-                messages.map((message) => {
-                  const isUserMessage = message.senderId === user?.userId;
-                  const isAiMessage = message.senderId === 'ai';
-
-                  return (
-                    <div key={message.id} className={`flex items-end gap-2 ${isUserMessage ? 'justify-end' : ''}`}>
-                      {!isUserMessage && (
-                        <Avatar>
-                          <AvatarImage src={isAiMessage ? activeCharacter?.avatarDataUri : undefined} />
-                          <AvatarFallback>{isAiMessage ? <Bot/> : message.senderUsername.charAt(0).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                      )}
-                      <div className={`flex flex-col space-y-1 max-w-lg ${isUserMessage ? 'items-end' : 'items-start'}`}>
-                          <div className={`px-4 py-2 rounded-lg inline-block ${isUserMessage ? 'bg-primary text-primary-foreground rounded-br-none' : isAiMessage ? 'bg-secondary rounded-bl-none' : 'bg-muted rounded-bl-none'}`}>
-                            <p className="text-sm">{message.text}</p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                              <span className="text-xs font-bold">{message.senderUsername}</span>
-                              <span className="text-xs text-muted-foreground">
-                                  {formatRelative(message.timestamp.toDate(), new Date())}
-                              </span>
-                          </div>
-                      </div>
-                       {isUserMessage && (
-                        <Avatar>
-                          <AvatarImage src={user?.avatar} />
-                          <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                      )}
-                    </div>
-                  );
-                })
+                messages.map((message) => (
+                    <ChatMessage
+                        key={message.id}
+                        message={message}
+                        currentUserId={user?.userId}
+                        userName={user?.username}
+                        activeCharacter={activeCharacter}
+                    />
+                ))
             )}
           </div>
         </ScrollArea>
