@@ -46,13 +46,10 @@ export default function AdminPage() {
     const router = useRouter();
     const { memorySettings } = useSettingsStore();
 
-    // Data states
     const [users, setUsers] = useState<DisplayUser[]>([]);
     const [feedback, setFeedback] = useState<Feedback[]>([]);
     const [userStats, setUserStats] = useState<UserStats | null>(null);
     const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
-
-    // Loading and error states
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
@@ -66,7 +63,6 @@ export default function AdminPage() {
                 fetch('/api/admin/stats/sessions'),
             ]);
 
-            // Process all responses
             if (usersResponse.ok) setUsers(await usersResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch users.', variant: 'destructive' });
             if (feedbackResponse.ok) setFeedback(await feedbackResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch feedback.', variant: 'destructive' });
             if (statsResponse.ok) setUserStats(await statsResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch user stats.', variant: 'destructive' });
@@ -133,7 +129,7 @@ export default function AdminPage() {
     <main className="p-4 sm:p-6 flex-1">
       <div className="max-w-7xl mx-auto space-y-6">
        <Tabs defaultValue="dashboard">
-        <TabsList className="grid w-full grid-cols-3 max-w-lg">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 sm:max-w-lg">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="users">User Management</TabsTrigger>
             <TabsTrigger value="feedback">User Feedback</TabsTrigger>

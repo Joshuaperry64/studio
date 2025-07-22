@@ -15,11 +15,11 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, UserCog, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import { useUserStore } from '@/store/user-store';
 import { useEffect } from 'react';
 import {
@@ -40,14 +40,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const { toast } = useToast();
 
   useEffect(() => {
-    // This effect runs once on mount to initialize the user state from cookies.
     if (!isInitialized) {
         initialize();
     }
   }, [initialize, isInitialized]);
 
    useEffect(() => {
-    // This effect redirects to login if initialization is complete and there's still no user.
     if (isInitialized && !user) {
         router.push('/login');
     }
@@ -57,7 +55,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const handleLogout = async () => {
     try {
         await fetch('/api/auth/logout', { method: 'POST' });
-        logout(); // Clear user from zustand store
+        logout(); 
         toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
         router.push('/login');
     } catch(error) {
@@ -88,8 +86,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   ]
 
   if (!isInitialized || !user) {
-    // Render a full-page loading indicator while the user state is being initialized
-    // or if the user is not yet available (which can happen briefly during redirects).
     return (
         <div className="flex items-center justify-center h-screen w-full bg-background">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -158,27 +154,25 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               </SidebarMenuItem>
             )}
           </SidebarMenu>
+          <SidebarSeparator />
+          <SidebarMenu>
+             {bottomMenuItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith(item.href)}
+                    tooltip={{ children: item.label }}
+                    className="justify-start"
+                    >
+                    <Link href={item.subpath || item.href}>
+                        <item.icon className="h-5 w-5" />
+                        <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                    </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                ))}
+          </SidebarMenu>
         </SidebarContent>
-        <Separator className="my-2" />
-          <SidebarContent>
-              <SidebarMenu>
-                 {bottomMenuItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton
-                        asChild
-                        isActive={pathname.startsWith(item.href)}
-                        tooltip={{ children: item.label }}
-                        className="justify-start"
-                        >
-                        <Link href={item.subpath || item.href}>
-                            <item.icon className="h-5 w-5" />
-                            <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
-                        </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    ))}
-              </SidebarMenu>
-          </SidebarContent>
         <SidebarFooter>
           <Dialog>
              <DialogTrigger asChild>
@@ -211,7 +205,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <SidebarInset>
         <div className="tech-background">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
-            <SidebarTrigger className="md:hidden" />
+            <SidebarTrigger />
             <h1 className="text-lg font-semibold md:text-xl font-headline">
               {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => pathname.startsWith(item.href))?.label || 'AlphaLink'}
             </h1>

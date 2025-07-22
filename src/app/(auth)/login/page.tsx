@@ -45,14 +45,6 @@ export default function LoginPage() {
     fetchUsernames();
   }, []);
 
-  useEffect(() => {
-    if (loginUsername === 'Joshua') {
-      setLoginPin('14235');
-    } else {
-      setLoginPin('');
-    }
-  }, [loginUsername]);
-
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
