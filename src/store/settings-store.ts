@@ -9,6 +9,8 @@ interface SettingsState {
   toggleNsfwMode: () => void;
   notifications: boolean;
   toggleNotifications: () => void;
+  hasSeenWelcomeScreen: boolean;
+  setHasSeenWelcomeScreen: (hasSeen: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -32,6 +34,8 @@ export const useSettingsStore = create<SettingsState>()(
       toggleNsfwMode: () => set((state) => ({ nsfwMode: !state.nsfwMode })),
       notifications: true,
       toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
+      hasSeenWelcomeScreen: false,
+      setHasSeenWelcomeScreen: (hasSeen: boolean) => set({ hasSeenWelcomeScreen: hasSeen }),
     }),
     {
       name: 'settings-storage',
@@ -40,6 +44,7 @@ export const useSettingsStore = create<SettingsState>()(
       partialize: (state) => ({
         nsfwMode: state.nsfwMode,
         notifications: state.notifications,
+        hasSeenWelcomeScreen: state.hasSeenWelcomeScreen,
       }),
     }
   )

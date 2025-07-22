@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { useCharacterStore } from '@/store/character-store';
 import { useUserStore } from '@/store/user-store';
+import { WelcomeDialog } from '@/components/welcome-dialog';
+import { useSettingsStore } from '@/store/settings-store';
 
 interface Message {
   id: number;
@@ -40,7 +42,16 @@ export default function ChatPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { activeCharacter } = useCharacterStore();
   const { user } = useUserStore();
-
+  const { hasSeenWelcomeScreen, setHasSeenWelcomeScreen } = useSettingsStore();
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
+  
+  useEffect(() => {
+    // Only show the welcome screen if it hasn't been seen before.
+    // The dialog's onOpenChange will handle setting the state.
+    if (!hasSeenWelcomeScreen) {
+      setIsWelcomeOpen(true);
+    }
+  }, [hasSeenWelcomeScreen]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -144,6 +155,14 @@ export default function ChatPage() {
   };
 
   return (
+    <>
+    <WelcomeDialog open={isWelcomeOpen} onOpenChange={(open) => {
+        setIsWelcomeOpen(open);
+        // If the dialog is closing, mark it as seen.
+        if (!open) {
+            setHasSeenWelcomeScreen(true);
+        }
+    }}/>
     <div className="flex flex-col h-[calc(100vh-4rem)] sm:h-[calc(100vh-4rem)]">
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-6 max-w-3xl mx-auto">
@@ -239,5 +258,6 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

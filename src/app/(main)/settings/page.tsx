@@ -20,6 +20,7 @@ export default function SettingsPage() {
     notifications,
     toggleNotifications,
     saveApiKey,
+    setHasSeenWelcomeScreen,
   } = useSettingsStore();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -47,6 +48,11 @@ export default function SettingsPage() {
         setIsLoading(false);
     }
   };
+
+  const handleShowWelcome = () => {
+      setHasSeenWelcomeScreen(false);
+      toast({ title: 'Welcome Screen Enabled', description: 'The welcome screen will be shown the next time you visit the chat page.'});
+  }
 
   return (
     <main className="p-4 sm:p-6 flex-1">
@@ -115,6 +121,16 @@ export default function SettingsPage() {
             </div>
             
             <Separator />
+            
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border p-4 gap-4">
+              <div>
+                <p className="font-medium">Show Welcome Screen</p>
+                <p className="text-sm text-muted-foreground">
+                  Display the initial welcome guide on your next visit.
+                </p>
+              </div>
+              <Button variant="outline" onClick={handleShowWelcome}>Show Again</Button>
+            </div>
 
             <div>
                 <h3 className="text-lg font-medium">Account</h3>
