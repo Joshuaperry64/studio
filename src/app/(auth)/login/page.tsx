@@ -84,7 +84,7 @@ export default function LoginPage() {
         <TabsTrigger value="register">Register</TabsTrigger>
       </TabsList>
       <TabsContent value="login">
-        <Card className="bg-background/80">
+        <Card className="bg-background/80 backdrop-blur-sm">
           <form onSubmit={handleLogin}>
             <CardHeader>
               <CardTitle className="text-2xl">Login to AlphaLink</CardTitle>
@@ -110,7 +110,7 @@ export default function LoginPage() {
         </Card>
       </TabsContent>
       <TabsContent value="register">
-        <Card className="bg-background/80">
+        <Card className="bg-background/80 backdrop-blur-sm">
           <form onSubmit={handleRegister}>
             <CardHeader>
               <CardTitle className="text-2xl">Create an Account</CardTitle>
