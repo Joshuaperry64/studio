@@ -21,3 +21,4 @@ import '@/ai/flows/save-message-to-session.ts';
 import '@/ai/flows/list-sessions.ts';
 import '@/ai/flows/get-user-by-username.ts';
 import '@/ai/flows/voice-biometrics.ts';
+import '@/ai/flows/voice-to-voice-chat.ts';

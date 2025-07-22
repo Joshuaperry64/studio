@@ -1,7 +1,8 @@
+
 'use client';
 
 import { analyzeUserInput } from '@/ai/flows/analyze-user-input';
-import { enableVoiceInput } from '@/ai/flows/enable-voice-input';
+import { voiceToVoiceChat } from '@/ai/flows/voice-to-voice-chat';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
@@ -136,13 +137,37 @@ export default function ChatPage() {
 
   const handleVoiceInput = async (audioFile: File) => {
     startLoading();
+    
     try {
       const audioDataUri = await fileToDataUri(audioFile);
-      const result = await enableVoiceInput({ audioDataUri });
-      setInput((prev) => (prev ? `${prev} ${result.transcription}` : result.transcription));
-      toast({ title: 'Transcription Successful', description: 'Voice input transcribed to text.' });
+      const voiceName = activeCharacter?.voiceName || 'Algenib';
+      
+      const result = await voiceToVoiceChat({ audioDataUri, voiceName });
+
+      // Add user's transcribed message to chat
+      const userMessage = {
+          id: Date.now(),
+          sender: 'user' as const,
+          text: result.transcription,
+      };
+      addMessage(userMessage);
+
+      // Add AI's response message to chat
+      const aiMessage = {
+          id: Date.now() + 1,
+          sender: 'ai' as const,
+          text: result.responseText,
+          character: activeCharacter ? { name: activeCharacter.name, avatar: activeCharacter.avatarDataUri } : undefined,
+      };
+      addMessage(aiMessage);
+
+      // Play AI's audio response
+      if (result.audioDataUri) {
+        playAudio(result.audioDataUri);
+      }
+
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to transcribe audio.';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process voice input.';
       toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     } finally {
       stopLoading();
