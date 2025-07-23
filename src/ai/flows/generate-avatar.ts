@@ -5,8 +5,6 @@
  * @fileOverview A Genkit flow for generating a user avatar image.
  *
  * - generateAvatar - A function that creates a photorealistic avatar from a prompt.
- * - GenerateAvatarInput - The input type for the generateAvatar function.
- * - GenerateAvatarOutput - The return type for the generateAvatar function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -45,7 +43,6 @@ const generateAvatarFlow = ai.defineFlow(
         prompt: `Generate a photorealistic, square user profile avatar based on this description: "${input.prompt}". The image should be suitable as a user icon.`,
         config: {
           responseModalities: ['TEXT', 'IMAGE'],
-          aspectRatio: '1:1',
         },
     });
 
