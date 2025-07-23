@@ -21,7 +21,7 @@ import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile,
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,20 @@ import {
 } from '@/components/ui/dialog';
 import ProfileSettingsPage from './settings/profile/page';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+
+function Clock() {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, []);
+
+  return <div className="font-mono text-lg">{format(time, 'HH:mm:ss')}</div>;
+}
 
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -176,14 +190,29 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-          <Dialog>
+           {/* Profile card moved to header */}
+        </SidebarFooter>
+      </Sidebar>
+      <SidebarInset>
+        <div className="tech-background">
+          <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
+            <div className='flex items-center gap-4'>
+                <SidebarTrigger />
+                <h1 className="text-lg font-semibold md:text-xl font-headline">
+                {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => pathname.startsWith(item.href))?.label || 'AlphaLink'}
+                </h1>
+            </div>
+            <div className="absolute left-1/2 -translate-x-1/2">
+                <Clock />
+            </div>
+            <Dialog>
              <DialogTrigger asChild>
-                <button className="flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent w-full text-left">
+                <button className="flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent text-left">
                      <Avatar className="h-9 w-9">
                         <AvatarImage src={user?.avatar} alt={user?.username} />
                         <AvatarFallback>{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                    <div className="flex-col hidden sm:flex">
                         <span className="text-sm font-medium">{user?.username}</span>
                         <span className="text-xs text-muted-foreground capitalize">
                           {user?.username === 'Joshua' ? 'Creator' : user?.role}
@@ -202,15 +231,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </Button>
             </DialogContent>
            </Dialog>
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>
-        <div className="tech-background">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
-            <SidebarTrigger />
-            <h1 className="text-lg font-semibold md:text-xl font-headline">
-              {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => pathname.startsWith(item.href))?.label || 'AlphaLink'}
-            </h1>
           </header>
           {children}
         </div>
