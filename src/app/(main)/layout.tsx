@@ -23,7 +23,7 @@ import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile,
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,7 @@ import ProfileSettingsPage from './settings/profile/page';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useSettingsStore } from '@/store/settings-store';
 
 function Clock() {
   const [time, setTime] = useState(new Date());
@@ -53,8 +54,11 @@ function Clock() {
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, isInitialized, initialize, logout } = useUserStore();
+  const { soundEnabled } = useSettingsStore();
   const router = useRouter();
   const { toast } = useToast();
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -67,6 +71,28 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         router.push('/login');
     }
   }, [isInitialized, user, router]);
+
+
+  useEffect(() => {
+    const playAudio = async () => {
+        if (soundEnabled && audioRef.current) {
+            try {
+                await audioRef.current.play();
+                setIsPlaying(true);
+            } catch (error) {
+                console.error("Background audio playback failed:", error);
+                setIsPlaying(false);
+            }
+        }
+    };
+    
+    if (soundEnabled && !isPlaying) {
+        playAudio();
+    } else if (!soundEnabled && audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+    }
+  }, [soundEnabled, isPlaying]);
 
 
   const handleLogout = async () => {
@@ -256,6 +282,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </Sidebar>
       <SidebarInset>
         <div className="tech-background">
+          <audio ref={audioRef} src="/audio/background_music.mp3" loop />
           <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <div className='flex items-center gap-4'>
                 <SidebarTrigger className="flex md:hidden" />

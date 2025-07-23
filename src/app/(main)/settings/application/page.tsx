@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, CheckCircle, Volume2 } from 'lucide-react';
+import { Loader2, ShieldCheck, CheckCircle, Volume2, Upload, Music } from 'lucide-react';
 import { useSettingsStore } from '@/store/settings-store';
 import Link from 'next/link';
 import {
@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useUserStore } from '@/store/user-store';
 
 const safetyCategories = [
     { id: 'HARM_CATEGORY_HATE_SPEECH', name: 'Hate Speech' },
@@ -51,6 +52,7 @@ const imageModels = [
 
 
 export default function ApplicationSettingsPage() {
+  const { user } = useUserStore();
   const {
     apiKey,
     nsfwMode,
@@ -75,6 +77,8 @@ export default function ApplicationSettingsPage() {
   const [isNsfwDialogOpen, setIsNsfwDialogOpen] = useState(false);
   const [nsfwAccessCode, setNsfwAccessCode] = useState('');
   const [apiKeyStatus, setApiKeyStatus] = useState<'loading' | 'exists' | 'missing'>('loading');
+  const [backgroundAudioFile, setBackgroundAudioFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -143,6 +147,36 @@ export default function ApplicationSettingsPage() {
   const handleShowWelcome = () => {
       setHasSeenWelcomeScreen(false);
       toast({ title: 'Welcome Screen Enabled', description: 'The welcome screen will be shown the next time you visit the chat page.'});
+  }
+
+  const handleBackgroundAudioUpload = async () => {
+    if (!backgroundAudioFile) {
+      toast({ title: 'No file selected', description: 'Please select an audio file to upload.', variant: 'destructive'});
+      return;
+    }
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('audio', backgroundAudioFile);
+
+    try {
+      const response = await fetch('/api/admin/background-audio', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        toast({ title: 'Success', description: 'Background audio updated successfully. It may take a moment to apply for all users.' });
+        setBackgroundAudioFile(null);
+      } else {
+        throw new Error(data.message || 'Failed to upload audio.');
+      }
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+        toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
+    } finally {
+      setIsUploading(false);
+    }
   }
 
   return (
@@ -267,6 +301,30 @@ export default function ApplicationSettingsPage() {
         </div>
         </CardContent>
     </Card>
+
+    {user?.role === 'admin' && (
+      <Card className="mt-6">
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Music />Global Background Audio</CardTitle>
+            <CardDescription>Upload an audio file (.mp3, .wav) to be used as background music for all users. The current track will be replaced.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="flex items-center gap-2">
+                <Input
+                    type="file"
+                    accept="audio/mpeg, audio/wav"
+                    onChange={(e) => setBackgroundAudioFile(e.target.files ? e.target.files[0] : null)}
+                    className="flex-1"
+                />
+                <Button onClick={handleBackgroundAudioUpload} disabled={isUploading || !backgroundAudioFile}>
+                    {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4"/>}
+                    <span className="ml-2 hidden sm:inline">Upload</span>
+                </Button>
+            </div>
+             {backgroundAudioFile && <p className="text-xs text-muted-foreground mt-2">Selected: {backgroundAudioFile.name}</p>}
+        </CardContent>
+      </Card>
+    )}
 
     {nsfwMode && (
       <div className="mt-6">
