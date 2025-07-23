@@ -13,12 +13,14 @@ import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/user-store';
 import { jwtDecode } from 'jwt-decode';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPin, setLoginPin] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [registerUsername, setRegisterUsername] = useState('');
   const [registerPin, setRegisterPin] = useState('');
   const [registerPinConfirm, setRegisterPinConfirm] = useState('');
@@ -42,6 +44,13 @@ export default function LoginPage() {
         toast({ title: 'Error', description: 'Could not connect to server to get user list.', variant: 'destructive' });
       }
     }
+
+    const rememberedUser = localStorage.getItem('rememberedUsername');
+    if (rememberedUser) {
+        setLoginUsername(rememberedUser);
+        setRememberMe(true);
+    }
+
     fetchUsernames();
   }, [toast]);
 
@@ -59,6 +68,11 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
+        if (rememberMe) {
+            localStorage.setItem('rememberedUsername', loginUsername);
+        } else {
+            localStorage.removeItem('rememberedUsername');
+        }
         toast({ title: 'Login Successful', description: "Welcome back!", duration: 3000 });
         login(data.token);
         router.push('/chat');
@@ -142,6 +156,10 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <Label htmlFor="login-pin">PIN</Label>
                 <Input id="login-pin" type="password" required placeholder="&#9679;&#9679;&#9679;&#9679;" value={loginPin} onChange={(e) => setLoginPin(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="remember-me" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked as boolean)} />
+                <Label htmlFor="remember-me" className="text-sm font-normal text-muted-foreground">Remember Me</Label>
               </div>
             </CardContent>
             <CardFooter>
