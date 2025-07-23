@@ -5,22 +5,37 @@ import { db } from '@/ai/genkit';
 import { verifyAuth } from '@/lib/auth-server';
 import fs from 'fs/promises';
 import path from 'path';
+import crypto from 'crypto';
 
 
 // In a real application, you would use a more robust encryption method 
 // and store the secret key securely (e.g., in environment variables).
-// For this example, we'll use a simple XOR cipher for demonstration.
-// DO NOT use this in production.
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'a-very-secret-key-that-is-long-and-secure';
-
-function encrypt(text: string): string {
-    let result = '';
-    for (let i = 0; i < text.length; i++) {
-        result += String.fromCharCode(text.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length));
+const aescipher = (secretKey: crypto.BinaryLike | undefined) => {
+    const algorithm = 'aes-256-gcm';
+    const key = secretKey;
+    if (!key) {
+        throw new Error('ENCRYPTION_KEY is not set in environment variables');
     }
-    return Buffer.from(result, 'binary').toString('base64');
-}
+    const iv = crypto.randomBytes(16);
 
+    return {
+        encrypt: (text: string) => {
+            const cipher = crypto.createCipheriv(algorithm, key, iv);
+            const encrypted = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]);
+            const tag = cipher.getAuthTag();
+            return Buffer.concat([iv, tag, encrypted]).toString('hex');
+        },
+        decrypt: (hash: string) => {
+            const data = Buffer.from(hash, 'hex');
+            const iv = data.subarray(0, 16);
+            const tag = data.subarray(16, 32);
+            const encrypted = data.subarray(32);
+            const decipher = crypto.createDecipheriv(algorithm, key, iv);
+            decipher.setAuthTag(tag);
+            return decipher.update(encrypted, undefined, 'utf8') + decipher.final('utf8');
+        },
+    };
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,6 +70,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'User not found.' }, { status: 404 });
     }
 
+    const key = process.env.ENCRYPTION_KEY ? Buffer.from(process.env.ENCRYPTION_KEY, 'hex') : undefined;
+    const { encrypt } = aescipher(key);
     const apiKeyEncrypted = encrypt(apiKey);
 
     await updateDoc(userRef, { apiKeyEncrypted });
@@ -67,4 +84,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }
-
