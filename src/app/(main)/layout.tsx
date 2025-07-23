@@ -109,6 +109,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const mainframeItems = [
     { href: '/chat', label: 'Alpha Comms', icon: MessageSquare },
     { href: '/virtual-environment', label: 'Virtual Environment', icon: Globe, subpath: '/virtual-environment'},
+    { href: '/memory-interface', label: 'Memory Interface', icon: BrainCircuit },
   ];
 
   const fabricationItems = [
@@ -168,10 +169,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
            <SidebarTrigger className="group-data-[collapsible=icon]:hidden md:flex" />
         </SidebarHeader>
         <SidebarContent>
-            <Accordion type="multiple" defaultValue={[]} className="w-full">
+            <Accordion type="multiple" defaultValue={['mainframe']} className="w-full">
                 <AccordionItem value="mainframe">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Mainframe</h3>
+                         <h3 className="text-lg font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Mainframe</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                         <SidebarMenu>
@@ -188,7 +189,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                  <SidebarSeparator />
                  <AccordionItem value="fabrication">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Fabrication</h3>
+                         <h3 className="text-lg font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Fabrication</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                         <SidebarMenu>
@@ -205,7 +206,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                  <SidebarSeparator />
                  <AccordionItem value="collaboration">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Collaboration</h3>
+                         <h3 className="text-lg font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Collaboration</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                          <SidebarMenu>
@@ -222,7 +223,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                  <SidebarSeparator />
                 <AccordionItem value="system">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">System</h3>
+                         <h3 className="text-lg font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">System</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                          <SidebarMenu>
@@ -236,16 +237,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         </SidebarMenu>
                     </AccordionContent>
                 </AccordionItem>
+                 <SidebarSeparator />
             </Accordion>
 
 
-          {user?.role === 'admin' && <SidebarSeparator />}
-
-          {user?.username === 'Joshua' && (
+          {user?.role === 'admin' && (
              <Accordion type="multiple" defaultValue={[]} className="w-full">
                 <AccordionItem value="administration">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Administration</h3>
+                         <h3 className="text-lg font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Administration</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                         <SidebarMenu>
@@ -261,16 +261,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </AccordionItem>
              </Accordion>
           )}
-
-           {user?.role === 'admin' && user?.username !== 'Joshua' && (
-              <SidebarMenu>
-                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/admin'} tooltip={{ children: 'Admin Panel' }} className="justify-start" >
-                        <Link href={'/admin'}> <Shield className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">Admin Panel</span> </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            )}
 
         </SidebarContent>
         <SidebarFooter>
