@@ -159,7 +159,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader className="flex items-center justify-between p-2">
-            <div className="flex items-center flex-1 gap-2 overflow-hidden">
+            <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" className="h-8 w-8 bg-primary/10 text-primary flex-shrink-0">
                     <Bot className="h-5 w-5" />
                 </Button>
