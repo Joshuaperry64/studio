@@ -38,7 +38,7 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
 export default function LocalDeploymentPage() {
   const { user } = useUserStore();
 
-  if (user?.username !== 'Joshua') {
+  if (user?.role !== 'admin') {
     return (
         <main className="p-4 sm:p-6 flex-1">
             <div className="max-w-4xl mx-auto">
@@ -47,7 +47,7 @@ export default function LocalDeploymentPage() {
                     <CardTitle className="text-destructive flex items-center gap-2"><AlertCircle/>Access Denied</CardTitle>
                     </CardHeader>
                     <CardContent>
-                    <p>You do not have the required permissions to view this page. This section is restricted to the Creator profile.</p>
+                    <p>You do not have the required permissions to view this page. This section is restricted to administrators.</p>
                     </CardContent>
                 </Card>
             </div>

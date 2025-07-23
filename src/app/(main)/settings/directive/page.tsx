@@ -32,7 +32,7 @@ export default function DirectiveSettingsPage() {
 
   useEffect(() => {
     async function fetchDirective() {
-      if (user?.username !== 'Joshua') return;
+      if (user?.role !== 'admin') return;
       setIsFetching(true);
       try {
         const response = await fetch('/api/settings/directive');
@@ -72,7 +72,7 @@ export default function DirectiveSettingsPage() {
     }
   };
 
-  if (user?.username !== 'Joshua') {
+  if (user?.role !== 'admin') {
     return (
       <Card>
         <CardHeader>

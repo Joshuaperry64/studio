@@ -8,7 +8,7 @@ const DIRECTIVE_PATH = path.resolve(process.cwd(), 'docs/AlphaCore.txt');
 
 async function checkPermissions(request: NextRequest) {
     const auth = await verifyAuth(request);
-    if (!auth.user || auth.user.username !== 'Joshua') {
+    if (!auth.user || auth.user.role !== 'admin') {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     return null;

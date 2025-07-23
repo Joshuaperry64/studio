@@ -15,25 +15,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Handle special case for the Creator profile
-    if (auth.user.username === 'Joshua') {
-      // First, check environment variables (for production deployments)
-      let keyExists = !!process.env.GEMINI_API_KEY;
-
-      // If not in env, check .env.local (for local development)
-      if (!keyExists) {
-        try {
-          const envLocalPath = path.resolve(process.cwd(), '.env.local');
-          const fileContent = await fs.readFile(envLocalPath, 'utf-8');
-          keyExists = fileContent.includes('GEMINI_API_KEY=');
-        } catch (error) {
-          // .env.local might not exist, which is fine.
-          keyExists = false;
-        }
-      }
-      return NextResponse.json({ keyExists });
-    }
-
     // Standard user logic: check for the encrypted key in the database
     const userRef = doc(db, 'users', auth.user.userId);
     const userDoc = await getDoc(userRef);

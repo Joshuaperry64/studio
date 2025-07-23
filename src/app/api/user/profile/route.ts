@@ -13,35 +13,6 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    // Handle special case for the Creator profile, which has no DB entry
-    if (auth.user.username === 'Joshua') {
-        // For the creator, we can't update a DB record.
-        // We will just re-issue the token with any new info if needed in the future.
-        // For now, we just prevent the error by returning a success message.
-        // A more complex implementation would be needed to persist creator-specific changes.
-         const token = jwt.sign(
-            { 
-                userId: auth.user.userId, 
-                role: auth.user.role, 
-                username: auth.user.username,
-                avatar: auth.user.avatar 
-            }, 
-            process.env.JWT_SECRET || 'your-secret-key', 
-            {
-                expiresIn: '7d',
-            }
-        );
-        const response = NextResponse.json({ message: 'Profile updated successfully (Master Operator Mode)', token });
-        response.cookies.set('auth_token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development',
-            maxAge: 60 * 60 * 24 * 7,
-            path: '/',
-        });
-        return response;
-    }
-
-
     try {
         const { avatarDataUri, username, pin } = await request.json();
 

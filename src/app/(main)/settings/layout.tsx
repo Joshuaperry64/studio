@@ -15,7 +15,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   const navItems = [
     { href: '/settings/application', label: 'Application' },
     { href: '/settings/profile', label: 'Profile' },
-    ...(user?.username === 'Joshua' ? [{ href: '/settings/directive', label: 'AI Directive' }] : []),
+    ...(user?.role === 'admin' ? [{ href: '/settings/directive', label: 'AI Directive' }] : []),
   ];
 
   return (

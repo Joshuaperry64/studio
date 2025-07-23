@@ -50,19 +50,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'API key is required.' }, { status: 400 });
     }
     
-    // Handle special case for the Creator profile
-    if (auth.user.username === 'Joshua') {
-        const envLocalPath = path.resolve(process.cwd(), '.env.local');
-        try {
-            // Note: This creates/overwrites .env.local. In a real scenario, you might want to parse and update.
-            await fs.writeFile(envLocalPath, `GEMINI_API_KEY=${apiKey}\n`);
-            return NextResponse.json({ message: 'API key saved successfully to local environment.' }, { status: 200 });
-        } catch (error) {
-            console.error('Failed to write to .env.local:', error);
-            return NextResponse.json({ message: 'Failed to save API key to local file.' }, { status: 500 });
-        }
-    }
-
     // Standard user logic (database)
     const userRef = doc(db, 'users', auth.user.userId);
     const userDoc = await getDoc(userRef);

@@ -18,7 +18,7 @@ const RoadmapPage = () => {
     const router = useRouter();
 
     useEffect(() => {
-        if (user && user.username !== 'Joshua') {
+        if (user && user.role !== 'admin') {
             router.push('/chat');
         }
     }, [user, router]);
@@ -45,7 +45,7 @@ const RoadmapPage = () => {
     ],
   };
 
-  if (!user || user.username !== 'Joshua') {
+  if (!user || user.role !== 'admin') {
     return null; // or a loading/access denied component
   }
 
