@@ -12,19 +12,19 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const GenerateAvatarInputSchema = z.object({
+const GenerateAvatarInputSchema = z.object({
   prompt: z.string().describe('A text description of the desired avatar.'),
 });
-export type GenerateAvatarInput = z.infer<typeof GenerateAvatarInputSchema>;
+type GenerateAvatarInput = z.infer<typeof GenerateAvatarInputSchema>;
 
-export const GenerateAvatarOutputSchema = z.object({
+const GenerateAvatarOutputSchema = z.object({
   avatarDataUri: z
     .string()
     .describe(
       "The generated avatar image, as a data URI that must include a MIME type and use Base64 encoding."
     ),
 });
-export type GenerateAvatarOutput = z.infer<typeof GenerateAvatarOutputSchema>;
+type GenerateAvatarOutput = z.infer<typeof GenerateAvatarOutputSchema>;
 
 
 export async function generateAvatar(input: GenerateAvatarInput): Promise<GenerateAvatarOutput> {
