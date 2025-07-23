@@ -29,5 +29,10 @@ import '@/ai/flows/list-files.ts';
 import '@/ai/flows/database-interaction.ts';
 import '@/ai/flows/generate-avatar.ts';
 import '@/ai/flows/browse-database.ts';
+import '@/ai/flows/projects/create-project.ts';
+import '@/ai/flows/projects/get-project.ts';
+import '@/ai/flows/projects/list-projects.ts';
+import '@/ai/flows/projects/update-project.ts';
+
 
 

@@ -63,7 +63,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, currentUserId, userA
   const isAiMessage = isSoloChatMessage ? message.sender === 'ai' : message.isAiMessage;
 
   const getSenderName = () => {
-      if (isUserMessage) return userName;
+      if (isUserMessage) return userName || 'You';
       if (isAiMessage) return isSoloChatMessage ? message.character?.name : activeCharacter?.name || 'AI';
       if (!isSoloChatMessage) return message.senderUsername;
       return 'AI';

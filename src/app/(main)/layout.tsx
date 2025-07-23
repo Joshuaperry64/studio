@@ -139,7 +139,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <SidebarMenu>
                     {mainframeItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                        <SidebarMenuButton asChild isActive={pathname.startsWith(item.href) && (item.href !== '/chat' || pathname === '/chat')} tooltip={{ children: item.label }} className="justify-start" >
                             <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
