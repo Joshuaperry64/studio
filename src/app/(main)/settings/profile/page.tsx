@@ -66,7 +66,7 @@ export default function ProfileSettingsPage() {
             const data = await response.json();
 
             if (response.ok) {
-                login(data.token);
+                login(data.token); // This line updates the user state with the new token
                 toast({ title: 'Success', description: 'Profile updated successfully.' });
                 setAvatarFile(null); // Reset file state
             } else {
