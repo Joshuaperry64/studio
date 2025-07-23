@@ -4,11 +4,12 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { doc, getDoc, Timestamp } from 'firebase/firestore';
 
-const GetCoPilotSessionInputSchema = z.object({
+export const GetCoPilotSessionInputSchema = z.object({
   sessionId: z.string().describe('The ID of the co-pilot session.'),
 });
+export type GetCoPilotSessionInput = z.infer<typeof GetCoPilotSessionInputSchema>;
 
-const CoPilotSessionSchema = z.object({
+export const CoPilotSessionSchema = z.object({
       id: z.string(),
       name: z.string(),
       projectDescription: z.string(),
@@ -18,9 +19,15 @@ const CoPilotSessionSchema = z.object({
       suggestions: z.array(z.string()).optional(),
       analysis: z.any().optional(), // Could be more specific later
 });
+export type CoPilotSession = z.infer<typeof CoPilotSessionSchema>;
 
 
-export const getCoPilotSessionFlow = ai.defineFlow(
+export async function getCoPilotSession(input: GetCoPilotSessionInput): Promise<CoPilotSession | undefined> {
+    return getCoPilotSessionFlow(input);
+}
+
+
+const getCoPilotSessionFlow = ai.defineFlow(
   {
     name: 'getCoPilotSessionFlow',
     inputSchema: GetCoPilotSessionInputSchema,

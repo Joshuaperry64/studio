@@ -5,17 +5,25 @@ import { z } from 'genkit';
 import { db } from '@/ai/genkit'; // Import the Firestore instance
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
-const GetUserByUsernameInputSchema = z.object({
+export const GetUserByUsernameInputSchema = z.object({
   username: z.string().describe('The username of the user to fetch.'),
 });
+export type GetUserByUsernameInput = z.infer<typeof GetUserByUsernameInputSchema>;
 
-const GetUserByUsernameOutputSchema = z.object({
+export const GetUserByUsernameOutputSchema = z.object({
   userId: z.string().optional().describe('The ID of the user.'),
   username: z.string().optional().describe('The username of the user.'),
   errorMessage: z.string().optional().describe('An error message if the user was not found or fetching failed.'),
 });
+export type GetUserByUsernameOutput = z.infer<typeof GetUserByUsernameOutputSchema>;
 
-export const getUserByUsernameFlow = ai.defineFlow(
+
+export async function getUserByUsername(input: GetUserByUsernameInput): Promise<GetUserByUsernameOutput> {
+    return getUserByUsernameFlow(input);
+}
+
+
+const getUserByUsernameFlow = ai.defineFlow(
   {
     name: 'getUserByUsernameFlow',
     inputSchema: GetUserByUsernameInputSchema,

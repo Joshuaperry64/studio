@@ -4,21 +4,29 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { doc, collection, addDoc, Timestamp, getDoc } from 'firebase/firestore';
 
-const SaveMessageToSessionInputSchema = z.object({
+export const SaveMessageToSessionInputSchema = z.object({
   sessionId: z.string().describe('The ID of the collaborative session.'),
   userId: z.string().describe('The ID of the message sender.'),
   username: z.string().describe('The username of the message sender.'),
   text: z.string().optional().describe('The text content of the message.'),
   mediaUrl: z.string().optional().describe('The URL of any media attached to the message.'),
 });
+export type SaveMessageToSessionInput = z.infer<typeof SaveMessageToSessionInputSchema>;
 
-const SaveMessageToSessionOutputSchema = z.object({
+export const SaveMessageToSessionOutputSchema = z.object({
   success: z.boolean().describe('Indicates if the message was saved successfully.'),
   messageId: z.string().optional().describe('The ID of the newly saved message.'),
   errorMessage: z.string().optional().describe('An error message if saving failed.'),
 });
+export type SaveMessageToSessionOutput = z.infer<typeof SaveMessageToSessionOutputSchema>;
 
-export const saveMessageToSessionFlow = ai.defineFlow(
+
+export async function saveMessageToSession(input: SaveMessageToSessionInput): Promise<SaveMessageToSessionOutput> {
+    return saveMessageToSessionFlow(input);
+}
+
+
+const saveMessageToSessionFlow = ai.defineFlow(
   {
     name: 'saveMessageToSessionFlow',
     inputSchema: SaveMessageToSessionInputSchema,

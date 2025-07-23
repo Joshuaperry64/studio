@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -11,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Plus, Sparkles, CheckCircle, XCircle } from 'lucide-react';
 import { doc, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '@/ai/genkit';
-import { updateCoPilotSessionFlow } from '@/ai/flows/update-copilot-session';
+import { updateCoPilotSession } from '@/ai/flows/update-copilot-session';
 import { Badge } from '@/components/ui/badge';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -69,7 +68,7 @@ export default function CoPilotSessionPage() {
     const handleAddSuggestion = async () => {
         if (!newSuggestion.trim() || !user) return;
         try {
-            await updateCoPilotSessionFlow({
+            await updateCoPilotSession({
                 sessionId,
                 suggestions: [...(session?.suggestions || []), newSuggestion],
             });
@@ -88,7 +87,7 @@ export default function CoPilotSessionPage() {
         }
         setIsAnalyzing(true);
         try {
-            await updateCoPilotSessionFlow({
+            await updateCoPilotSession({
                 sessionId,
                 runAnalysis: true,
             });

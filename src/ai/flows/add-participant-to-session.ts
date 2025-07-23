@@ -4,18 +4,27 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { doc, collection, addDoc, getDoc } from 'firebase/firestore';
 
-const AddParticipantToSessionInputSchema = z.object({
+export const AddParticipantToSessionInputSchema = z.object({
   sessionId: z.string().describe('The ID of the collaborative session.'),
   userId: z.string().describe('The ID of the user to add.'),
   username: z.string().describe('The username of the user to add.'),
 });
+export type AddParticipantToSessionInput = z.infer<typeof AddParticipantToSessionInputSchema>;
 
-const AddParticipantToSessionOutputSchema = z.object({
+
+export const AddParticipantToSessionOutputSchema = z.object({
   success: z.boolean().describe('Indicates if the participant was added successfully.'),
   message: z.string().describe('A message describing the result.'),
 });
+export type AddParticipantToSessionOutput = z.infer<typeof AddParticipantToSessionOutputSchema>;
 
-export const addParticipantToSessionFlow = ai.defineFlow(
+
+export async function addParticipantToSession(input: AddParticipantToSessionInput): Promise<AddParticipantToSessionOutput> {
+    return addParticipantToSessionFlow(input);
+}
+
+
+const addParticipantToSessionFlow = ai.defineFlow(
   {
     name: 'addParticipantToSessionFlow',
     inputSchema: AddParticipantToSessionInputSchema,

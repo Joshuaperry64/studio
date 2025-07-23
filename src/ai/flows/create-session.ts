@@ -4,15 +4,22 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
-const CreateSessionInputSchema = z.object({
+export const CreateSessionInputSchema = z.object({
   sessionName: z.string().describe('The name of the new collaborative session.'),
 });
+export type CreateSessionInput = z.infer<typeof CreateSessionInputSchema>;
 
-const CreateSessionOutputSchema = z.object({
+export const CreateSessionOutputSchema = z.object({
   sessionId: z.string().describe('The ID of the newly created session.'),
 });
+export type CreateSessionOutput = z.infer<typeof CreateSessionOutputSchema>;
 
-export const createSessionFlow = ai.defineFlow(
+export async function createSession(input: CreateSessionInput): Promise<CreateSessionOutput> {
+    return createSessionFlow(input);
+}
+
+
+const createSessionFlow = ai.defineFlow(
   {
     name: 'createSessionFlow',
     inputSchema: CreateSessionInputSchema,

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -10,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Send, Loader2, Users, Bot } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
 import { useToast } from '@/hooks/use-toast';
-import { saveMessageToSessionFlow } from '@/ai/flows/save-message-to-session';
+import { saveMessageToSession } from '@/ai/flows/save-message-to-session';
 import { analyzeUserInput } from '@/ai/flows/analyze-user-input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -127,7 +126,7 @@ export default function CollaborativeChatPage() {
       setInputMessage('');
 
       try {
-          const result = await saveMessageToSessionFlow({
+          const result = await saveMessageToSession({
               sessionId,
               userId: user.userId,
               username: user.username,
@@ -150,7 +149,7 @@ export default function CollaborativeChatPage() {
               });
 
               // Save AI response to chat
-              await saveMessageToSessionFlow({
+              await saveMessageToSession({
                   sessionId,
                   userId: 'ai', // Special ID for AI
                   username: activeCharacter?.name || 'AI',

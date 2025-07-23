@@ -1,9 +1,8 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { createSessionFlow } from '@/ai/flows/create-session';
-import { addParticipantToSessionFlow } from '@/ai/flows/add-participant-to-session';
+import { createSession } from '@/ai/flows/create-session';
+import { addParticipantToSession } from '@/ai/flows/add-participant-to-session';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -68,7 +67,7 @@ export default function LobbyPage() {
     setCreatingSessionError(null);
 
     try {
-      const result = await createSessionFlow({ sessionName: newSessionName });
+      const result = await createSession({ sessionName: newSessionName });
       
       toast({ title: 'Session Created', description: `Session "${newSessionName}" created successfully.` });
       setNewSessionName('');
@@ -88,7 +87,7 @@ export default function LobbyPage() {
       }
 
       try {
-          const result = await addParticipantToSessionFlow({ sessionId, userId: user.userId, username: user.username });
+          const result = await addParticipantToSession({ sessionId, userId: user.userId, username: user.username });
 
           if (result.success) {
               toast({ title: 'Joined Session', description: result.message });

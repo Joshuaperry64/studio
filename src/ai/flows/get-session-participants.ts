@@ -4,11 +4,13 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { doc, collection, getDocs, getDoc } from 'firebase/firestore';
 
-const GetSessionParticipantsInputSchema = z.object({
+export const GetSessionParticipantsInputSchema = z.object({
   sessionId: z.string().describe('The ID of the collaborative session.'),
 });
+export type GetSessionParticipantsInput = z.infer<typeof GetSessionParticipantsInputSchema>;
 
-const GetSessionParticipantsOutputSchema = z.object({
+
+export const GetSessionParticipantsOutputSchema = z.object({
   participants: z.array(
     z.object({
       userId: z.string().describe('The ID of the participant.'),
@@ -18,8 +20,15 @@ const GetSessionParticipantsOutputSchema = z.object({
   ).describe('The list of participants in the session.'),
   errorMessage: z.string().optional().describe('An error message if fetching failed.'),
 });
+export type GetSessionParticipantsOutput = z.infer<typeof GetSessionParticipantsOutputSchema>;
 
-export const getSessionParticipantsFlow = ai.defineFlow(
+
+export async function getSessionParticipants(input: GetSessionParticipantsInput): Promise<GetSessionParticipantsOutput> {
+    return getSessionParticipantsFlow(input);
+}
+
+
+const getSessionParticipantsFlow = ai.defineFlow(
   {
     name: 'getSessionParticipantsFlow',
     inputSchema: GetSessionParticipantsInputSchema,

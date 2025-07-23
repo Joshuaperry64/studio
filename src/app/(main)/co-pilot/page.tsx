@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -14,8 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, PlusCircle, Users } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
 import { useRouter } from 'next/navigation';
-import { createCoPilotSessionFlow } from '@/ai/flows/create-copilot-session';
-import { listCoPilotSessionsFlow } from '@/ai/flows/list-copilot-sessions';
+import { createCoPilotSession } from '@/ai/flows/create-copilot-session';
+import { listCoPilotSessions } from '@/ai/flows/list-copilot-sessions';
 import { formatDistanceToNow } from 'date-fns';
 
 const formSchema = z.object({
@@ -52,7 +51,7 @@ export default function CoPilotLobbyPage() {
 
   const fetchSessions = async () => {
     try {
-      const { sessions: fetchedSessions, errorMessage } = await listCoPilotSessionsFlow();
+      const { sessions: fetchedSessions, errorMessage } = await listCoPilotSessions();
       if (errorMessage) {
         toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
       } else {
@@ -76,7 +75,7 @@ export default function CoPilotLobbyPage() {
     }
     setIsLoading(true);
     try {
-      const { sessionId } = await createCoPilotSessionFlow({
+      const { sessionId } = await createCoPilotSession({
         ...values,
         createdBy: user.username,
       });

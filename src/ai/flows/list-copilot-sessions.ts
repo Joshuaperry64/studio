@@ -4,7 +4,7 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
-const ListCoPilotSessionsOutputSchema = z.object({
+export const ListCoPilotSessionsOutputSchema = z.object({
   sessions: z.array(
     z.object({
       id: z.string().describe('The ID of the session.'),
@@ -17,8 +17,15 @@ const ListCoPilotSessionsOutputSchema = z.object({
   ).describe('The list of co-pilot sessions.'),
   errorMessage: z.string().optional().describe('An error message if fetching failed.'),
 });
+export type ListCoPilotSessionsOutput = z.infer<typeof ListCoPilotSessionsOutputSchema>;
 
-export const listCoPilotSessionsFlow = ai.defineFlow(
+
+export async function listCoPilotSessions(): Promise<ListCoPilotSessionsOutput> {
+    return listCoPilotSessionsFlow();
+}
+
+
+const listCoPilotSessionsFlow = ai.defineFlow(
   {
     name: 'listCoPilotSessionsFlow',
     inputSchema: z.undefined(),
