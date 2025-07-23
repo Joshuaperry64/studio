@@ -50,6 +50,19 @@ export const useUserStore = create<UserState>((set, get) => ({
     // checking if a valid cookie already exists.
     if (get().isInitialized) return;
 
+    // --- TEMPORARY AUTO-LOGIN ---
+    const tempUser: UserPayload = {
+      userId: 'creator-joshua',
+      username: 'Joshua',
+      role: 'admin',
+      avatar: '/joshua-avatar.jpg',
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days from now
+    };
+    set({ user: tempUser, isInitialized: true });
+    // To disable auto-login, comment out or remove the two lines above and uncomment the original logic below.
+
+    /*
     const token = Cookies.get('auth_token');
     if (token) {
         const decodedUser = decodeToken(token);
@@ -64,5 +77,6 @@ export const useUserStore = create<UserState>((set, get) => ({
          // No token, we are logged out and initialized.
          set({ user: null, isInitialized: true });
     }
+    */
   },
 }));
