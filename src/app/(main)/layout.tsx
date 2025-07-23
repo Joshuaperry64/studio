@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -43,7 +42,7 @@ function Clock() {
     return () => clearInterval(timerId);
   }, []);
 
-  return <div className="font-mono text-lg">{format(time, 'HH:mm:ss')}</div>;
+  return <div className="font-mono text-lg">{format(time, 'hh:mm:ss a')}</div>;
 }
 
 
