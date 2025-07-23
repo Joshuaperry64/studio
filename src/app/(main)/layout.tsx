@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -17,7 +16,7 @@ import {
   SidebarInset,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
@@ -71,6 +70,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/lobby', label: 'Collaboration', icon: Users },
     { href: '/voice-biometrics', label: 'Voice Biometrics', icon: Fingerprint },
     { href: '/code-synthesis', label: 'Code Synthesis', icon: Code },
+    { href: '/memory-interface', label: 'Memory Interface', icon: Database },
     { href: '/roadmap', label: 'Roadmap', icon: Map },
   ];
 
