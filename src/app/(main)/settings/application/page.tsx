@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldCheck } from 'lucide-react';
 import { useSettingsStore } from '@/store/settings-store';
 import Link from 'next/link';
 import {
@@ -219,69 +219,77 @@ export default function ApplicationSettingsPage() {
         </CardContent>
     </Card>
 
-    <Card className="mt-6">
-        <CardHeader>
-            <CardTitle>AI Model Configuration</CardTitle>
-            <CardDescription>Select the models used for generation.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-            <div className="rounded-lg border p-4">
-                <Label htmlFor="text-model" className="font-semibold">Default Text Model</Label>
-                <p className="text-sm text-muted-foreground mb-2">The primary model for chat and text-based analysis.</p>
-                <Select value={textModel} onValueChange={setTextModel}>
-                    <SelectTrigger id="text-model">
-                        <SelectValue placeholder="Select a text model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {textModels.map(model => <SelectItem key={model.id} value={model.id}>{model.name}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-            </div>
-             <div className="rounded-lg border p-4">
-                <Label htmlFor="image-model" className="font-semibold">Image Generation Model</Label>
-                 <p className="text-sm text-muted-foreground mb-2">The model used for the Visual Media Generation page.</p>
-                <Select value={imageModel} onValueChange={setImageModel}>
-                    <SelectTrigger id="image-model">
-                        <SelectValue placeholder="Select an image model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {imageModels.map(model => <SelectItem key={model.id} value={model.id}>{model.name}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-            </div>
-        </CardContent>
-    </Card>
-
-    <Card className="mt-6">
-        <CardHeader>
-            <CardTitle>AI Safety Settings</CardTitle>
-            <CardDescription>Configure the content safety filters for the AI. Applies to text generation.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-            {safetyCategories.map(category => (
-                <div key={category.id} className="flex flex-col gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <Label className="font-medium">{category.name}</Label>
-                        <p className="text-sm text-muted-foreground">Set the blocking threshold for {category.name.toLowerCase()} content.</p>
-                    </div>
-                    <Select
-                        value={safetySettings[category.id as keyof typeof safetySettings]}
-                        onValueChange={(value) => setSafetySetting(category.id as keyof typeof safetySettings, value)}
-                    >
-                        <SelectTrigger className="w-full sm:w-[220px]">
-                            <SelectValue placeholder="Select threshold" />
+    {nsfwMode && (
+      <div className="mt-6">
+        <div className="mb-4">
+            <h2 className="text-xl font-headline flex items-center gap-2"><ShieldCheck />NSFW Mode: Advanced Configuration</h2>
+            <p className="text-muted-foreground">Manage AI generation models and safety overrides.</p>
+        </div>
+        <Card>
+            <CardHeader>
+                <CardTitle>AI Model Configuration</CardTitle>
+                <CardDescription>Select the models used for generation.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="rounded-lg border p-4">
+                    <Label htmlFor="text-model" className="font-semibold">Default Text Model</Label>
+                    <p className="text-sm text-muted-foreground mb-2">The primary model for chat and text-based analysis.</p>
+                    <Select value={textModel} onValueChange={setTextModel}>
+                        <SelectTrigger id="text-model">
+                            <SelectValue placeholder="Select a text model" />
                         </SelectTrigger>
                         <SelectContent>
-                             {blockThresholds.map(threshold => <SelectItem key={threshold.id} value={threshold.id}>{threshold.name}</SelectItem>)}
+                            {textModels.map(model => <SelectItem key={model.id} value={model.id}>{model.name}</SelectItem>)}
                         </SelectContent>
                     </Select>
                 </div>
-            ))}
-        </CardContent>
-        <CardFooter>
-            <p className="text-xs text-muted-foreground">Note: These settings provide control over the model's safety filters but do not override any underlying safety policies of the service.</p>
-        </CardFooter>
-    </Card>
+                 <div className="rounded-lg border p-4">
+                    <Label htmlFor="image-model" className="font-semibold">Image Generation Model</Label>
+                     <p className="text-sm text-muted-foreground mb-2">The model used for the Visual Media Generation page.</p>
+                    <Select value={imageModel} onValueChange={setImageModel}>
+                        <SelectTrigger id="image-model">
+                            <SelectValue placeholder="Select an image model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {imageModels.map(model => <SelectItem key={model.id} value={model.id}>{model.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+            <CardHeader>
+                <CardTitle>AI Safety Settings</CardTitle>
+                <CardDescription>Configure the content safety filters for the AI. Applies to text generation.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {safetyCategories.map(category => (
+                    <div key={category.id} className="flex flex-col gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <Label className="font-medium">{category.name}</Label>
+                            <p className="text-sm text-muted-foreground">Set the blocking threshold for {category.name.toLowerCase()} content.</p>
+                        </div>
+                        <Select
+                            value={safetySettings[category.id as keyof typeof safetySettings]}
+                            onValueChange={(value) => setSafetySetting(category.id as keyof typeof safetySettings, value)}
+                        >
+                            <SelectTrigger className="w-full sm:w-[220px]">
+                                <SelectValue placeholder="Select threshold" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                 {blockThresholds.map(threshold => <SelectItem key={threshold.id} value={threshold.id}>{threshold.name}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                ))}
+            </CardContent>
+            <CardFooter>
+                <p className="text-xs text-muted-foreground">Note: These settings provide control over the model's safety filters but do not override any underlying safety policies of the service.</p>
+            </CardFooter>
+        </Card>
+      </div>
+    )}
 
     <AlertDialog open={isNsfwDialogOpen} onOpenChange={setIsNsfwDialogOpen}>
         <AlertDialogContent>
