@@ -19,7 +19,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group, Globe, GanttChartSquare } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group, Globe, GanttChartSquare, FolderKanban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
@@ -118,6 +118,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   ];
   
   const collaborationItems = [
+    { href: '/projects', label: 'Projects', icon: FolderKanban, subpath: '/projects' },
     { href: '/co-pilot', label: 'AI Co-Pilot', icon: Wand2, subpath: '/co-pilot' },
     { href: '/lobby', label: 'Chat Lobby', icon: Users, subpath: '/chat/' },
   ];

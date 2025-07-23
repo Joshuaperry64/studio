@@ -37,8 +37,5 @@ import '@/ai/flows/world/create-world.ts';
 import '@/ai/flows/world/get-world-state.ts';
 import '@/ai/flows/world/update-world-entity.ts';
 import '@/ai/flows/world/add-world-event.ts';
-
-
-
-
-
+import '@/ai/flows/projects/run-project-analysis.ts';
+import '@/ai/flows/projects/add-suggestion.ts';
