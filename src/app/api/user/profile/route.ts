@@ -1,10 +1,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/ai/genkit';
 import { User } from '@/lib/auth';
 import { verifyAuth } from '@/lib/auth-server';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 export async function PUT(request: NextRequest) {
     const auth = await verifyAuth(request);
@@ -13,14 +14,43 @@ export async function PUT(request: NextRequest) {
     }
 
     try {
-        const { avatarDataUri } = await request.json();
+        const { avatarDataUri, username, pin } = await request.json();
 
-        if (!avatarDataUri) {
-            return NextResponse.json({ message: 'Avatar data URI is required.' }, { status: 400 });
+        if (!avatarDataUri && !username && !pin) {
+            return NextResponse.json({ message: 'No profile data provided to update.' }, { status: 400 });
+        }
+        
+        const updateData: Partial<User> = {};
+
+        // Handle username change
+        if (username) {
+            if (username !== auth.user.username) {
+                // Check if new username is already taken
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where("username", "==", username));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    return NextResponse.json({ message: 'Username is already taken.' }, { status: 409 });
+                }
+            }
+            updateData.username = username;
+        }
+
+        // Handle PIN change
+        if (pin) {
+             if (pin.length < 4 || pin.length > 6) {
+                return NextResponse.json({ message: 'PIN must be between 4 and 6 digits.' }, { status: 400 });
+            }
+            updateData.pinHash = await bcrypt.hash(pin, 10);
+        }
+        
+        // Handle avatar change
+        if (avatarDataUri) {
+            updateData.avatarDataUri = avatarDataUri;
         }
 
         const userRef = doc(db, 'users', auth.user.userId);
-        await updateDoc(userRef, { avatarDataUri });
+        await updateDoc(userRef, updateData);
 
         const updatedUserDoc = await getDoc(userRef);
         if (!updatedUserDoc.exists()) {
@@ -28,7 +58,7 @@ export async function PUT(request: NextRequest) {
         }
         const updatedUser = { id: updatedUserDoc.id, ...updatedUserDoc.data() } as User;
         
-        // Re-issue the auth token with the new avatar URL
+        // Re-issue the auth token with the new user info
         const token = jwt.sign(
             { 
                 userId: updatedUser.id, 
@@ -55,6 +85,7 @@ export async function PUT(request: NextRequest) {
         return response;
     } catch (error) {
         console.error(error);
-        return NextResponse.json({ message: 'An internal server error occurred.' }, { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : 'An internal server error occurred.';
+        return NextResponse.json({ message: errorMessage }, { status: 500 });
     }
 }

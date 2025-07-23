@@ -27,3 +27,5 @@ import '@/ai/flows/propose-code-changes.ts';
 import '@/ai/flows/read-file.ts';
 import '@/ai/flows/list-files.ts';
 import '@/ai/flows/database-interaction.ts';
+import '@/ai/flows/generate-avatar.ts';
+

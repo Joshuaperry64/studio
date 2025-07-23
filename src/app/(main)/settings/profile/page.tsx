@@ -1,12 +1,15 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Loader2, Save, Trash2, Download } from 'lucide-react';
+import { Camera, Loader2, Save, Trash2, Download, Wand2, RefreshCw } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { fileToDataUri } from '@/lib/utils';
@@ -23,17 +26,48 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 import { useChatStore } from '@/store/chat-store';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Textarea } from '@/components/ui/textarea';
+import { generateAvatar } from '@/ai/flows/generate-avatar';
+
+const profileFormSchema = z.object({
+    username: z.string().min(3, 'Username must be at least 3 characters.'),
+    pin: z.string().optional(),
+    confirmPin: z.string().optional(),
+}).refine(data => data.pin === data.confirmPin, {
+    message: 'PINs do not match.',
+    path: ['confirmPin'],
+});
 
 export default function ProfileSettingsPage() {
     const { user, login, logout } = useUserStore();
     const { messages: chatMessages } = useChatStore();
     const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatar || null);
+    const [avatarPrompt, setAvatarPrompt] = useState('');
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const { toast } = useToast();
     const router = useRouter();
+
+    const form = useForm<z.infer<typeof profileFormSchema>>({
+        resolver: zodResolver(profileFormSchema),
+        defaultValues: {
+            username: user?.username || '',
+            pin: '',
+            confirmPin: '',
+        },
+    });
+    
+    useEffect(() => {
+        if (user) {
+            form.reset({ username: user.username });
+            setAvatarPreview(user.avatar || null);
+        }
+    }, [user, form]);
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -46,29 +80,57 @@ export default function ProfileSettingsPage() {
             setAvatarPreview(URL.createObjectURL(file));
         }
     };
+    
+    const handleGenerateAvatar = async () => {
+        if (!avatarPrompt) {
+            toast({ title: 'Prompt is empty', description: 'Please describe the avatar you want to generate.', variant: 'destructive' });
+            return;
+        }
+        setIsGeneratingAvatar(true);
+        try {
+            const result = await generateAvatar({ prompt: avatarPrompt });
+            setAvatarPreview(result.avatarDataUri);
+            
+            // Convert data URI to Blob/File to be saved
+            const response = await fetch(result.avatarDataUri);
+            const blob = await response.blob();
+            const file = new File([blob], "ai_avatar.png", { type: "image/png" });
+            setAvatarFile(file);
 
-    const handleSaveProfile = async () => {
+            toast({ title: 'Avatar Generated!', description: 'Click "Save Changes" to apply your new avatar.' });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+            toast({ title: 'Avatar Generation Failed', description: errorMessage, variant: 'destructive' });
+        } finally {
+            setIsGeneratingAvatar(false);
+        }
+    };
+
+    const handleSaveProfile = async (values: z.infer<typeof profileFormSchema>) => {
         setIsLoading(true);
         try {
-            if (!avatarFile) {
-                toast({ title: 'No changes to save.', variant: 'default' });
-                return;
+            let avatarDataUri: string | undefined = undefined;
+            if (avatarFile) {
+                 avatarDataUri = await fileToDataUri(avatarFile);
             }
-
-            const avatarDataUri = await fileToDataUri(avatarFile);
             
             const response = await fetch('/api/user/profile', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ avatarDataUri }),
+                body: JSON.stringify({ 
+                    avatarDataUri,
+                    username: values.username,
+                    pin: values.pin,
+                 }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                login(data.token); // This line updates the user state with the new token
+                login(data.token);
                 toast({ title: 'Success', description: 'Profile updated successfully.' });
-                setAvatarFile(null); // Reset file state
+                setAvatarFile(null);
+                form.reset({ ...values, pin: '', confirmPin: '' });
             } else {
                  toast({ title: 'Error', description: data.message || 'Failed to update profile.', variant: 'destructive' });
             }
@@ -104,7 +166,6 @@ export default function ProfileSettingsPage() {
     
     const handleExportData = () => {
         try {
-            // Filter only messages from the solo chat, not collaborative sessions.
             const soloChatMessages = chatMessages.filter(msg => msg.sender);
             if (soloChatMessages.length === 0) {
                  toast({ title: 'No Data to Export', description: 'Your solo chat history is empty.' });
@@ -135,44 +196,120 @@ export default function ProfileSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <Card>
-                <CardContent className="pt-6">
-                    <div className="flex flex-col items-center gap-4 text-center">
-                        <div className="relative">
-                            <Avatar className="h-32 w-32">
-                                <AvatarImage src={avatarPreview || undefined} alt={user.username} />
-                                <AvatarFallback className="text-4xl">
-                                    {user.username?.charAt(0).toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
-                            <Button 
-                                size="icon" 
-                                className="absolute bottom-1 right-1 rounded-full"
-                                onClick={() => fileInputRef.current?.click()}
-                            >
-                                <Camera className="h-5 w-5"/>
-                            </Button>
-                            <Input 
-                                type="file" 
-                                ref={fileInputRef} 
-                                className="hidden" 
-                                accept="image/png, image/jpeg, image/gif"
-                                onChange={handleAvatarChange}
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleSaveProfile)}>
+                    <Card>
+                         <CardHeader>
+                            <CardTitle>Edit Profile</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="flex flex-col items-center gap-4 text-center">
+                                <div className="relative">
+                                    <Avatar className="h-32 w-32">
+                                        <AvatarImage src={avatarPreview || undefined} alt={form.watch('username')} />
+                                        <AvatarFallback className="text-4xl">
+                                            {form.watch('username')?.charAt(0).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="absolute bottom-1 right-1 flex gap-1">
+                                         <Button 
+                                            type="button"
+                                            size="icon" 
+                                            className="h-8 w-8 rounded-full"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <Camera className="h-4 w-4"/>
+                                        </Button>
+                                         <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button type="button" size="icon" className="h-8 w-8 rounded-full bg-purple-600 hover:bg-purple-700">
+                                                    <Wand2 className="h-4 w-4" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-80">
+                                                <div className="grid gap-4">
+                                                <div className="space-y-2">
+                                                    <h4 className="font-medium leading-none">Generate AI Avatar</h4>
+                                                    <p className="text-sm text-muted-foreground">
+                                                    Describe the avatar you want.
+                                                    </p>
+                                                </div>
+                                                <div className="grid gap-2">
+                                                    <Textarea
+                                                        placeholder="e.g., a cyberpunk samurai with a neon katana"
+                                                        value={avatarPrompt}
+                                                        onChange={(e) => setAvatarPrompt(e.target.value)}
+                                                        rows={3}
+                                                    />
+                                                    <Button onClick={handleGenerateAvatar} disabled={isGeneratingAvatar}>
+                                                        {isGeneratingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                                                        Generate
+                                                    </Button>
+                                                </div>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                    <Input 
+                                        type="file" 
+                                        ref={fileInputRef} 
+                                        className="hidden" 
+                                        accept="image/png, image/jpeg, image/gif"
+                                        onChange={handleAvatarChange}
+                                    />
+                                </div>
+                            </div>
+                            <FormField
+                                control={form.control}
+                                name="username"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter your username" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
                             />
-                        </div>
-                        <div>
-                            <p className="text-2xl font-bold">{user.username}</p>
-                            <p className="text-sm text-muted-foreground capitalize">{isCreator ? 'Creator' : user.role}</p>
-                        </div>
-                    </div>
-                </CardContent>
-                <CardFooter className="justify-end">
-                    <Button onClick={handleSaveProfile} disabled={isLoading || !avatarFile}>
-                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                        Save Changes
-                    </Button>
-                </CardFooter>
-            </Card>
+                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="pin"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>New PIN</FormLabel>
+                                            <FormControl>
+                                                <Input type="password" placeholder="4-6 digits" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="confirmPin"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Confirm New PIN</FormLabel>
+                                            <FormControl>
+                                                <Input type="password" placeholder="Confirm PIN" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                             </div>
+                        </CardContent>
+                        <CardFooter className="justify-end">
+                            <Button type="submit" disabled={isLoading || !form.formState.isDirty && !avatarFile}>
+                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                                Save Changes
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </form>
+            </Form>
 
              <Card>
                 <CardContent className="pt-6 space-y-4">
