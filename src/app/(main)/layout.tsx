@@ -108,28 +108,24 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const mainframeItems = [
     { href: '/chat', label: 'Alpha Comms', icon: MessageSquare },
-    { href: '/character-hub', label: 'Character Hub', icon: Smile },
-    { href: '/memory-interface', label: 'Memory Interface', icon: BrainCircuit },
     { href: '/virtual-environment', label: 'Virtual Environment', icon: Globe, subpath: '/virtual-environment'},
-    { href: '/virtual-world/roadmap', label: 'VE Roadmap', icon: Map },
   ];
 
   const fabricationItems = [
-    { href: '/media-generation', label: 'Visual Media', icon: ImageIcon },
+    { href: '/visual-synthesis', label: 'Visual Synthesis', icon: ImageIcon },
     { href: '/code-synthesis', label: 'Code Synthesis', icon: Code },
     { href: '/voice-biometrics', label: 'Voice Biometrics', icon: Fingerprint },
   ];
   
   const collaborationItems = [
-    { href: '/projects', label: 'Projects', icon: HardDrive },
-    { href: '/co-pilot', label: 'AI Co-Pilot', icon: Wand2 },
-    { href: '/lobby', label: 'Chat Lobby', icon: Users },
+    { href: '/co-pilot', label: 'AI Co-Pilot', icon: Wand2, subpath: '/co-pilot' },
+    { href: '/lobby', label: 'Chat Lobby', icon: Users, subpath: '/chat/' },
   ];
 
   const systemItems = [
       { href: '/instructions', label: 'Instructions', icon: BookOpen },
       { href: '/feedback', label: 'Feedback', icon: MessageSquarePlus },
-      { href: '/settings', label: 'Application', icon: Settings, subpath: '/settings/application' },
+      { href: '/settings', label: 'Settings', icon: Settings, subpath: '/settings' },
   ];
 
   const adminMenuItems = [
@@ -214,7 +210,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                          <SidebarMenu>
                             {collaborationItems.map((item) => (
                             <SidebarMenuItem key={item.href}>
-                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.subpath || item.href)} tooltip={{ children: item.label }} className="justify-start" >
                                     <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -231,7 +227,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                          <SidebarMenu>
                             {systemItems.map((item) => (
                             <SidebarMenuItem key={item.href}>
-                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.subpath || item.href)} tooltip={{ children: item.label }} className="justify-start" >
                                     <Link href={item.subpath || item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -287,7 +283,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className='flex items-center gap-4'>
                 <SidebarTrigger className="flex md:hidden" />
                 <h1 className="text-lg font-semibold md:text-xl font-headline">
-                {allMenuItems.find((item) => pathname.startsWith(item.subpath || item.href))?.label || 'AlphaLink'}
+                {allMenuItems.find((item) => pathname.startsWith(item.subpath || item.href) && !(item.href === '/chat' && pathname.includes('/chat/')) )?.label || 'AlphaLink'}
                 </h1>
             </div>
             <div className="absolute left-1/2 -translate-x-1/2 hidden md:block">
