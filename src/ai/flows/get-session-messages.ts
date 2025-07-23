@@ -4,12 +4,12 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { doc, collection, getDocs, query, orderBy, Timestamp, getDoc } from 'firebase/firestore';
 
-export const GetSessionMessagesInputSchema = z.object({
+const GetSessionMessagesInputSchema = z.object({
   sessionId: z.string().describe('The ID of the collaborative session.'),
 });
-export type GetSessionMessagesInput = z.infer<typeof GetSessionMessagesInputSchema>;
+type GetSessionMessagesInput = z.infer<typeof GetSessionMessagesInputSchema>;
 
-export const GetSessionMessagesOutputSchema = z.object({
+const GetSessionMessagesOutputSchema = z.object({
   messages: z.array(
     z.object({
       senderId: z.string().describe('The ID of the message sender.'),
@@ -21,7 +21,7 @@ export const GetSessionMessagesOutputSchema = z.object({
   ).describe('The list of messages in the session, ordered by timestamp.'),
   errorMessage: z.string().optional().describe('An error message if fetching failed.'),
 });
-export type GetSessionMessagesOutput = z.infer<typeof GetSessionMessagesOutputSchema>;
+type GetSessionMessagesOutput = z.infer<typeof GetSessionMessagesOutputSchema>;
 
 
 export async function getSessionMessages(input: GetSessionMessagesInput): Promise<GetSessionMessagesOutput> {

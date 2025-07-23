@@ -52,15 +52,15 @@ const executeSqlTool = ai.defineTool(
   }
 );
 
-export const DatabaseInteractionInputSchema = z.object({
+const DatabaseInteractionInputSchema = z.object({
   query: z.string().describe('The natural language query for the database. e.g., "Add a new critical fact: The sky is blue." or "What are my learned skills?"'),
 });
-export type DatabaseInteractionInput = z.infer<typeof DatabaseInteractionInputSchema>;
+type DatabaseInteractionInput = z.infer<typeof DatabaseInteractionInputSchema>;
 
-export const DatabaseInteractionOutputSchema = z.object({
+const DatabaseInteractionOutputSchema = z.object({
   response: z.string().describe('A natural language response summarizing the result of the database operation.'),
 });
-export type DatabaseInteractionOutput = z.infer<typeof DatabaseInteractionOutputSchema>;
+type DatabaseInteractionOutput = z.infer<typeof DatabaseInteractionOutputSchema>;
 
 
 export async function databaseInteraction(input: DatabaseInteractionInput): Promise<DatabaseInteractionOutput> {

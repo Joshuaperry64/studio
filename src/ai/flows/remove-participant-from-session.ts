@@ -4,17 +4,17 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { doc, collection, query, where, getDocs, deleteDoc, getDoc } from 'firebase/firestore';
 
-export const RemoveParticipantFromSessionInputSchema = z.object({
+const RemoveParticipantFromSessionInputSchema = z.object({
   sessionId: z.string().describe('The ID of the collaborative session.'),
   userId: z.string().describe('The ID of the user to remove.'),
 });
-export type RemoveParticipantFromSessionInput = z.infer<typeof RemoveParticipantFromSessionInputSchema>;
+type RemoveParticipantFromSessionInput = z.infer<typeof RemoveParticipantFromSessionInputSchema>;
 
-export const RemoveParticipantFromSessionOutputSchema = z.object({
+const RemoveParticipantFromSessionOutputSchema = z.object({
   success: z.boolean().describe('Indicates if the participant was removed successfully.'),
   message: z.string().describe('A message describing the result.'),
 });
-export type RemoveParticipantFromSessionOutput = z.infer<typeof RemoveParticipantFromSessionOutputSchema>;
+type RemoveParticipantFromSessionOutput = z.infer<typeof RemoveParticipantFromSessionOutputSchema>;
 
 
 export async function removeParticipantFromSession(input: RemoveParticipantFromSessionInput): Promise<RemoveParticipantFromSessionOutput> {

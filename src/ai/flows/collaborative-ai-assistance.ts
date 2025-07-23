@@ -18,7 +18,7 @@ const CollaborativeAiAssistanceInputSchema = z.object({
   groupSuggestions: z.array(z.string()).describe('An array of suggestions from the group members.'),
   aiPersonaDescription: z.string().describe('Description of the AI persona to be used for assistance.'),
 });
-export type CollaborativeAiAssistanceInput = z.infer<typeof CollaborativeAiAssistanceInputSchema>;
+type CollaborativeAiAssistanceInput = z.infer<typeof CollaborativeAiAssistanceInputSchema>;
 
 const CollaborativeAiAssistanceOutputSchema = z.object({
   analyzedSuggestions: z.array(z.object({
@@ -28,7 +28,7 @@ const CollaborativeAiAssistanceOutputSchema = z.object({
   })).describe('The analyzed suggestions with incorporation rationales.'),
   revisedProjectDescription: z.string().describe('The revised description of the collaborative project after incorporating suggestions.'),
 });
-export type CollaborativeAiAssistanceOutput = z.infer<typeof CollaborativeAiAssistanceOutputSchema>;
+type CollaborativeAiAssistanceOutput = z.infer<typeof CollaborativeAiAssistanceOutputSchema>;
 
 export async function collaborativeAiAssistance(input: CollaborativeAiAssistanceInput): Promise<CollaborativeAiAssistanceOutput> {
   return collaborativeAiAssistanceFlow(input);

@@ -33,6 +33,11 @@ import '@/ai/flows/projects/create-project.ts';
 import '@/ai/flows/projects/get-project.ts';
 import '@/ai/flows/projects/list-projects.ts';
 import '@/ai/flows/projects/update-project.ts';
+import '@/ai/flows/world/create-world.ts';
+import '@/ai/flows/world/get-world-state.ts';
+import '@/ai/flows/world/update-world-entity.ts';
+import '@/ai/flows/world/add-world-event.ts';
+
 
 
 

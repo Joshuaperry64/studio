@@ -5,18 +5,18 @@ import { z } from 'genkit';
 import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { collaborativeAiAssistance } from './collaborative-ai-assistance';
 
-export const UpdateCoPilotSessionInputSchema = z.object({
+const UpdateCoPilotSessionInputSchema = z.object({
   sessionId: z.string().describe('The ID of the co-pilot session to update.'),
   suggestions: z.array(z.string()).optional().describe('An array of new suggestions to add.'),
   runAnalysis: z.boolean().optional().describe('Set to true to trigger the AI analysis.'),
 });
-export type UpdateCoPilotSessionInput = z.infer<typeof UpdateCoPilotSessionInputSchema>;
+type UpdateCoPilotSessionInput = z.infer<typeof UpdateCoPilotSessionInputSchema>;
 
-export const UpdateCoPilotSessionOutputSchema = z.object({
+const UpdateCoPilotSessionOutputSchema = z.object({
   success: z.boolean(),
   message: z.string(),
 });
-export type UpdateCoPilotSessionOutput = z.infer<typeof UpdateCoPilotSessionOutputSchema>;
+type UpdateCoPilotSessionOutput = z.infer<typeof UpdateCoPilotSessionOutputSchema>;
 
 
 export async function updateCoPilotSession(input: UpdateCoPilotSessionInput): Promise<UpdateCoPilotSessionOutput> {

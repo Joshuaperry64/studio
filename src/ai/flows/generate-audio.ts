@@ -44,12 +44,12 @@ const GenerateAudioInputSchema = z.object({
   text: z.string().describe("The text to convert to speech."),
   voiceName: z.string().optional().describe("The prebuilt voice to use for generation."),
 });
-export type GenerateAudioInput = z.infer<typeof GenerateAudioInputSchema>;
+type GenerateAudioInput = z.infer<typeof GenerateAudioInputSchema>;
 
 const GenerateAudioOutputSchema = z.object({
   media: z.string().describe("The generated audio as a data URI."),
 });
-export type GenerateAudioOutput = z.infer<typeof GenerateAudioOutputSchema>;
+type GenerateAudioOutput = z.infer<typeof GenerateAudioOutputSchema>;
 
 export async function generateAudio(input: GenerateAudioInput): Promise<GenerateAudioOutput> {
   return generateAudioFlow(input);

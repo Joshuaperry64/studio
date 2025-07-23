@@ -19,12 +19,12 @@ const VoiceBiometricsInputSchema = z.object({
       "The audio data as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
-export type VoiceBiometricsInput = z.infer<typeof VoiceBiometricsInputSchema>;
+type VoiceBiometricsInput = z.infer<typeof VoiceBiometricsInputSchema>;
 
 const VoiceBiometricsOutputSchema = z.object({
   transcription: z.string().describe('The transcribed text with speaker labels.'),
 });
-export type VoiceBiometricsOutput = z.infer<typeof VoiceBiometricsOutputSchema>;
+type VoiceBiometricsOutput = z.infer<typeof VoiceBiometricsOutputSchema>;
 
 export async function voiceBiometrics(input: VoiceBiometricsInput): Promise<VoiceBiometricsOutput> {
   return voiceBiometricsFlow(input);

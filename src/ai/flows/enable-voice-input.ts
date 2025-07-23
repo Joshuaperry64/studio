@@ -18,12 +18,12 @@ const EnableVoiceInputInputSchema = z.object({
       "The audio data as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
-export type EnableVoiceInputInput = z.infer<typeof EnableVoiceInputInputSchema>;
+type EnableVoiceInputInput = z.infer<typeof EnableVoiceInputInputSchema>;
 
 const EnableVoiceInputOutputSchema = z.object({
   transcription: z.string().describe('The transcribed text from the audio input.'),
 });
-export type EnableVoiceInputOutput = z.infer<typeof EnableVoiceInputOutputSchema>;
+type EnableVoiceInputOutput = z.infer<typeof EnableVoiceInputOutputSchema>;
 
 export async function enableVoiceInput(input: EnableVoiceInputInput): Promise<EnableVoiceInputOutput> {
   return enableVoiceInputFlow(input);

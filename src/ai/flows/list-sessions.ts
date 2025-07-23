@@ -4,10 +4,10 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { collection, getDocs } from 'firebase/firestore';
 
-export const ListSessionsInputSchema = z.undefined(); // No specific input needed for listing all sessions
-export type ListSessionsInput = z.infer<typeof ListSessionsInputSchema>;
+const ListSessionsInputSchema = z.undefined(); // No specific input needed for listing all sessions
+type ListSessionsInput = z.infer<typeof ListSessionsInputSchema>;
 
-export const ListSessionsOutputSchema = z.object({
+const ListSessionsOutputSchema = z.object({
   sessions: z.array(
     z.object({
       id: z.string().describe('The ID of the session.'),
@@ -18,7 +18,7 @@ export const ListSessionsOutputSchema = z.object({
   ).describe('The list of collaborative sessions.'),
   errorMessage: z.string().optional().describe('An error message if fetching failed.'),
 });
-export type ListSessionsOutput = z.infer<typeof ListSessionsOutputSchema>;
+type ListSessionsOutput = z.infer<typeof ListSessionsOutputSchema>;
 
 
 export async function listSessions(): Promise<ListSessionsOutput> {

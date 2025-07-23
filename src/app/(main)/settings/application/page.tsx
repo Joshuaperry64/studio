@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, CheckCircle } from 'lucide-react';
+import { Loader2, ShieldCheck, CheckCircle, Volume2 } from 'lucide-react';
 import { useSettingsStore } from '@/store/settings-store';
 import Link from 'next/link';
 import {
@@ -66,6 +66,8 @@ export default function ApplicationSettingsPage() {
     setImageModel,
     safetySettings,
     setSafetySetting,
+    soundEnabled,
+    toggleSound,
   } = useSettingsStore();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -199,6 +201,23 @@ export default function ApplicationSettingsPage() {
                 </Button>
             </div>
         </div>
+        
+         <div className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+            <Label htmlFor="sound-enabled" className="font-semibold">
+                Enable Sound
+            </Label>
+            <p className="text-sm text-muted-foreground">
+                Enable UI sound effects and ambient audio.
+            </p>
+            </div>
+            <Switch
+            id="sound-enabled"
+            checked={soundEnabled}
+            onCheckedChange={toggleSound}
+            aria-label="Toggle sound"
+            />
+        </div>
 
         <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
@@ -302,7 +321,7 @@ export default function ApplicationSettingsPage() {
                         </div>
                         <Select
                             value={safetySettings[category.id as keyof typeof safetySettings]}
-                            onValueChange={(value) => setSafetySetting(category.id as keyof typeof safetySettings, value)}
+                            onValueChange={(value) => setSafetySetting(category.id as keyof typeof safetySettings, value as BlockThreshold)}
                         >
                             <SelectTrigger className="w-full sm:w-[220px]">
                                 <SelectValue placeholder="Select threshold" />

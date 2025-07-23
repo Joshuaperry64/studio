@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, setDoc, doc } from 'firebase/firestore';
 import { db } from '@/ai/genkit';
 import bcrypt from 'bcryptjs';
 
@@ -26,13 +26,31 @@ export async function POST(request: Request) {
 
     const pinHash = await bcrypt.hash(pin, 10);
 
-    await addDoc(usersRef, {
+    const newUserRef = await addDoc(usersRef, {
         username,
         pinHash,
         role: 'user',
         status: 'pending',
         createdAt: serverTimestamp(),
     });
+
+    // Create a corresponding entity in the virtual world
+    const worldId = 'main';
+    const entityRef = doc(db, 'virtual-worlds', worldId, 'entities', newUserRef.id);
+    await setDoc(entityRef, {
+      name: username,
+      description: `Entity for Operator ${username}.`,
+      location: "Registration Hub",
+      status: "Pending Approval",
+      mood: "Calm",
+      inventory: [],
+      relationships: {},
+      wallet: {
+        credits: 0,
+        digits: 0,
+      }
+    });
+
 
     return NextResponse.json({ message: "Application submitted. Your account is pending approval." }, { status: 201 });
   } catch (error) {

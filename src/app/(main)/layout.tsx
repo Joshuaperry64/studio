@@ -19,7 +19,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group, Globe, GanttChartSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
@@ -83,6 +83,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/chat', label: 'Alpha Comms', icon: MessageSquare },
     { href: '/character-hub', label: 'Character Hub', icon: Smile },
     { href: '/memory-interface', label: 'Memory Interface', icon: BrainCircuit },
+    { href: '/virtual-environment', label: 'Virtual Environment', icon: Globe },
   ];
 
   const fabricationItems = [
@@ -107,6 +108,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/admin', label: 'Admin Panel', icon: Shield },
     { href: '/analytics', label: 'Analytics', icon: BarChart },
     { href: '/local-deployment', label: 'Local Deployment', icon: Server },
+    { href: '/roadmap', label: 'Dev Roadmap', icon: GanttChartSquare },
   ]
   
   const allMenuItems = [...mainframeItems, ...fabricationItems, ...collaborationItems, ...systemItems, ...adminMenuItems];

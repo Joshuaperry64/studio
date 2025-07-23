@@ -51,12 +51,12 @@ const listFilesTool = ai.defineTool(
 );
 
 
-export const ProposeCodeChangesInputSchema = z.object({
+const ProposeCodeChangesInputSchema = z.object({
   request: z.string().describe("The user's request for a code change, e.g., 'add a new button'."),
 });
-export type ProposeCodeChangesInput = z.infer<typeof ProposeCodeChangesInputSchema>;
+type ProposeCodeChangesInput = z.infer<typeof ProposeCodeChangesInputSchema>;
 
-export const ProposeCodeChangesOutputSchema = z.object({
+const ProposeCodeChangesOutputSchema = z.object({
   summary: z.string().describe('A brief summary of the proposed changes.'),
   plan: z.array(z.string()).describe('A step-by-step plan of what the AI will do.'),
   changeset: z.array(z.object({

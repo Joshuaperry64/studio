@@ -4,19 +4,19 @@ import { ai, db } from '@/ai/genkit';
 import { z } from 'genkit';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
-export const CreateCoPilotSessionInputSchema = z.object({
+const CreateCoPilotSessionInputSchema = z.object({
   sessionName: z.string().describe('The name of the new co-pilot session.'),
   projectDescription: z.string().describe('The initial description of the project.'),
   aiPersonaDescription: z.string().describe('The description of the AI persona for the session.'),
   createdBy: z.string().describe('The username of the user creating the session.'),
 });
-export type CreateCoPilotSessionInput = z.infer<typeof CreateCoPilotSessionInputSchema>;
+type CreateCoPilotSessionInput = z.infer<typeof CreateCoPilotSessionInputSchema>;
 
 
-export const CreateCoPilotSessionOutputSchema = z.object({
+const CreateCoPilotSessionOutputSchema = z.object({
   sessionId: z.string().describe('The ID of the newly created session.'),
 });
-export type CreateCoPilotSessionOutput = z.infer<typeof CreateCoPilotSessionOutputSchema>;
+type CreateCoPilotSessionOutput = z.infer<typeof CreateCoPilotSessionOutputSchema>;
 
 
 export async function createCoPilotSession(input: CreateCoPilotSessionInput): Promise<CreateCoPilotSessionOutput> {

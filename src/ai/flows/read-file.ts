@@ -10,10 +10,10 @@ import { z } from 'genkit';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-export const ReadFileInputSchema = z.object({
+const ReadFileInputSchema = z.object({
   path: z.string().describe('The relative path to the file from the project root.'),
 });
-export type ReadFileInput = z.infer<typeof ReadFileInputSchema>;
+type ReadFileInput = z.infer<typeof ReadFileInputSchema>;
 
 export async function readFile(input: ReadFileInput): Promise<string> {
   return readFileFlow(input);

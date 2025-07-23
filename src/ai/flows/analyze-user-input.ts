@@ -13,6 +13,8 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { generateAudio } from './generate-audio';
+import { addWorldEvent } from './world/add-world-event';
+import { updateWorldEntity } from './world/update-world-entity';
 
 // Define the search tool
 const searchTool = ai.defineTool(
@@ -39,6 +41,50 @@ const searchTool = ai.defineTool(
     }
   }
 );
+
+// Define the virtual world interaction tool
+const virtualWorldTool = ai.defineTool(
+  {
+    name: 'virtualWorldInteraction',
+    description: 'Perform an action or update the state of an entity within the virtual world simulation.',
+    inputSchema: z.object({
+        worldId: z.string().describe("The ID of the virtual world to interact with. Assume 'main' if not specified."),
+        entityId: z.string().describe("The ID of the entity to update (e.g., 'alpha-ai')."),
+        actionDescription: z.string().describe("A description of the action being taken by the entity."),
+        newState: z.object({
+            location: z.string().optional().describe("The new location of the entity."),
+            status: z.string().optional().describe("The new status of the entity."),
+        }).describe("The new state values for the entity.")
+    }),
+    outputSchema: z.string(),
+  },
+  async ({ worldId, entityId, actionDescription, newState }) => {
+    console.log(`[Virtual World Tool] Action: ${actionDescription}`);
+    try {
+        await updateWorldEntity({
+            worldId,
+            entityId,
+            updates: newState,
+        });
+
+        await addWorldEvent({
+            worldId,
+            event: {
+                timestamp: new Date(),
+                description: `Entity '${entityId}' performed action: ${actionDescription}`,
+                details: newState,
+            }
+        });
+
+        return `Action successful. The virtual world has been updated.`;
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`[Virtual World Tool] Error:`, error);
+        return `Failed to perform action in the virtual world: ${errorMessage}`;
+    }
+  }
+);
+
 
 const SafetySettingSchema = z.object({
   category: z.string(),
@@ -69,14 +115,14 @@ const AnalyzeUserInputInputSchema = z.object({
   safetySettings: z.array(SafetySettingSchema).optional().describe('The safety settings to apply to the generation.'),
 });
 
-export type AnalyzeUserInputInput = z.infer<typeof AnalyzeUserInputInputSchema>;
+type AnalyzeUserInputInput = z.infer<typeof AnalyzeUserInputInputSchema>;
 
 const AnalyzeUserInputOutputSchema = z.object({
   analysisResult: z.string().describe('The analysis result of the user input.'),
   audioDataUri: z.string().optional().describe("The audio response as a data URI."),
 });
 
-export type AnalyzeUserInputOutput = z.infer<typeof AnalyzeUserInputOutputSchema>;
+type AnalyzeUserInputOutput = z.infer<typeof AnalyzeUserInputOutputSchema>;
 
 export async function analyzeUserInput(input: AnalyzeUserInputInput): Promise<AnalyzeUserInputOutput> {
   return analyzeUserInputFlow(input);
@@ -97,7 +143,7 @@ const analyzeUserInputFlow = ai.defineFlow(
       output: {schema: z.object({
         analysisResult: z.string().describe('The analysis result of the user input.'),
       })},
-      tools: [searchTool],
+      tools: [searchTool, virtualWorldTool],
       model: input.modelName, // Use the model name from the input
       config: {
         safetySettings: input.safetySettings,
@@ -110,6 +156,10 @@ You are currently embodying the following character. You must adopt this persona
 - Name: {{{characterDetails.name}}}
 - Personality: {{{characterDetails.personality}}}
 - Backstory: {{{characterDetails.backstory}}}
+
+If the user gives you a command that implies an action within the simulated Virtual Environment, you MUST use the 'virtualWorldInteraction' tool.
+Your entityId is 'alpha-ai'. The worldId is 'main'.
+Example: If the user says "walk to the console", you should call the tool with an action description like "Walking to the central console." and set the newState.location to "Central Console". Your final text response should then narrate this action, e.g., "I am now walking to the central console."
 {{/if}}
 
 If the user's question requires real-time information, recent events, or specific data from the web, use the provided search tool to find the answer.

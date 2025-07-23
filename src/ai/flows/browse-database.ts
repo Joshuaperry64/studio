@@ -19,13 +19,13 @@ const DB_PATH = './ai_memory.db';
 
 const TableDataSchema = z.array(z.record(z.any()));
 
-export const BrowseDatabaseOutputSchema = z.object({
+const BrowseDatabaseOutputSchema = z.object({
   critical_facts: TableDataSchema,
   learned_skills: TableDataSchema,
   user_profiles: TableDataSchema,
   past_conversations: TableDataSchema,
 });
-export type BrowseDatabaseOutput = z.infer<typeof BrowseDatabaseOutputSchema>;
+type BrowseDatabaseOutput = z.infer<typeof BrowseDatabaseOutputSchema>;
 
 async function getTableData(db: any, tableName: string) {
     try {

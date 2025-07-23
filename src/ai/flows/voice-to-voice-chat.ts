@@ -23,14 +23,14 @@ const VoiceToVoiceChatInputSchema = z.object({
     ),
   voiceName: z.string().optional().describe('The voice to use for the AI response.'),
 });
-export type VoiceToVoiceChatInput = z.infer<typeof VoiceToVoiceChatInputSchema>;
+type VoiceToVoiceChatInput = z.infer<typeof VoiceToVoiceChatInputSchema>;
 
 const VoiceToVoiceChatOutputSchema = z.object({
   transcription: z.string().describe('The transcribed text from the user\'s audio.'),
   responseText: z.string().describe('The AI\'s text response.'),
   audioDataUri: z.string().describe("The AI's audio response as a data URI."),
 });
-export type VoiceToVoiceChatOutput = z.infer<typeof VoiceToVoiceChatOutputSchema>;
+type VoiceToVoiceChatOutput = z.infer<typeof VoiceToVoiceChatOutputSchema>;
 
 export async function voiceToVoiceChat(input: VoiceToVoiceChatInput): Promise<VoiceToVoiceChatOutput> {
   return voiceToVoiceChatFlow(input);

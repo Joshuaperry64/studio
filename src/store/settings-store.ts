@@ -34,6 +34,8 @@ interface SettingsState {
   disableNsfwMode: () => void;
   notifications: boolean;
   toggleNotifications: () => void;
+  soundEnabled: boolean;
+  toggleSound: () => void;
   hasSeenWelcomeScreen: boolean;
   setHasSeenWelcomeScreen: (hasSeen: boolean) => void;
   memorySettings: MemorySettings;
@@ -85,6 +87,8 @@ export const useSettingsStore = create<SettingsState>()(
       disableNsfwMode: () => set({ nsfwMode: false }),
       notifications: true,
       toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
+      soundEnabled: true,
+      toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
       hasSeenWelcomeScreen: false,
       setHasSeenWelcomeScreen: (hasSeen: boolean) => set({ hasSeenWelcomeScreen: hasSeen }),
       memorySettings: initialMemorySettings,
@@ -120,6 +124,7 @@ export const useSettingsStore = create<SettingsState>()(
       partialize: (state) => ({
         nsfwMode: state.nsfwMode,
         notifications: state.notifications,
+        soundEnabled: state.soundEnabled,
         hasSeenWelcomeScreen: state.hasSeenWelcomeScreen,
         textModel: state.textModel,
         imageModel: state.imageModel,
