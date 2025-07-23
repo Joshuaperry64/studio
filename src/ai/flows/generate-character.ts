@@ -18,13 +18,13 @@ const PREBUILT_VOICES = [
     "Altair", "Antares", "Arcturus", "Deneb", "Capella", "Achernar"
 ];
 
-export const GenerateCharacterInputSchema = z.object({
+const GenerateCharacterInputSchema = z.object({
   name: z.string().describe('The name of the character.'),
   concept: z.string().describe('A brief concept or core idea for the character.'),
 });
-export type GenerateCharacterInput = z.infer<typeof GenerateCharacterInputSchema>;
+type GenerateCharacterInput = z.infer<typeof GenerateCharacterInputSchema>;
 
-export const GenerateCharacterOutputSchema = z.object({
+const GenerateCharacterOutputSchema = z.object({
   name: z.string().describe('The character\'s name.'),
   backstory: z.string().describe('The detailed backstory of the character.'),
   personality: z.string().describe('A description of the character\'s personality traits.'),
