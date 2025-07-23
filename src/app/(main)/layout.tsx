@@ -84,7 +84,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/chat', label: 'Alpha Comms', icon: MessageSquare },
     { href: '/character-hub', label: 'Character Hub', icon: Smile },
     { href: '/memory-interface', label: 'Memory Interface', icon: BrainCircuit },
-    { href: '/virtual-environment', label: 'Virtual Environment', icon: Globe },
+    { href: '/virtual-environment', label: 'Virtual Environment', icon: Globe, subpath: '/virtual-environment'},
+    { href: '/virtual-world/roadmap', label: 'VE Roadmap', icon: Map },
   ];
 
   const fabricationItems = [
@@ -153,7 +154,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         <SidebarMenu>
                             {mainframeItems.map((item) => (
                             <SidebarMenuItem key={item.href}>
-                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href) && (item.href !== '/chat' || pathname === '/chat')} tooltip={{ children: item.label }} className="justify-start" >
+                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.subpath || item.href) && (item.href !== '/chat' || pathname === '/chat')} tooltip={{ children: item.label }} className="justify-start" >
                                     <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -259,7 +260,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className='flex items-center gap-4'>
                 <SidebarTrigger className="flex md:hidden" />
                 <h1 className="text-lg font-semibold md:text-xl font-headline">
-                {allMenuItems.find((item) => pathname.startsWith(item.href))?.label || 'AlphaLink'}
+                {allMenuItems.find((item) => pathname.startsWith(item.subpath || item.href))?.label || 'AlphaLink'}
                 </h1>
             </div>
             <div className="absolute left-1/2 -translate-x-1/2 hidden md:block">
