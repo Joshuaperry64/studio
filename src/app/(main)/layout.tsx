@@ -50,6 +50,37 @@ function Clock() {
   return <div className="font-mono text-lg">{format(time, 'hh:mm:ss a')}</div>;
 }
 
+function AudioPlayer() {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const { soundEnabled } = useSettingsStore();
+  const [audioExists, setAudioExists] = useState(false);
+
+  useEffect(() => {
+    // Check if the background audio file exists
+    fetch('/api/admin/background-audio/status')
+      .then(res => res.json())
+      .then(data => setAudioExists(data.exists))
+      .catch(() => setAudioExists(false));
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      if (soundEnabled && audioExists) {
+        audio.play().catch(e => console.error("Audio playback failed:", e));
+      } else {
+        audio.pause();
+      }
+    }
+  }, [soundEnabled, audioExists]);
+  
+  if (!audioExists) return null;
+
+  return (
+    <audio ref={audioRef} src="/audio/background_music.mp3" loop />
+  );
+}
+
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -245,6 +276,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </Sidebar>
       <SidebarInset>
         <div className="tech-background">
+          <AudioPlayer />
           <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <div className='flex items-center gap-4'>
                 <SidebarTrigger className="flex md:hidden" />
