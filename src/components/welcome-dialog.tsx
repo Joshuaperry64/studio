@@ -49,7 +49,7 @@ export function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps) {
                 <Users className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                 <div>
                     <h3 className="font-semibold">AI Co-Pilot</h3>
-                    <p className="text-sm text-muted-foreground">Collaborate with your team by getting AI feedback on project descriptions and suggestions.</p>
+                    <p className="text-sm text-muted-foreground">Collaborate with a friend using AI Feedback on project descriptions and suggestions.</p>
                 </div>
             </div>
         </div>
