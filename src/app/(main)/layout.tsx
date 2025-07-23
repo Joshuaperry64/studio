@@ -16,7 +16,7 @@ import {
   SidebarInset,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
@@ -82,6 +82,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const adminMenuItems = [
     { href: '/admin', label: 'Admin Panel', icon: Shield },
+    { href: '/analytics', label: 'Analytics', icon: BarChart },
     { href: '/local-deployment', label: 'Local Deployment', icon: Server },
   ]
 

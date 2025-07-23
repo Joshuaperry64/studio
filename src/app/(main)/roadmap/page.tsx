@@ -1,126 +1,77 @@
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Clock, Map, Globe } from 'lucide-react';
+import { CheckCircle, Hourglass } from 'lucide-react';
+import { Metadata } from 'next';
 
-interface RoadmapItemProps {
-  title: string;
-  status: 'complete' | 'pending';
-  children: React.ReactNode;
-}
-
-const RoadmapItem: React.FC<RoadmapItemProps> = ({ title, status, children }) => (
-  <div className="relative pl-8">
-    <div className="absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-      {status === 'complete' ? (
-        <CheckCircle2 className="h-4 w-4 text-green-500" />
-      ) : (
-        <Clock className="h-4 w-4 text-yellow-500" />
-      )}
-    </div>
-    <div className="flex items-center gap-4">
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <Badge variant={status === 'complete' ? 'secondary' : 'outline'} className={status === 'complete' ? 'bg-green-700/50 text-green-400' : 'text-yellow-400 border-yellow-400/50'}>
-        {status === 'complete' ? 'Complete' : 'Pending'}
-      </Badge>
-    </div>
-    <p className="mt-1 text-muted-foreground">{children}</p>
-  </div>
-);
-
-const roadmapData = {
-  infrastructure: [
-    { title: 'Next.js 15 & App Router', status: 'complete', description: 'Foundation built on the latest Next.js features for optimal performance.' },
-    { title: 'TypeScript Integration', status: 'complete', description: 'Full type-safety across the entire application.' },
-    { title: 'UI with ShadCN & Tailwind', status: 'complete', description: 'Modern, responsive, and accessible user interface.' },
-    { title: 'Genkit for AI', status: 'complete', description: 'Integrated Google\'s Genkit for all generative AI functionalities.' },
-    { title: 'Cloud-Based Data Storage', status: 'complete', description: 'User accounts, feedback, and collaborative sessions are stored persistently in Firestore.' },
-  ],
-  userFeatures: [
-    { title: 'Authentication System', status: 'complete', description: 'Secure PIN-based login with session management and user roles.' },
-    { title: 'Admin Dashboard', status: 'complete', description: 'Comprehensive user management and feedback review for administrators.' },
-    { title: 'Profile Customization', status: 'complete', description: 'Users can upload their own profile pictures.' },
-    { title: 'AI Character Hub', status: 'complete', description: 'Create, manage, and interact with unique AI personas.' },
-    { title: 'Customizable AI Personas', status: 'complete', description: 'Allow users to edit the AI-generated backstories and personalities of their characters.' },
-    { title: 'Visual Media Generation', status: 'complete', description: 'Generate images and videos from text prompts.' },
-    { title: 'AI Control Settings', status: 'complete', description: 'Granular control over AI models and safety filter configurations.' },
-    { title: 'Persistent Chat History', status: 'complete', description: 'Conversations are saved locally and persist between sessions.' },
-    { title: 'Real-time Collaboration', status: 'complete', description: 'Real-time chat sessions with live updates for messages and participants.' },
-    { title: 'Expanded AI Toolset', status: 'complete', description: 'Integrated more advanced Genkit tools for functions like web searches.' },
-    { title: 'Voice-to-Voice Chat', status: 'complete', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
-    { title: 'AI Co-Pilot', status: 'complete', description: 'Collaborative tool for AI-powered project feedback.' },
-    { title: 'AI-Powered Code Modification', status: 'complete', description: 'Allow the AI to analyze the codebase and generate a plan for code modifications for user review.' },
-    { title: 'Gamification & Co-op Features', status: 'complete', description: 'Introduce cooperative goals, like the AI Co-Pilot, to enhance user engagement.' },
-    { title: 'Persistent Memory Management', status: 'complete', description: 'Admin-only interface to configure and test the AI\'s external memory connection.' },
-  ],
-  upcoming: [
-    { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
-    { title: 'Cross-Platform Integration', status: 'pending', description: 'Extend the AI\'s reach to mobile and desktop applications.' },
-    { title: 'Android Application Export/Creation', status: 'pending', description: 'Provide the ability to compile and export the application as a native Android package.' },
-  ],
+export const metadata: Metadata = {
+  title: 'Roadmap',
+  description: 'The roadmap for the development of the application.',
 };
 
-export default function RoadmapPage() {
+const RoadmapPage = () => {
+  const features = {
+    complete: [
+      { title: 'User Authentication', status: 'complete', description: 'Secure sign-up and login with email and password.' },
+      { title: 'Admin Dashboard', status: 'complete', description: 'Comprehensive user management and feedback review for administrators.' },
+      { title: 'Profile Customization', status: 'complete', description: 'Users can upload their own profile pictures.' },
+      { title: 'AI Character Hub', status: 'complete', description: 'Create, manage, and interact with unique AI personas.' },
+      { title: 'Customizable AI Personas', status: 'complete', description: 'Allow users to edit the AI-generated backstories and personalities of their characters.' },
+      { title: 'Visual Media Generation', status: 'complete', description: 'Generate images and videos from text prompts.' },
+      { title: 'AI Control Settings', status: 'complete', description: 'Granular control over AI models and safety filter configurations.' },
+      { title: 'Persistent Chat History', status: 'complete', description: 'Conversations are saved locally and persist between sessions.' },
+      { title: 'Real-time Collaboration', status: 'complete', description: 'Real-time chat sessions with live updates for messages and participants.' },
+      { title: 'Expanded AI Toolset', status: 'complete', description: 'Integrated more advanced Genkit tools for functions like web searches.' },
+      { title: 'Voice-to-Voice Chat', status: 'complete', description: 'Allow for fully voice-based conversations with AI characters, including AI-generated voice responses.' },
+      { title: 'AI Co-Pilot', status: 'complete', description: 'Collaborative tool for AI-powered project feedback.' },
+      { title: 'AI-Powered Code Modification', status: 'complete', description: 'Allow the AI to analyze the codebase and generate a plan for code modifications for user review.' },
+      { title: 'Gamification & Co-op Features', status: 'complete', description: 'Introduce cooperative goals, like the AI Co-Pilot, to enhance user engagement.' },
+      { title: 'Persistent Memory Management', status: 'complete', description: 'Admin-only interface to configure and test the AI's external memory connection.' },
+    ],
+    upcoming: [
+      { title: 'Firebase Analytics', status: 'pending', description: 'Add Firebase Analytics to gather usage data and inform future development.' },
+      { title: 'Smart Home Integration', status: 'pending', description: 'Connect with Google Home and Amazon Alexa for a multi-platform AI experience.' },
+      { title: 'Cross-Platform Integration', status: 'pending', description: 'Extend the AI's reach to mobile and desktop applications.' },
+      { title: 'Android Application Export/Creation', status: 'pending', description: 'Provide the ability to compile and export the application as a native Android package.' },
+    ],
+  };
+
   return (
-    <main className="p-4 sm:p-6 flex-1">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center">
-            <Map className="mx-auto h-12 w-12 text-primary" />
-            <h1 className="text-3xl font-headline mt-4">Project Roadmap</h1>
-            <p className="text-muted-foreground mt-2">
-                Our journey of building AlphaLink: what's done and what's next.
-            </p>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Roadmap</h1>
+      <p className="mb-8">
+        This roadmap outlines the development timeline for the application. It is divided into completed features and upcoming features.
+      </p>
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Completed</h2>
+          <div className="space-y-4">
+            {features.complete.map((feature, index) => (
+              <div key={index} className="p-4 border rounded-lg">
+                <div className="flex items-center">
+                  <CheckCircle className="text-green-500 mr-2" />
+                  <h3 className="font-bold">{feature.title}</h3>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">{feature.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Core Infrastructure</CardTitle>
-            <CardDescription>The foundational technologies that power the application.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="relative space-y-6 before:absolute before:inset-y-0 before:w-px before:bg-border before:left-3">
-              {roadmapData.infrastructure.map(item => (
-                <RoadmapItem key={item.title} title={item.title} status={item.status as any}>
-                  {item.description}
-                </RoadmapItem>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>User Features & AI Capabilities</CardTitle>
-            <CardDescription>The features that have been implemented and are ready for use.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-             <div className="relative space-y-6 before:absolute before:inset-y-0 before:w-px before:bg-border before:left-3">
-              {roadmapData.userFeatures.map(item => (
-                <RoadmapItem key={item.title} title={item.title} status={item.status as any}>
-                  {item.description}
-                </RoadmapItem>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Features</CardTitle>
-            <CardDescription>What we're planning to build next.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-             <div className="relative space-y-6 before:absolute before:inset-y-0 before:w-px before:bg-border before:left-3">
-              {roadmapData.upcoming.map(item => (
-                <RoadmapItem key={item.title} title={item.title} status={item.status as any}>
-                  {item.description}
-                </RoadmapItem>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Upcoming</h2>
+          <div className="space-y-4">
+            {features.upcoming.map((feature, index) => (
+              <div key={index} className="p-4 border rounded-lg">
+                <div className="flex items-center">
+                  <Hourglass className="text-yellow-500 mr-2" />
+                  <h3 className="font-bold">{feature.title}</h3>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   );
-}
+};
+
+export default RoadmapPage;
