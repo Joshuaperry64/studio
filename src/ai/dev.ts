@@ -28,4 +28,6 @@ import '@/ai/flows/read-file.ts';
 import '@/ai/flows/list-files.ts';
 import '@/ai/flows/database-interaction.ts';
 import '@/ai/flows/generate-avatar.ts';
+import '@/ai/flows/browse-database.ts';
+
 
