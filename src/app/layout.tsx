@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en" className={`${spaceGrotesk.variable} ${sourceCodePro.variable}`} suppressHydrationWarning>
       <head>
       </head>
-      <body className="font-code antialiased bg-background">
+      <body className="font-sans antialiased bg-background">
         <ThemeProvider
             attribute="class"
             defaultTheme="dark"

@@ -147,7 +147,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <Accordion type="multiple" defaultValue={[]} className="w-full">
                 <AccordionItem value="mainframe" className="border-none">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Mainframe</h3>
+                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Mainframe</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                         <SidebarMenu>
@@ -164,7 +164,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
                  <AccordionItem value="fabrication" className="border-none">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Fabrication</h3>
+                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Fabrication</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                         <SidebarMenu>
@@ -181,7 +181,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
                  <AccordionItem value="collaboration" className="border-none">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Collaboration</h3>
+                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Collaboration</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                          <SidebarMenu>
@@ -198,7 +198,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 
                 <AccordionItem value="system" className="border-none">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">System</h3>
+                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">System</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                          <SidebarMenu>
@@ -221,7 +221,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
              <Accordion type="multiple" defaultValue={[]} className="w-full">
                 <AccordionItem value="administration" className="border-none">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
-                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Administration</h3>
+                         <h3 className="text-sm font-medium uppercase tracking-wider text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Administration</h3>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
                         <SidebarMenu>
