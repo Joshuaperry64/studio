@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import { Loader2, ShieldCheck, CheckCircle } from 'lucide-react';
 import { useSettingsStore } from '@/store/settings-store';
 import Link from 'next/link';
 import {
@@ -72,8 +72,26 @@ export default function ApplicationSettingsPage() {
   const [localApiKey, setLocalApiKey] = useState('');
   const [isNsfwDialogOpen, setIsNsfwDialogOpen] = useState(false);
   const [nsfwAccessCode, setNsfwAccessCode] = useState('');
+  const [apiKeyStatus, setApiKeyStatus] = useState<'loading' | 'exists' | 'missing'>('loading');
   const { toast } = useToast();
 
+  useEffect(() => {
+    async function checkApiKeyStatus() {
+        try {
+            const response = await fetch('/api/user/key/status');
+            if (response.ok) {
+                const { keyExists } = await response.json();
+                setApiKeyStatus(keyExists ? 'exists' : 'missing');
+            } else {
+                setApiKeyStatus('missing');
+            }
+        } catch (error) {
+            setApiKeyStatus('missing');
+        }
+    }
+    checkApiKeyStatus();
+  }, []);
+  
   useEffect(() => {
       setLocalApiKey(apiKey);
   }, [apiKey]);
@@ -88,6 +106,7 @@ export default function ApplicationSettingsPage() {
     try {
         await saveApiKey(localApiKey);
         toast({ title: 'Success', description: 'API Key saved successfully.' });
+        setApiKeyStatus('exists');
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
         toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
@@ -145,13 +164,24 @@ export default function ApplicationSettingsPage() {
 
 
         <div className="flex flex-col gap-4 rounded-lg border p-4">
-            <div>
-            <Label htmlFor="api-key" className="font-semibold">
-                Gemini API Key
-            </Label>
-            <p className="text-sm text-muted-foreground">
-                Your API key is stored securely and is only used to interact with the Gemini API.
-            </p>
+            <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                    <Label htmlFor="api-key" className="font-semibold">
+                        Gemini API Key
+                    </Label>
+                    {apiKeyStatus === 'exists' && (
+                        <div className="flex items-center gap-1 text-xs text-green-500">
+                            <CheckCircle className="h-3 w-3" />
+                            <span>Key on file</span>
+                        </div>
+                    )}
+                     {apiKeyStatus === 'loading' && (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                    )}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                    Your API key is stored securely and is only used to interact with the Gemini API.
+                </p>
             </div>
             <div className="flex items-center gap-2">
                 <Input 
