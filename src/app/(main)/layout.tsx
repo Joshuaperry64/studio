@@ -195,25 +195,30 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         </SidebarMenu>
                     </AccordionContent>
                 </AccordionItem>
+                
+                <AccordionItem value="system" className="border-none">
+                    <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
+                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">System</h3>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-0">
+                         <SidebarMenu>
+                            {systemItems.map((item) => (
+                            <SidebarMenuItem key={item.href}>
+                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                                    <Link href={item.subpath || item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </AccordionContent>
+                </AccordionItem>
             </Accordion>
 
-
-          <SidebarSeparator />
-          
-          <SidebarMenu>
-             {systemItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
-                        <Link href={item.subpath || item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-             ))}
-          </SidebarMenu>
 
           {user?.role === 'admin' && <SidebarSeparator />}
 
           {user?.username === 'Joshua' && (
-             <Accordion type="multiple" defaultValue={['administration']} className="w-full">
+             <Accordion type="multiple" defaultValue={[]} className="w-full">
                 <AccordionItem value="administration" className="border-none">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
                          <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Administration</h3>
