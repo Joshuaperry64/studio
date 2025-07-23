@@ -23,6 +23,7 @@ const formSchema = z.object({
   mediaType: z.enum(['image', 'video']),
   aspectRatio: z.enum(['16:9', '9:16']).optional(),
   durationSeconds: z.number().min(5).max(8).optional(),
+  imageSource: z.enum(['gemini', 'stable-diffusion']).optional(),
 });
 
 export default function MediaGenerationPage() {
@@ -39,6 +40,7 @@ export default function MediaGenerationPage() {
       mediaType: 'image',
       aspectRatio: '16:9',
       durationSeconds: 5,
+      imageSource: 'gemini',
     },
   });
 
@@ -98,6 +100,30 @@ export default function MediaGenerationPage() {
                     </FormItem>
                   )}
                 />
+                
+                {watchMediaType === 'image' && (
+                   <FormField
+                      control={form.control}
+                      name="imageSource"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Image Source</FormLabel>
+                           <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an image generation source" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="gemini">Gemini</SelectItem>
+                                    <SelectItem value="stable-diffusion">Local Stable Diffusion</SelectItem>
+                                </SelectContent>
+                            </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                )}
 
                 <FormField
                   control={form.control}

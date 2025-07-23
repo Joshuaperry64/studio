@@ -25,6 +25,7 @@ const GenerateVisualMediaInputSchema = z.object({
       "A photo to use as a reference for video generation, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ).optional(),
     imageModel: z.string().optional().describe('The name of the image generation model to use.'),
+    imageSource: z.enum(['gemini', 'stable-diffusion']).optional().describe('The source for image generation.'),
 });
 
 export type GenerateVisualMediaInput = z.infer<typeof GenerateVisualMediaInputSchema>;
@@ -47,6 +48,44 @@ async function ensureSharedFilesDir() {
   }
 }
 
+async function callStableDiffusion(prompt: string): Promise<string> {
+    const STABLE_DIFFUSION_API = 'http://127.0.0.1:7860/sdapi/v1/txt2img';
+    
+    try {
+        const response = await fetch(STABLE_DIFFUSION_API, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                steps: 25,
+                width: 512,
+                height: 512,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Stable Diffusion API error: ${response.statusText} - ${errorBody}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.images && result.images.length > 0) {
+            const base64Image = result.images[0];
+            return `data:image/png;base64,${base64Image}`;
+        } else {
+            throw new Error('No image returned from Stable Diffusion API.');
+        }
+
+    } catch (error) {
+        console.error('Failed to call Stable Diffusion API:', error);
+        throw new Error('Could not connect to the local Stable Diffusion instance. Please ensure it is running and accessible.');
+    }
+}
+
+
 export async function generateVisualMedia(input: GenerateVisualMediaInput): Promise<GenerateVisualMediaOutput> {
   await ensureSharedFilesDir(); // Ensure directory exists before generating
   return generateVisualMediaFlow(input);
@@ -61,6 +100,13 @@ const generateVisualMediaFlow = ai.defineFlow(
   },
   async input => {
     if (input.mediaType === 'image') {
+      
+      if (input.imageSource === 'stable-diffusion') {
+          const imageUrl = await callStableDiffusion(input.prompt);
+          return { mediaUrl: imageUrl };
+      }
+
+      // Default to Gemini
       const {media} = await ai.generate({
         model: input.imageModel || 'googleai/gemini-2.0-flash-preview-image-generation',
         prompt: input.prompt,
