@@ -19,7 +19,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group, Globe, GanttChartSquare, FolderKanban } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group, Globe, GanttChartSquare, FolderKanban, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
@@ -107,7 +107,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }
 
   const mainframeItems = [
-    { href: '/chat', label: 'Alpha Comms', icon: MessageSquare },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/chat', label: 'Alpha Comm', icon: MessageSquare },
     { href: '/virtual-environment', label: 'Virtual Environment', icon: Globe, subpath: '/virtual-environment'},
     { href: '/memory-interface', label: 'Memory Interface', icon: BrainCircuit },
   ];
@@ -158,15 +159,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader className="flex items-center justify-between p-2">
-            <div className="flex items-center flex-1 gap-2">
-              <Button variant="ghost" size="icon" className="h-8 w-8 bg-primary/10 text-primary">
-                <Bot className="h-5 w-5" />
-              </Button>
-              <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                <h2 className="font-headline text-lg tracking-tight">AlphaLink</h2>
-              </div>
+            <div className="flex items-center flex-1 gap-2 overflow-hidden">
+                <Button variant="ghost" size="icon" className="h-8 w-8 bg-primary/10 text-primary flex-shrink-0">
+                    <Bot className="h-5 w-5" />
+                </Button>
+                <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                    <h2 className="font-headline text-lg tracking-tight">AlphaLink</h2>
+                </div>
             </div>
-           <SidebarTrigger className="group-data-[collapsible=icon]:hidden md:flex" />
+            <SidebarTrigger className="md:flex" />
         </SidebarHeader>
         <SidebarContent>
             <Accordion type="multiple" defaultValue={['mainframe']} className="w-full">
