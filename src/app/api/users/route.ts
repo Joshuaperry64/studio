@@ -20,7 +20,7 @@ export async function GET() {
     return NextResponse.json(Array.from(uniqueUsernames), { status: 200 });
 
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('Error fetching operators:', error);
     // If the database query itself fails, fallback to a default user to prevent total lockout.
     return NextResponse.json(['Joshua'], { status: 500 });
   }

@@ -32,7 +32,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { generateAvatar } from '@/ai/flows/generate-avatar';
 
 const profileFormSchema = z.object({
-    username: z.string().min(3, 'Username must be at least 3 characters.'),
+    username: z.string().min(3, 'Operator name must be at least 3 characters.'),
     pin: z.string().optional(),
     confirmPin: z.string().optional(),
 }).refine(data => data.pin === data.confirmPin, {
@@ -264,9 +264,9 @@ export default function ProfileSettingsPage() {
                                 name="username"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Username</FormLabel>
+                                        <FormLabel>Operator Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Enter your username" {...field} />
+                                            <Input placeholder="Enter your operator name" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

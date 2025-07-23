@@ -33,11 +33,11 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
-        return NextResponse.json({ message: 'User not found.' }, { status: 404 });
+        return NextResponse.json({ message: 'Operator not found.' }, { status: 404 });
     }
 
     if (userDoc.id === auth.user.userId) {
-        return NextResponse.json({ message: 'Administrators cannot modify their own account.'}, { status: 403 });
+        return NextResponse.json({ message: 'Licensed Operators cannot modify their own account.'}, { status: 403 });
     }
     
     await updateDoc(userRef, { role, status });
@@ -73,10 +73,10 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
         const userRef = doc(db, 'users', userId);
         const userDoc = await getDoc(userRef);
         if (!userDoc.exists()) {
-            return NextResponse.json({ message: 'User not found' }, { status: 404 });
+            return NextResponse.json({ message: 'Operator not found' }, { status: 404 });
         }
         await deleteDoc(userRef);
-        return NextResponse.json({ message: 'User deleted successfully.' }, { status: 200 });
+        return NextResponse.json({ message: 'Operator deleted successfully.' }, { status: 200 });
     } catch (error: any) {
         console.error(error);
         const errorMessage = error.message || 'An internal server error occurred.';

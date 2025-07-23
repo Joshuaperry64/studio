@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const { username, pin } = await request.json();
 
     if (!username || !pin) {
-      return NextResponse.json({ message: 'Username and PIN are required.' }, { status: 400 });
+      return NextResponse.json({ message: 'Operator Name and PIN are required.' }, { status: 400 });
     }
     
     if (pin.length < 4 || pin.length > 6) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty) {
-      return NextResponse.json({ message: 'Username already exists.' }, { status: 409 });
+      return NextResponse.json({ message: 'Operator Name already exists.' }, { status: 409 });
     }
 
     const pinHash = await bcrypt.hash(pin, 10);

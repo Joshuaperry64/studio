@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -175,7 +176,7 @@ export default function CoPilotLobbyPage() {
                            <CardHeader>
                                 <CardTitle>{session.name}</CardTitle>
                                 <CardDescription>
-                                   Created by {session.createdBy} {formatDistanceToNow(new Date(session.createdAt.seconds * 1000), { addSuffix: true })}
+                                   Created by Operator {session.createdBy} {formatDistanceToNow(new Date(session.createdAt.seconds * 1000), { addSuffix: true })}
                                 </CardDescription>
                            </CardHeader>
                            <CardContent>

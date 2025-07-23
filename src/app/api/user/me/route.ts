@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         const userDoc = await getDoc(userRef);
 
         if (!userDoc.exists()) {
-            return NextResponse.json({ message: 'User not found.' }, { status: 404 });
+            return NextResponse.json({ message: 'Operator not found.' }, { status: 404 });
         }
 
         const { pinHash, apiKeyEncrypted, ...safeUser } = userDoc.data() as User;

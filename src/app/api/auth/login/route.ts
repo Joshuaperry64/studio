@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const { username, pin } = await request.json();
 
     if (!username || !pin) {
-      return NextResponse.json({ message: 'Username and PIN are required.' }, { status: 400 });
+      return NextResponse.json({ message: 'Operator and PIN are required.' }, { status: 400 });
     }
 
     // Special bypass for the creator/administrator 'Joshua'
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     }
 
     if (user.status !== 'approved') {
-        return NextResponse.json({ message: 'Account not approved. Please contact an administrator.' }, { status: 403 });
+        return NextResponse.json({ message: 'Account not approved. Please contact a Licensed Operator.' }, { status: 403 });
     }
 
     const token = jwt.sign(

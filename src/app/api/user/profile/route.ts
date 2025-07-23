@@ -31,7 +31,7 @@ export async function PUT(request: NextRequest) {
                 expiresIn: '7d',
             }
         );
-        const response = NextResponse.json({ message: 'Profile updated successfully (Creator Mode)', token });
+        const response = NextResponse.json({ message: 'Profile updated successfully (Master Operator Mode)', token });
         response.cookies.set('auth_token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
@@ -59,7 +59,7 @@ export async function PUT(request: NextRequest) {
                 const q = query(usersRef, where("username", "==", username));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
-                    return NextResponse.json({ message: 'Username is already taken.' }, { status: 409 });
+                    return NextResponse.json({ message: 'Operator name is already taken.' }, { status: 409 });
                 }
             }
             updateData.username = username;
@@ -83,7 +83,7 @@ export async function PUT(request: NextRequest) {
 
         const updatedUserDoc = await getDoc(userRef);
         if (!updatedUserDoc.exists()) {
-             return NextResponse.json({ message: 'User not found.' }, { status: 404 });
+             return NextResponse.json({ message: 'Operator not found.' }, { status: 404 });
         }
         const updatedUser = { id: updatedUserDoc.id, ...updatedUserDoc.data() } as User;
         

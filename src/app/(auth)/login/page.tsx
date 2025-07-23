@@ -38,10 +38,10 @@ export default function LoginPage() {
           const data = await response.json();
           setAllUsernames(data);
         } else {
-          toast({ title: 'Error', description: 'Could not load user list.', variant: 'destructive' });
+          toast({ title: 'Error', description: 'Could not load operator list.', variant: 'destructive' });
         }
       } catch (error) {
-        toast({ title: 'Error', description: 'Could not connect to server to get user list.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not connect to server to get operator list.', variant: 'destructive' });
       }
     }
 
@@ -135,14 +135,14 @@ export default function LoginPage() {
           <form onSubmit={handleLogin}>
             <CardHeader>
               <CardTitle className="text-2xl">Login to AlphaLink</CardTitle>
-              <CardDescription>Enter your username and PIN to access your account.</CardDescription>
+              <CardDescription>Enter your Operator name and PIN to access your account.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="login-username">Username</Label>
+                <Label htmlFor="login-username">Operator</Label>
                 <Select value={loginUsername} onValueChange={setLoginUsername}>
                     <SelectTrigger id="login-username" className="bg-transparent border-0 border-b-2 rounded-none px-0 focus:ring-0 focus:ring-offset-0">
-                        <SelectValue placeholder="Select a user" />
+                        <SelectValue placeholder="Select an Operator" />
                     </SelectTrigger>
                     <SelectContent>
                         {allUsernames.map((name) => (
@@ -176,11 +176,11 @@ export default function LoginPage() {
           <form onSubmit={handleRegister}>
             <CardHeader>
               <CardTitle className="text-2xl">Submit an Application</CardTitle>
-              <CardDescription>Submit an application to gain access. Your application will be reviewed by an administrator.</CardDescription>
+              <CardDescription>Submit an application to gain access. Your application will be reviewed by a Licensed Operator.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="register-username">Username</Label>
+                <Label htmlFor="register-username">Operator Name</Label>
                 <Input id="register-username" required value={registerUsername} onChange={(e) => setRegisterUsername(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
               <div className="space-y-2">

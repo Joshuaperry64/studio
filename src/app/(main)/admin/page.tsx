@@ -63,9 +63,9 @@ export default function AdminPage() {
                 fetch('/api/admin/stats/sessions'),
             ]);
 
-            if (usersResponse.ok) setUsers(await usersResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch users.', variant: 'destructive' });
+            if (usersResponse.ok) setUsers(await usersResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch operators.', variant: 'destructive' });
             if (feedbackResponse.ok) setFeedback(await feedbackResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch feedback.', variant: 'destructive' });
-            if (statsResponse.ok) setUserStats(await statsResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch user stats.', variant: 'destructive' });
+            if (statsResponse.ok) setUserStats(await statsResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch operator stats.', variant: 'destructive' });
             if (sessionsResponse.ok) setActiveSessions(await sessionsResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch active sessions.', variant: 'destructive' });
 
         } catch (error) {
@@ -96,11 +96,11 @@ export default function AdminPage() {
                 body: JSON.stringify(data),
             });
             if (response.ok) {
-                toast({ title: 'Success', description: 'User updated successfully.' });
+                toast({ title: 'Success', description: 'Operator updated successfully.' });
                 fetchAllData();
             } else {
                  const errorData = await response.json();
-                 toast({ title: 'Error', description: errorData.message || 'Failed to update user.', variant: 'destructive' });
+                 toast({ title: 'Error', description: errorData.message || 'Failed to update operator.', variant: 'destructive' });
             }
         } catch (error) {
              toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
@@ -113,11 +113,11 @@ export default function AdminPage() {
                 method: 'DELETE',
             });
             if (response.ok) {
-                toast({ title: 'Success', description: 'User deleted successfully.' });
+                toast({ title: 'Success', description: 'Operator deleted successfully.' });
                 fetchAllData();
             } else {
                 const errorData = await response.json();
-                toast({ title: 'Error', description: errorData.message || 'Failed to delete user.', variant: 'destructive' });
+                toast({ title: 'Error', description: errorData.message || 'Failed to delete operator.', variant: 'destructive' });
             }
         } catch (error) {
              toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
@@ -131,14 +131,14 @@ export default function AdminPage() {
        <Tabs defaultValue="dashboard">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 sm:max-w-lg">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="users">User Management</TabsTrigger>
-            <TabsTrigger value="feedback">User Feedback</TabsTrigger>
+            <TabsTrigger value="users">Operator Management</TabsTrigger>
+            <TabsTrigger value="feedback">Operator Feedback</TabsTrigger>
         </TabsList>
         <TabsContent value="dashboard">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Operators</CardTitle>
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -213,8 +213,8 @@ export default function AdminPage() {
         <TabsContent value="users">
             <Card>
             <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>Approve, manage roles for, and remove users.</CardDescription>
+                <CardTitle>Operator Management</CardTitle>
+                <CardDescription>Approve, manage roles for, and remove operators.</CardDescription>
             </CardHeader>
             <CardContent>
                 {isLoading ? (
@@ -223,7 +223,7 @@ export default function AdminPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Username</TableHead>
+                                <TableHead>Operator</TableHead>
                                 <TableHead>Role</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -234,7 +234,7 @@ export default function AdminPage() {
                                 <TableRow key={u.id}>
                                     <TableCell>{u.username}</TableCell>
                                     <TableCell>
-                                        <Badge variant={u.role === 'admin' ? 'default' : 'secondary'} className="capitalize">{u.role}</Badge>
+                                        <Badge variant={u.role === 'admin' ? 'default' : 'secondary'} className="capitalize">{u.role === 'admin' ? 'Licensed Operator' : 'Operator'}</Badge>
                                     </TableCell>
                                     <TableCell>
                                          <Badge
@@ -264,17 +264,17 @@ export default function AdminPage() {
                                                     )}
                                                     {u.role !== 'admin' && (
                                                         <DropdownMenuItem onClick={() => handleUpdateUser(u.id!, { role: 'admin' })}>
-                                                            Make Admin
+                                                            Make Licensed Operator
                                                         </DropdownMenuItem>
                                                     )}
                                                     {u.role === 'admin' && (
                                                         <DropdownMenuItem onClick={() => handleUpdateUser(u.id!, { role: 'user' })}>
-                                                            Make User
+                                                            Make Operator
                                                         </DropdownMenuItem>
                                                     )}
                                                     <AlertDialogTrigger asChild>
                                                         <DropdownMenuItem className="text-destructive">
-                                                            <Trash2 className="mr-2 h-4 w-4" /> Delete User
+                                                            <Trash2 className="mr-2 h-4 w-4" /> Delete Operator
                                                         </DropdownMenuItem>
                                                     </AlertDialogTrigger>
                                                 </DropdownMenuContent>
@@ -283,7 +283,7 @@ export default function AdminPage() {
                                                 <AlertDialogHeader>
                                                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    This action cannot be undone. This will permanently delete the user account for {u.username}.
+                                                    This action cannot be undone. This will permanently delete the account for operator {u.username}.
                                                 </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
@@ -307,8 +307,8 @@ export default function AdminPage() {
         <TabsContent value="feedback">
              <Card>
                 <CardHeader>
-                    <CardTitle>User Feedback</CardTitle>
-                    <CardDescription>Review feedback and suggestions submitted by users.</CardDescription>
+                    <CardTitle>Operator Feedback</CardTitle>
+                    <CardDescription>Review feedback and suggestions submitted by operators.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (

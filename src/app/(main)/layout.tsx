@@ -119,6 +119,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
     );
   }
+  
+  const getRoleDisplayName = () => {
+      if (user?.username === 'Joshua') return 'Master Operator';
+      if (user?.role === 'admin') return 'Licensed Operator';
+      return 'Operator';
+  }
 
   return (
     <SidebarProvider>
@@ -239,7 +245,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <div className="flex-col hidden sm:flex">
                         <span className="text-sm font-medium">{user?.username}</span>
                         <span className="text-xs text-muted-foreground capitalize">
-                          {user?.username === 'Joshua' ? 'Creator' : user?.role}
+                          {getRoleDisplayName()}
                         </span>
                     </div>
                 </button>
