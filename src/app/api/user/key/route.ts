@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
     if (auth.user.username === 'Joshua') {
         const envLocalPath = path.resolve(process.cwd(), '.env.local');
         try {
+            // Note: This creates/overwrites .env.local. In a real scenario, you might want to parse and update.
             await fs.writeFile(envLocalPath, `GEMINI_API_KEY=${apiKey}\n`);
             return NextResponse.json({ message: 'API key saved successfully to local environment.' }, { status: 200 });
         } catch (error) {
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
         }
     }
 
+    // Standard user logic (database)
     const userRef = doc(db, 'users', auth.user.userId);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists()) {
@@ -65,3 +67,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }
+
