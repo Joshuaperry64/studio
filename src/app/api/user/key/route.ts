@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/ai/genkit';
 import { verifyAuth } from '@/lib/auth-server';
+import fs from 'fs/promises';
+import path from 'path';
+
 
 // In a real application, you would use a more robust encryption method 
 // and store the secret key securely (e.g., in environment variables).
@@ -32,6 +35,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'API key is required.' }, { status: 400 });
     }
     
+    // Handle special case for the Creator profile
+    if (auth.user.username === 'Joshua') {
+        const envLocalPath = path.resolve(process.cwd(), '.env.local');
+        try {
+            await fs.writeFile(envLocalPath, `GEMINI_API_KEY=${apiKey}\n`);
+            return NextResponse.json({ message: 'API key saved successfully to local environment.' }, { status: 200 });
+        } catch (error) {
+            console.error('Failed to write to .env.local:', error);
+            return NextResponse.json({ message: 'Failed to save API key to local file.' }, { status: 500 });
+        }
+    }
+
     const userRef = doc(db, 'users', auth.user.userId);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists()) {
