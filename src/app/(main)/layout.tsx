@@ -57,8 +57,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const { soundEnabled } = useSettingsStore();
   const router = useRouter();
   const { toast } = useToast();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -71,29 +69,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         router.push('/login');
     }
   }, [isInitialized, user, router]);
-
-
-  useEffect(() => {
-    const playAudio = async () => {
-        if (soundEnabled && audioRef.current) {
-            try {
-                await audioRef.current.play();
-                setIsPlaying(true);
-            } catch (error) {
-                console.error("Background audio playback failed:", error);
-                setIsPlaying(false);
-            }
-        }
-    };
-    
-    if (soundEnabled && !isPlaying) {
-        playAudio();
-    } else if (!soundEnabled && audioRef.current) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-    }
-  }, [soundEnabled, isPlaying]);
-
 
   const handleLogout = async () => {
     try {
@@ -270,7 +245,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </Sidebar>
       <SidebarInset>
         <div className="tech-background">
-          <audio ref={audioRef} src="/audio/background_music.mp3" loop />
           <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <div className='flex items-center gap-4'>
                 <SidebarTrigger className="flex md:hidden" />
