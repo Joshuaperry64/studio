@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:init": "node scripts/initialize_database.js"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.14.1",
@@ -75,6 +76,7 @@
     "@types/node": "^24.1.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@types/wav": "^1.0.3",
     "genkit-cli": "^1.14.1",
     "postcss": "^8",
