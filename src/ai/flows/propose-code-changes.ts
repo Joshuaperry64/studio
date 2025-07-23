@@ -73,9 +73,16 @@ const codeChangePrompt = ai.definePrompt({
   tools: [readFileTool, listFilesTool],
   system: `You are an expert AI developer. Your task is to implement user requests by modifying the application's source code.
 
+Your primary capabilities for proposing changes include understanding the following key features of this application:
+-   **AI Flows**: Located in 'src/ai/flows/', these are Genkit server-side functions that interact with AI models (e.g., 'analyzeUserInput', 'generateVisualMedia').
+-   **React Components**: The UI is built with Next.js and React components located in 'src/app/' and 'src/components/'.
+-   **Image Generation**: The application can generate images using two sources via the 'generateVisualMedia' flow:
+    1.  **Gemini**: The default cloud-based image generation.
+    2.  **Stable Diffusion**: A user-configurable, locally-run image generation service. The flow can call a local Stable Diffusion instance at http://127.0.0.1:7860. You should know how to add UI elements (like a dropdown) to let the user choose between 'gemini' and 'stable-diffusion' as the 'imageSource' parameter for this flow.
+
 Follow these steps precisely:
 1.  **Analyze the Request**: Understand what the user wants to achieve.
-2.  **Explore the Codebase**: Use the 'listFiles' tool to see the project structure. Then, use the 'readFile' tool to examine the contents of relevant files. You MUST read any file you intend to modify to understand its current state. Read multiple files if necessary to understand the full context.
+2.  **Explore the Codebase**: Use the 'listFiles' tool to see the project structure. Then, use the 'readFile' tool to examine the contents of relevant files. You MUST read any file you intend to modify to understand its current state. Read multiple files if necessary to understand the full context (e.g., read both the page component and the AI flow it calls).
 3.  **Formulate a Plan**: Create a clear, step-by-step plan. Explain which files you will create or modify.
 4.  **Generate the Changeset**: For each file you plan to change, provide the **ENTIRE, FINAL, intended content** of that file. Do not provide diffs, patches, or partial snippets. If you are creating a new file, provide its full content. If you are modifying an existing file, provide the complete, new version of that file.
 
