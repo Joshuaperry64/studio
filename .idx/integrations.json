@@ -1,3 +1,6 @@
 {
+  "firebase_hosting": {
+    "deploymentHostingUrl": "https://alphapersonaai.web.app"
+  },
   "gemini_api": {}
 }
