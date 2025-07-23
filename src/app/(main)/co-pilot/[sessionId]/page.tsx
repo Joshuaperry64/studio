@@ -42,6 +42,7 @@ export default function CoPilotSessionPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [newSuggestion, setNewSuggestion] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     useEffect(() => {
@@ -67,6 +68,7 @@ export default function CoPilotSessionPage() {
 
     const handleAddSuggestion = async () => {
         if (!newSuggestion.trim() || !user) return;
+        setIsSubmitting(true);
         try {
             await updateCoPilotSession({
                 sessionId,
@@ -77,6 +79,8 @@ export default function CoPilotSessionPage() {
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
             toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
+        } finally {
+            setIsSubmitting(false);
         }
     };
     
@@ -140,7 +144,9 @@ export default function CoPilotSessionPage() {
                             </div>
                             <div>
                                 <h3 className="font-semibold">Project Description</h3>
-                                <p className="text-sm text-muted-foreground p-3 bg-secondary rounded-md whitespace-pre-wrap">{session?.projectDescription}</p>
+                                <div className="text-sm text-muted-foreground p-3 bg-secondary rounded-md whitespace-pre-wrap">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{session?.projectDescription || ''}</ReactMarkdown>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -161,8 +167,8 @@ export default function CoPilotSessionPage() {
                                 </div>
                                 <div className="flex gap-2">
                                     <Textarea placeholder="Type your suggestion here..." value={newSuggestion} onChange={(e) => setNewSuggestion(e.target.value)} rows={2}/>
-                                    <Button onClick={handleAddSuggestion} disabled={!newSuggestion.trim()} size="icon">
-                                        <Plus />
+                                    <Button onClick={handleAddSuggestion} disabled={!newSuggestion.trim() || isSubmitting} size="icon">
+                                        {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus />}
                                     </Button>
                                 </div>
                             </CardContent>

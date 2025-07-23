@@ -13,27 +13,11 @@ export async function GET() {
 
     const usernames = querySnapshot.docs.map(doc => doc.data().username as string);
     
-    // As a safeguard, ensure the 'Joshua' user can always log in.
-    // Check if Joshua is already in the list from the 'approved' query.
-    if (!usernames.includes('Joshua')) {
-        const joshuaQuery = query(collection(db, 'users'), where("username", "==", "Joshua"));
-        const joshuaSnapshot = await getDocs(joshuaQuery);
-        // If Joshua exists in the database but wasn't in the 'approved' list, add him.
-        if (!joshuaSnapshot.empty) {
-            usernames.push('Joshua');
-        }
-    }
-    
-    // If after all checks the list is still empty, add Joshua as a final fallback.
-    // This handles the case of a completely empty or new database.
-    if (usernames.length === 0) {
-        usernames.push('Joshua');
-    }
+    // Create a Set for efficient duplicate checking and add the special 'Joshua' user.
+    const uniqueUsernames = new Set(usernames);
+    uniqueUsernames.add('Joshua');
 
-    // Remove duplicates, just in case.
-    const uniqueUsernames = [...new Set(usernames)];
-
-    return NextResponse.json(uniqueUsernames, { status: 200 });
+    return NextResponse.json(Array.from(uniqueUsernames), { status: 200 });
 
   } catch (error) {
     console.error('Error fetching users:', error);

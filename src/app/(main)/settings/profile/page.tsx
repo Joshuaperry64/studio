@@ -104,7 +104,13 @@ export default function ProfileSettingsPage() {
     
     const handleExportData = () => {
         try {
-            const dataStr = JSON.stringify(chatMessages, null, 2);
+            // Filter only messages from the solo chat, not collaborative sessions.
+            const soloChatMessages = chatMessages.filter(msg => msg.sender);
+            if (soloChatMessages.length === 0) {
+                 toast({ title: 'No Data to Export', description: 'Your solo chat history is empty.' });
+                 return;
+            }
+            const dataStr = JSON.stringify(soloChatMessages, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a');
@@ -114,7 +120,7 @@ export default function ProfileSettingsPage() {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            toast({ title: 'Success', description: 'Your chat history has been downloaded.' });
+            toast({ title: 'Success', description: 'Your solo chat history has been downloaded.' });
         } catch (error) {
             toast({ title: 'Error', description: 'Failed to export your data.', variant: 'destructive' });
         }
@@ -143,7 +149,6 @@ export default function ProfileSettingsPage() {
                                 size="icon" 
                                 className="absolute bottom-1 right-1 rounded-full"
                                 onClick={() => fileInputRef.current?.click()}
-                                disabled={isCreator}
                             >
                                 <Camera className="h-5 w-5"/>
                             </Button>
@@ -162,7 +167,7 @@ export default function ProfileSettingsPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="justify-end">
-                    <Button onClick={handleSaveProfile} disabled={isLoading || !avatarFile || isCreator}>
+                    <Button onClick={handleSaveProfile} disabled={isLoading || !avatarFile}>
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                         Save Changes
                     </Button>
@@ -178,7 +183,7 @@ export default function ProfileSettingsPage() {
                                 Download a copy of all your solo chat conversations.
                             </p>
                         </div>
-                        <Button variant="outline" onClick={handleExportData} disabled={chatMessages.length === 0}>
+                        <Button variant="outline" onClick={handleExportData} disabled={chatMessages.filter(m => m.sender).length === 0}>
                             <Download className="mr-2 h-4 w-4" />
                             Export Data
                         </Button>
@@ -192,7 +197,7 @@ export default function ProfileSettingsPage() {
                         </div>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
-                                <Button variant="destructive" disabled={isDeleting || isCreator}>
+                                <Button variant="destructive" disabled={isDeleting || user.role === 'admin'}>
                                      {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
                                     Delete My Account
                                 </Button>

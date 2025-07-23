@@ -11,6 +11,11 @@ export async function DELETE(request: NextRequest) {
     if (!auth.user) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
+    
+    // Prevent the creator/admin from deleting their own account
+    if (auth.user.role === 'admin') {
+        return NextResponse.json({ message: 'Administrator accounts cannot be deleted.' }, { status: 403 });
+    }
 
     try {
         const userRef = doc(db, 'users', auth.user.userId);
@@ -18,11 +23,6 @@ export async function DELETE(request: NextRequest) {
 
         if (!userDoc.exists()) {
             return NextResponse.json({ message: 'User not found.' }, { status: 404 });
-        }
-
-        const user = userDoc.data() as User;
-        if (user.role === 'admin') {
-            return NextResponse.json({ message: 'Administrator accounts cannot be deleted.' }, { status: 403 });
         }
 
         await deleteDoc(userRef);
