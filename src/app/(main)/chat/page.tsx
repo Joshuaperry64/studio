@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { fileToDataUri } from '@/lib/utils';
-import { Bot, Loader2, Mic, Paperclip, Send, X, Plus } from 'lucide-react';
+import { Bot, Loader2, Mic, Paperclip, Send, X, Plus, Trash2 } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -20,6 +20,17 @@ import { useChatStore } from '@/store/chat-store';
 import ChatMessage, { ThinkingMessage } from '@/components/ChatMessage';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function ChatPage() {
   const { 
@@ -34,6 +45,7 @@ export default function ChatPage() {
     setActiveConversationId,
     getCurrentConversation,
     getConversationById,
+    clearChat,
   } = useChatStore();
 
   const [input, setInput] = useState('');
@@ -222,6 +234,16 @@ export default function ChatPage() {
     }
   };
 
+  const handleClearChat = () => {
+    if (activeConversationId) {
+        clearChat(activeConversationId);
+        toast({
+            title: 'Chat Cleared',
+            description: `The history for "${activeConversation?.name}" has been cleared.`,
+        });
+    }
+  };
+
   return (
     <>
       <audio ref={audioPlayerRef} className="hidden" />
@@ -318,10 +340,37 @@ export default function ChatPage() {
                             }
                             }}
                             rows={1}
-                            className="pr-24 min-h-[48px] resize-none"
+                            className="pr-36 min-h-[48px] resize-none"
                             disabled={!activeConversationId}
                         />
                         <div className="absolute top-1/2 right-2 transform -translate-y-1/2 flex gap-1">
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    disabled={isLoading || messages.length === 0}
+                                    >
+                                    <Trash2 className="h-5 w-5" />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                    <AlertDialogTitle>Clear chat history?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This will permanently delete all messages in the current conversation. This action cannot be undone.
+                                    </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleClearChat}>
+                                        Clear History
+                                    </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+
                             <Button
                             type="button"
                             size="icon"
