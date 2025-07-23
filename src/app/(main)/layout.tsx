@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -63,7 +64,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }
 
   const menuItems = [
-    { href: '/chat', label: 'AI Chat', icon: MessageSquare },
+    { href: '/chat', label: 'Alpha Comms', icon: MessageSquare },
     { href: '/character-hub', label: 'Character Hub', icon: Smile },
     { href: '/media-generation', label: 'Visual Media', icon: ImageIcon },
     { href: '/co-pilot', label: 'AI Co-Pilot', icon: Wand2 },

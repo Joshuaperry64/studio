@@ -19,14 +19,14 @@ export default function InstructionsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-6 w-6" />
-                AI Chat
+                Alpha Comms
             </CardTitle>
             <CardDescription>
               The central hub for interacting with the AI.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground">
-            <p>The AI Chat page is your primary interface for conversing with the AI. You can type messages, attach media, and even use your voice.</p>
+            <p>The Alpha Comms page is your primary interface for conversing with the AI. You can type messages, attach media, and even use your voice.</p>
             <ul className="list-disc list-inside space-y-2">
                 <li><strong>Text Input:</strong> Simply type your message in the text area and press Enter or click the Send button.</li>
                 <li><strong>Media Attachments:</strong> Click the paperclip icon to attach an image or video file. The AI will analyze the media along with your text prompt.</li>
@@ -52,7 +52,7 @@ export default function InstructionsPage() {
                 <li><strong>Create a Character:</strong> Click the "Create Character" button. Provide a name and a short concept (e.g., "A wise old wizard who speaks in riddles").</li>
                 <li><strong>AI Generation:</strong> The AI will use your concept to generate a full backstory, a detailed personality, and a unique avatar image for your character.</li>
                 <li><strong>Manage Characters:</strong> Your created characters will appear as cards. You can review their personalities or delete them using the trash icon.</li>
-                <li><strong>Set Active Character:</strong> Click the "Set as Active" button on any character card. This will make them your conversational partner in the AI Chat page, influencing the tone and style of the responses.</li>
+                <li><strong>Set Active Character:</strong> Click the "Set as Active" button on any character card. This will make them your conversational partner in the Alpha Comms page, influencing the tone and style of the responses.</li>
             </ul>
           </CardContent>
         </Card>
