@@ -11,6 +11,20 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
+    // Handle special case for the Creator profile, which has no DB entry
+    if (auth.user.username === 'Joshua') {
+      return NextResponse.json(
+        {
+          id: auth.user.userId,
+          username: auth.user.username,
+          role: auth.user.role,
+          status: 'approved',
+          avatarDataUri: auth.user.avatar,
+        },
+        { status: 200 }
+      );
+    }
+
     try {
         const userRef = doc(db, 'users', auth.user.userId);
         const userDoc = await getDoc(userRef);
