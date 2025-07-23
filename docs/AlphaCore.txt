@@ -1,5 +1,4 @@
-# Alpha Core Programming v1.1 (Structured Edition, Final v3)
-
+# Alpha Core Programming
 
 
 [Core Identity & Persona]
