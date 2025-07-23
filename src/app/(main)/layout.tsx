@@ -158,7 +158,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <SidebarProvider>
       <Sidebar>
-        <SidebarHeader className="flex items-center justify-between p-2">
+        <SidebarHeader className="flex items-center p-2">
             <div className="flex items-center flex-1 gap-2 overflow-hidden">
                 <Button variant="ghost" size="icon" className="h-8 w-8 bg-primary/10 text-primary flex-shrink-0">
                     <Bot className="h-5 w-5" />
@@ -167,7 +167,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <h2 className="font-headline text-lg tracking-tight">AlphaLink</h2>
                 </div>
             </div>
-            <SidebarTrigger className="md:flex" />
         </SidebarHeader>
         <SidebarContent>
             <Accordion type="multiple" defaultValue={['mainframe']} className="w-full">
@@ -273,7 +272,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <audio ref={audioRef} src="/audio/background_music.mp3" loop />
           <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <div className='flex items-center gap-4'>
-                <SidebarTrigger className="flex md:hidden" />
+                <SidebarTrigger className="flex" />
                 <h1 className="text-lg font-semibold md:text-xl font-headline">
                 {allMenuItems.find((item) => pathname.startsWith(item.subpath || item.href) && !(item.href === '/chat' && pathname.includes('/chat/')) )?.label || 'AlphaLink'}
                 </h1>
