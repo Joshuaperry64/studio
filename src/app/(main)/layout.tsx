@@ -67,17 +67,20 @@ function AudioPlayer() {
     const audio = audioRef.current;
     if (audio) {
       if (soundEnabled && audioExists) {
+        if (!audio.src) {
+          audio.src = '/audio/background_music.mp3';
+        }
         audio.play().catch(e => console.error("Audio playback failed:", e));
       } else {
         audio.pause();
+        audio.currentTime = 0;
       }
     }
   }, [soundEnabled, audioExists]);
   
-  if (!audioExists) return null;
 
   return (
-    <audio ref={audioRef} src="/audio/background_music.mp3" loop />
+    <audio ref={audioRef} loop />
   );
 }
 
