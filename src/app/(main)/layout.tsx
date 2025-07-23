@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -110,7 +111,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="h-8 w-8 bg-primary/10 text-primary">
