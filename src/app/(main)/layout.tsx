@@ -132,19 +132,19 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarHeader className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8 bg-primary/10 text-primary">
-              <Bot className="h-5 w-5" />
-            </Button>
-            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <h2 className="font-headline text-lg tracking-tight">AlphaLink</h2>
+        <SidebarHeader className="flex items-center justify-between p-2">
+            <div className="flex items-center flex-1 gap-2">
+              <Button variant="ghost" size="icon" className="h-8 w-8 bg-primary/10 text-primary">
+                <Bot className="h-5 w-5" />
+              </Button>
+              <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                <h2 className="font-headline text-lg tracking-tight">AlphaLink</h2>
+              </div>
             </div>
-          </div>
-           <SidebarTrigger className="group-data-[collapsible=icon]:hidden md:flex hidden" />
+           <SidebarTrigger className="group-data-[collapsible=icon]:hidden md:flex" />
         </SidebarHeader>
         <SidebarContent>
-            <Accordion type="multiple" defaultValue={['mainframe', 'fabrication', 'collaboration']} className="w-full">
+            <Accordion type="multiple" defaultValue={[]} className="w-full">
                 <AccordionItem value="mainframe" className="border-none">
                     <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
                          <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Mainframe</h3>
