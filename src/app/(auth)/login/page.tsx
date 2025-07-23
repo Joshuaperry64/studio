@@ -158,7 +158,7 @@ export default function LoginPage() {
                 <Input id="login-pin" type="password" required placeholder="&#9679;&#9679;&#9679;&#9679;" value={loginPin} onChange={(e) => setLoginPin(e.target.value)} className="bg-transparent border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
               <div className="flex items-center space-x-2">
-                <Checkbox id="remember-me" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked as boolean)} />
+                <Checkbox id="remember-me" checked={rememberMe} onCheckedChange={(checked: boolean) => setRememberMe(checked)} />
                 <Label htmlFor="remember-me" className="text-sm font-normal text-muted-foreground">Remember Me</Label>
               </div>
             </CardContent>
