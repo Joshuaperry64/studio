@@ -34,6 +34,7 @@ import {
 import ProfileSettingsPage from './settings/profile/page';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 function Clock() {
   const [time, setTime] = useState(new Date());
@@ -140,47 +141,62 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               <h2 className="font-headline text-lg tracking-tight">AlphaLink</h2>
             </div>
           </div>
-           <SidebarTrigger className="group-data-[collapsible=icon]:hidden" />
+           <SidebarTrigger className="group-data-[collapsible=icon]:hidden md:flex hidden" />
         </SidebarHeader>
         <SidebarContent>
-           <SidebarGroup>
-                <SidebarGroupLabel>Mainframe</SidebarGroupLabel>
-                <SidebarMenu>
-                    {mainframeItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith(item.href) && (item.href !== '/chat' || pathname === '/chat')} tooltip={{ children: item.label }} className="justify-start" >
-                            <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-          </SidebarGroup>
+            <Accordion type="multiple" defaultValue={['mainframe', 'fabrication', 'collaboration']} className="w-full">
+                <AccordionItem value="mainframe" className="border-none">
+                    <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
+                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Mainframe</h3>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-0">
+                        <SidebarMenu>
+                            {mainframeItems.map((item) => (
+                            <SidebarMenuItem key={item.href}>
+                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href) && (item.href !== '/chat' || pathname === '/chat')} tooltip={{ children: item.label }} className="justify-start" >
+                                    <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </AccordionContent>
+                </AccordionItem>
 
-           <SidebarGroup>
-                <SidebarGroupLabel>Fabrication</SidebarGroupLabel>
-                <SidebarMenu>
-                    {fabricationItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
-                            <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-           </SidebarGroup>
-           
-            <SidebarGroup>
-                <SidebarGroupLabel>Collaboration</SidebarGroupLabel>
-                 <SidebarMenu>
-                    {collaborationItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
-                            <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-           </SidebarGroup>
+                 <AccordionItem value="fabrication" className="border-none">
+                    <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
+                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Fabrication</h3>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-0">
+                        <SidebarMenu>
+                            {fabricationItems.map((item) => (
+                            <SidebarMenuItem key={item.href}>
+                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                                    <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </AccordionContent>
+                </AccordionItem>
+
+                 <AccordionItem value="collaboration" className="border-none">
+                    <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
+                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Collaboration</h3>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-0">
+                         <SidebarMenu>
+                            {collaborationItems.map((item) => (
+                            <SidebarMenuItem key={item.href}>
+                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                                    <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+
 
           <SidebarSeparator />
           
@@ -197,18 +213,24 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           {user?.role === 'admin' && <SidebarSeparator />}
 
           {user?.username === 'Joshua' && (
-             <SidebarGroup>
-                <SidebarGroupLabel>Administration</SidebarGroupLabel>
-                <SidebarMenu>
-                    {adminMenuItems.map((item) => (
-                    <SidebarMenuItem key={item.label}>
-                        <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={{ children: item.label }} className="justify-start" >
-                            <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-             </SidebarGroup>
+             <Accordion type="multiple" defaultValue={['administration']} className="w-full">
+                <AccordionItem value="administration" className="border-none">
+                    <AccordionTrigger className="p-2 hover:no-underline hover:bg-sidebar-accent rounded-md group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:size-8">
+                         <h3 className="text-xs font-medium text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">Administration</h3>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-0">
+                        <SidebarMenu>
+                            {adminMenuItems.map((item) => (
+                            <SidebarMenuItem key={item.label}>
+                                <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={{ children: item.label }} className="justify-start" >
+                                    <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </AccordionContent>
+                </AccordionItem>
+             </Accordion>
           )}
 
            {user?.role === 'admin' && user?.username !== 'Joshua' && (
