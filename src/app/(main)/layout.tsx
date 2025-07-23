@@ -257,12 +257,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <div className="tech-background">
           <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
             <div className='flex items-center gap-4'>
-                <SidebarTrigger className="md:hidden" />
+                <SidebarTrigger className="flex md:hidden" />
                 <h1 className="text-lg font-semibold md:text-xl font-headline">
                 {allMenuItems.find((item) => pathname.startsWith(item.href))?.label || 'AlphaLink'}
                 </h1>
             </div>
-            <div className="absolute left-1/2 -translate-x-1/2">
+            <div className="absolute left-1/2 -translate-x-1/2 hidden md:block">
                 <Clock />
             </div>
             <Dialog>
