@@ -43,7 +43,7 @@ export default function LoginPage() {
       }
     }
     fetchUsernames();
-  }, []);
+  }, [toast]);
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
