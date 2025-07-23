@@ -16,8 +16,10 @@ import {
   SidebarTrigger,
   SidebarInset,
   SidebarSeparator,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
@@ -77,21 +79,27 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     }
   }
 
-  const menuItems = [
+  const mainframeItems = [
     { href: '/chat', label: 'Alpha Comms', icon: MessageSquare },
     { href: '/character-hub', label: 'Character Hub', icon: Smile },
-    { href: '/media-generation', label: 'Visual Media', icon: ImageIcon },
-    { href: '/co-pilot', label: 'AI Co-Pilot', icon: Wand2 },
-    { href: '/lobby', label: 'Collaboration', icon: Users },
-    { href: '/voice-biometrics', label: 'Voice Biometrics', icon: Fingerprint },
-    { href: '/code-synthesis', label: 'Code Synthesis', icon: Code },
-    { href: '/memory-interface', label: 'Memory Interface', icon: Database },
-    { href: '/roadmap', label: 'Roadmap', icon: Map },
+    { href: '/memory-interface', label: 'Memory Interface', icon: BrainCircuit },
   ];
 
-  const bottomMenuItems = [
-      { href: '/feedback', label: 'Feedback', icon: MessageSquarePlus },
+  const fabricationItems = [
+    { href: '/media-generation', label: 'Visual Media', icon: ImageIcon },
+    { href: '/code-synthesis', label: 'Code Synthesis', icon: Code },
+    { href: '/voice-biometrics', label: 'Voice Biometrics', icon: Fingerprint },
+  ];
+  
+  const collaborationItems = [
+    { href: '/projects', label: 'Projects', icon: HardDrive },
+    { href: '/co-pilot', label: 'AI Co-Pilot', icon: Wand2 },
+    { href: '/lobby', label: 'Chat Lobby', icon: Users },
+  ];
+
+  const systemItems = [
       { href: '/instructions', label: 'Instructions', icon: BookOpen },
+      { href: '/feedback', label: 'Feedback', icon: MessageSquarePlus },
       { href: '/settings', label: 'Application', icon: Settings, subpath: '/settings/application' },
   ];
 
@@ -100,6 +108,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/analytics', label: 'Analytics', icon: BarChart },
     { href: '/local-deployment', label: 'Local Deployment', icon: Server },
   ]
+  
+  const allMenuItems = [...mainframeItems, ...fabricationItems, ...collaborationItems, ...systemItems, ...adminMenuItems];
+
 
   if (!isInitialized || !user) {
     return (
@@ -123,71 +134,84 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
-            {menuItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname.startsWith(item.href)}
-                  tooltip={{ children: item.label }}
-                  className="justify-start"
-                >
-                  <Link href={item.href}>
-                    <item.icon className="h-5 w-5" />
-                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-            {user?.username === 'Joshua' && adminMenuItems.map((item) => (
-               <SidebarMenuItem key={item.label}>
-               <SidebarMenuButton
-                 asChild
-                 isActive={pathname === item.href}
-                 tooltip={{ children: item.label }}
-                 className="justify-start"
-               >
-                 <Link href={item.href}>
-                   <item.icon className="h-5 w-5" />
-                   <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
-                 </Link>
-               </SidebarMenuButton>
-             </SidebarMenuItem>
-            ))}
-             {user?.role === 'admin' && user?.username !== 'Joshua' && (
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === '/admin'}
-                  tooltip={{ children: 'Admin Panel' }}
-                  className="justify-start"
-                >
-                  <Link href={'/admin'}>
-                    <Shield className="h-5 w-5" />
-                    <span className="group-data-[collapsible=icon]:hidden">Admin Panel</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
-          </SidebarMenu>
+           <SidebarGroup>
+                <SidebarGroupLabel>Mainframe</SidebarGroupLabel>
+                <SidebarMenu>
+                    {mainframeItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                            <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+          </SidebarGroup>
+
+           <SidebarGroup>
+                <SidebarGroupLabel>Fabrication</SidebarGroupLabel>
+                <SidebarMenu>
+                    {fabricationItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                            <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+           </SidebarGroup>
+           
+            <SidebarGroup>
+                <SidebarGroupLabel>Collaboration</SidebarGroupLabel>
+                 <SidebarMenu>
+                    {collaborationItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                            <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+           </SidebarGroup>
+
           <SidebarSeparator />
+          
           <SidebarMenu>
-             {bottomMenuItems.map((item) => (
+             {systemItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                    asChild
-                    isActive={pathname.startsWith(item.href)}
-                    tooltip={{ children: item.label }}
-                    className="justify-start"
-                    >
-                    <Link href={item.subpath || item.href}>
-                        <item.icon className="h-5 w-5" />
-                        <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
-                    </Link>
+                    <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={{ children: item.label }} className="justify-start" >
+                        <Link href={item.subpath || item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
-                ))}
+             ))}
           </SidebarMenu>
+
+          {user?.role === 'admin' && <SidebarSeparator />}
+
+          {user?.username === 'Joshua' && (
+             <SidebarGroup>
+                <SidebarGroupLabel>Administration</SidebarGroupLabel>
+                <SidebarMenu>
+                    {adminMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.label}>
+                        <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={{ children: item.label }} className="justify-start" >
+                            <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+             </SidebarGroup>
+          )}
+
+           {user?.role === 'admin' && user?.username !== 'Joshua' && (
+              <SidebarMenu>
+                 <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={pathname === '/admin'} tooltip={{ children: 'Admin Panel' }} className="justify-start" >
+                        <Link href={'/admin'}> <Shield className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">Admin Panel</span> </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            )}
+
         </SidebarContent>
         <SidebarFooter>
            {/* Profile card moved to header */}
@@ -199,7 +223,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className='flex items-center gap-4'>
                 <SidebarTrigger />
                 <h1 className="text-lg font-semibold md:text-xl font-headline">
-                {[...menuItems, ...adminMenuItems, ...bottomMenuItems].find((item) => pathname.startsWith(item.href))?.label || 'AlphaLink'}
+                {allMenuItems.find((item) => pathname.startsWith(item.href))?.label || 'AlphaLink'}
                 </h1>
             </div>
             <div className="absolute left-1/2 -translate-x-1/2">
