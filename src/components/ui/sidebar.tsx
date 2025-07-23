@@ -169,7 +169,7 @@ const Sidebar = React.forwardRef<
     {
       side = "left",
       variant = "sidebar",
-      collapsible = "offcanvas",
+      collapsible = "icon",
       className,
       children,
       ...props
@@ -264,11 +264,8 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar, state, isMobile } = useSidebar();
-  const Icon = state === 'collapsed' ? ChevronRight : ChevronLeft;
+  const { toggleSidebar, isMobile } = useSidebar();
   
-  const MobileIcon = PanelLeft;
-
   return (
     <Button
       ref={ref}
@@ -282,7 +279,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      {isMobile ? <MobileIcon /> : <Icon />}
+      <PanelLeft />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
