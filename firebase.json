@@ -3,7 +3,6 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-<<<<<<< HEAD
   "functions": [
     {
       "source": "functions",
@@ -17,11 +16,6 @@
       ]
     }
   ],
-=======
-  "functions": {
-    "source": "functions"
-  },
->>>>>>> 387812b (up)
   "hosting": {
     "public": "public",
     "ignore": [
@@ -29,12 +23,6 @@
       "**/.*",
       "**/node_modules/**"
     ]
-<<<<<<< HEAD
-=======
-  },
-  "storage": {
-    "rules": "storage.rules"
->>>>>>> 387812b (up)
   },
   "emulators": {
     "auth": {
@@ -49,12 +37,6 @@
     "hosting": {
       "port": 5000
     },
-<<<<<<< HEAD
-=======
-    "storage": {
-      "port": 9199
-    },
->>>>>>> 387812b (up)
     "ui": {
       "enabled": true,
       "port": 4000
