@@ -113,13 +113,6 @@ export const useChatStore = create<ChatStoreState>()(
         const state = get();
         return state.conversations.find(c => c.id === id);
       },
-      
-      // We need to initialize activeConversationId after rehydration
-      // But we can't do it inside persist, so we'll do it on the component side.
-      // This is a placeholder for the old logic.
-      isLoading: false,
-      removeLastMessage: () => {},
-      addMessage: () => {},
     }),
     {
       name: 'chat-tabs-storage',
@@ -137,17 +130,15 @@ export const useChatStore = create<ChatStoreState>()(
           }
       },
       partialize: (state) => ({
-        ...state,
         // Make sure messages with blob URLs aren't persisted.
         conversations: state.conversations.map(c => ({
             ...c,
             isLoading: false, // Don't persist loading state
             messages: c.messages.map(({ photo, video, ...rest }) => rest),
         })),
+         // Also persist these top-level state properties
+        activeConversationId: state.activeConversationId,
       }),
     }
   )
 );
-
-// Install uuid and its types: npm i uuid && npm i --save-dev @types/uuid
-// For this environment, I'll just add the dependency to package.json
