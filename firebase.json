@@ -1,14 +1,21 @@
 {
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": {
+    "source": "functions"
+  },
   "hosting": {
-    "source": ".",
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "frameworksBackend": {
-      "region": "us-east1"
-    }
+    ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   },
   "emulators": {
     "auth": {
@@ -24,11 +31,11 @@
       "port": 5000
     },
     "storage": {
-      "port": 9199,
-      "rules": "storage.rules"
+      "port": 9199
     },
     "ui": {
-      "enabled": true
+      "enabled": true,
+      "port": 4000
     },
     "singleProjectMode": true
   }
