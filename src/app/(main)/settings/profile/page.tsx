@@ -244,7 +244,7 @@ export default function ProfileSettingsPage() {
                                                         onChange={(e) => setAvatarPrompt(e.target.value)}
                                                         rows={3}
                                                     />
-                                                    <Button onClick={handleGenerateAvatar} disabled={isGeneratingAvatar}>
+                                                    <Button type="button" onClick={handleGenerateAvatar} disabled={isGeneratingAvatar}>
                                                         {isGeneratingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
                                                         Generate
                                                     </Button>
