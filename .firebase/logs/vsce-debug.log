@@ -123,6 +123,7 @@ Generated sources: README.md [2896B] react\package.json [468B] react\esm\package
 [debug] [2025-07-23T23:47:51.614Z] [Firebase Plugin] Received emulators shutdown notification.
 [debug] [2025-07-23T23:49:56.121Z] [Firebase Plugin] Received CLI notification.
 [debug] [2025-07-23T23:49:56.174Z] [Firebase Plugin] Received emulators shutdown notification.
+<<<<<<< HEAD
 [debug] [2025-07-24T00:37:01.336Z] [Firebase Plugin] Activating Firebase extension.
 [info] [Firebase Plugin] Checked firebase-tools, is up to date!
 [debug] [2025-07-24T00:37:18.869Z] [Firebase Plugin] requireAuthWrapper
@@ -167,3 +168,5 @@ I0723 20:37:22.145173   21788 load.go:115] Finished reloading
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0723 20:37:23.130997   21788 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
 [debug] [2025-07-24T00:37:26.079Z] I0723 20:37:26.072773   21788 engine.go:174] [/emulator/ai b191] ExecuteGraphqlRead IntrospectionQuery: succeeded. 
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0723 20:37:26.072773   21788 engine.go:174] [/emulator/ai b191] ExecuteGraphqlRead IntrospectionQuery: succeeded. \n"}}
+=======
+>>>>>>> 5ba1b44619a820f3cbbc782a0fca2d9347aa002f
