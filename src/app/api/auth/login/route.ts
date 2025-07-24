@@ -5,6 +5,7 @@ import { db } from '@/ai/genkit';
 import { User } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
 export async function POST(request: Request) {
   try {
@@ -35,6 +36,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: 'Account not approved. Please contact a Licensed Operator.' }, { status: 403 });
     }
 
+    const jwtSecret = process.env.ENCRYPTION_KEY || 'your-secret-key';
+
     const token = jwt.sign(
         { 
             userId: user.id, 
@@ -42,7 +45,7 @@ export async function POST(request: Request) {
             username: user.username,
             avatar: user.avatarDataUri 
         }, 
-        process.env.JWT_SECRET || 'your-secret-key', 
+        jwtSecret, 
         {
             expiresIn: '7d',
         }

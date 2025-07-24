@@ -6,6 +6,7 @@ import { User } from '@/lib/auth';
 import { verifyAuth } from '@/lib/auth-server';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import 'dotenv/config';
 
 export async function PUT(request: NextRequest) {
     const auth = await verifyAuth(request);
@@ -58,6 +59,7 @@ export async function PUT(request: NextRequest) {
         }
         const updatedUser = { id: updatedUserDoc.id, ...updatedUserDoc.data() } as User;
         
+        const jwtSecret = process.env.ENCRYPTION_KEY || 'your-secret-key';
         // Re-issue the auth token with the new user info
         const token = jwt.sign(
             { 
@@ -66,7 +68,7 @@ export async function PUT(request: NextRequest) {
                 username: updatedUser.username,
                 avatar: updatedUser.avatarDataUri 
             }, 
-            process.env.JWT_SECRET || 'your-secret-key', 
+            jwtSecret, 
             {
                 expiresIn: '7d',
             }

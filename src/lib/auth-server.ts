@@ -1,6 +1,8 @@
+
 import { NextRequest } from 'next/server';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import crypto from 'crypto';
+import 'dotenv/config';
 
 interface UserPayload extends JwtPayload {
     userId: string;
@@ -16,9 +18,11 @@ export async function verifyAuth(request: NextRequest) {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as UserPayload;
+        const jwtSecret = process.env.ENCRYPTION_KEY || 'your-secret-key';
+        const decoded = jwt.verify(token, jwtSecret) as UserPayload;
         return { user: decoded };
     } catch (error) {
+        console.error("Auth verification error:", error);
         return { user: null };
     }
 }

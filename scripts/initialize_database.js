@@ -3,6 +3,9 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const { getFirestore, collection, doc, setDoc, serverTimestamp } = require('firebase/firestore');
 const { initializeApp } = require('firebase/app');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
 
 // IMPORTANT: This configuration is for the script to connect to Firestore.
 // It should match the configuration in `src/ai/genkit.ts`.
@@ -81,9 +84,37 @@ async function initializeFirestore() {
     }
 }
 
+function setupEnvFile() {
+  const envPath = path.resolve(process.cwd(), '.env');
+  let envContent = '';
+
+  try {
+    if (fs.existsSync(envPath)) {
+      envContent = fs.readFileSync(envPath, 'utf8');
+    }
+  } catch (e) {
+    console.error('Could not read .env file, will create a new one.');
+  }
+  
+  const updates = [];
+  if (!/ENCRYPTION_KEY/.test(envContent)) {
+    const newKey = crypto.randomBytes(32).toString('hex');
+    envContent += `\nENCRYPTION_KEY=${newKey}`;
+    updates.push('ENCRYPTION_KEY');
+  }
+
+  if (updates.length > 0) {
+    fs.writeFileSync(envPath, envContent.trim());
+    console.log(`Updated .env file with: ${updates.join(', ')}`);
+  } else {
+    console.log('.env file is already configured.');
+  }
+}
+
 
 async function main() {
     try {
+        setupEnvFile();
         await initializeLocalDatabase();
         console.log('Local database initialized successfully.');
         
