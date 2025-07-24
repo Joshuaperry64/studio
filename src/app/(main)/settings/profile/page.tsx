@@ -42,7 +42,7 @@ const profileFormSchema = z.object({
 
 export default function ProfileSettingsPage() {
     const { user, login, logout } = useUserStore();
-    const { messages: chatMessages } = useChatStore();
+    const { conversations } = useChatStore();
     const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
@@ -166,7 +166,9 @@ export default function ProfileSettingsPage() {
     
     const handleExportData = () => {
         try {
-            const soloChatMessages = chatMessages.filter(msg => msg.sender);
+            const allMessages = conversations.flatMap(c => c.messages);
+            const soloChatMessages = allMessages.filter(msg => msg.sender);
+
             if (soloChatMessages.length === 0) {
                  toast({ title: 'No Data to Export', description: 'Your solo chat history is empty.' });
                  return;
@@ -193,6 +195,7 @@ export default function ProfileSettingsPage() {
     }
 
     const isCreator = user.username === 'Joshua';
+    const allMessages = conversations.flatMap(c => c.messages);
 
     return (
         <div className="space-y-6">
@@ -320,7 +323,7 @@ export default function ProfileSettingsPage() {
                                 Download a copy of all your solo chat conversations.
                             </p>
                         </div>
-                        <Button variant="outline" onClick={handleExportData} disabled={chatMessages.filter(m => m.sender).length === 0}>
+                        <Button variant="outline" onClick={handleExportData} disabled={allMessages.filter(m => m.sender).length === 0}>
                             <Download className="mr-2 h-4 w-4" />
                             Export Data
                         </Button>
