@@ -17,7 +17,6 @@ interface UserState {
   isInitialized: boolean;
   login: (token: string) => void;
   logout: () => void;
-  initialize: () => void;
 }
 
 const decodeToken = (token: string): UserPayload | null => {
@@ -29,11 +28,25 @@ const decodeToken = (token: string): UserPayload | null => {
   }
 };
 
-export const useUserStore = create<UserState>((set, get) => ({
-  user: null,
-  isInitialized: false,
+const initialize = (): UserPayload | null => {
+  if (typeof window === 'undefined') return null;
+  const token = Cookies.get('auth_token');
+  if (token) {
+    const decodedUser = decodeToken(token);
+    if (decodedUser && decodedUser.exp * 1000 > Date.now()) {
+      return decodedUser;
+    } else {
+      Cookies.remove('auth_token');
+      return null;
+    }
+  }
+  return null;
+}
+
+export const useUserStore = create<UserState>((set) => ({
+  user: initialize(),
+  isInitialized: true,
   login: (token) => {
-    // This function can be called on login or when the token is refreshed (e.g., after profile update)
     const decodedUser = decodeToken(token);
     if (decodedUser) {
       set({ user: decodedUser, isInitialized: true });
@@ -44,25 +57,5 @@ export const useUserStore = create<UserState>((set, get) => ({
   logout: () => {
     Cookies.remove('auth_token');
     set({ user: null, isInitialized: true });
-  },
-  initialize: () => {
-    // This function handles the initial load of the application,
-    // checking if a valid cookie already exists.
-    if (get().isInitialized) return;
-
-    const token = Cookies.get('auth_token');
-    if (token) {
-        const decodedUser = decodeToken(token);
-        if (decodedUser && decodedUser.exp * 1000 > Date.now()) {
-            set({ user: decodedUser, isInitialized: true });
-        } else {
-            // Token is expired or invalid, so remove it.
-            Cookies.remove('auth_token');
-            set({ user: null, isInitialized: true });
-        }
-    } else {
-         // No token, we are logged out and initialized.
-         set({ user: null, isInitialized: true });
-    }
   },
 }));
