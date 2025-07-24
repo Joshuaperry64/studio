@@ -13,6 +13,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import * as fs from 'fs/promises'; // Use fs.promises for async file operations
 import * as path from 'path'; // Import path module
+import { Readable } from 'stream';
 
 const GenerateVisualMediaInputSchema = z.object({
   prompt: z.string().describe('The text prompt to use for generating the visual media.'),
@@ -172,12 +173,15 @@ const generateVisualMediaFlow = ai.defineFlow(
       const filePath = path.join(SHARED_FILES_DIR, fileName);
 
       try {
-        const response = await fetch(videoUrl);
-        if (!response.ok) {
+        const response = await fetch(`${videoUrl}&key=${process.env.GEMINI_API_KEY}`);
+        if (!response.ok || !response.body) {
           throw new Error(`Failed to download video: ${response.statusText}`);
         }
+        
+        // Convert ReadableStream to Buffer
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
+        
         await fs.writeFile(filePath, buffer);
         console.log(`Video saved to ${filePath}`);
 
