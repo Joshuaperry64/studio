@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
         return response;
     } catch (error) {
         console.error(error);
-        const errorMessage = error instanceof Error ? error.message : 'An internal server error occurred.';
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
         return NextResponse.json({ message: errorMessage }, { status: 500 });
     }
 }
