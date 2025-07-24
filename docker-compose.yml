@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  firebase:
+    build: .
+    container_name: my_firebase_app
+    ports:
+      # Map container ports to your local machine's ports
+      - "4000:4000" # Emulator Suite UI
+      - "5001:5001" # Functions Port
+      - "8080:8080" # Hosting Port
+      - "9000:9000" # Realtime Database Port
+      - "9099:9099" # Authentication Port
+      - "9199:9199" # Storage Port
+    volumes:
+      # Mount your local code into the container for live-reloading
+      # Any change you make in VS Code is reflected inside the container
+      - ./functions:/app/functions
+      - ./public:/app/public
+      - ./firestore.rules:/app/firestore.rules
+      - ./storage.rules:/app/storage.rules
