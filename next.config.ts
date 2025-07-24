@@ -1,33 +1,19 @@
-
-import type {NextConfig} from 'next';
+import { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-        port: '',
-        pathname: '/**',
-      },
-    ],
-  },
+  // Your existing Next.js config options might be here
+
+  // Add the following webpack configuration
   webpack: (config, { isServer }) => {
     if (!isServer) {
-        // Fix for "Module not found: Can't resolve 'async_hooks'"
-        // This is a server-side module that shouldn't be bundled in the client.
-        config.resolve.fallback = {
-            ...config.resolve.fallback,
-            async_hooks: false,
-        };
+      // Exclude server-side modules from the client-side bundle
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        async_hooks: false, // Tells webpack to ignore 'async_hooks'
+        sqlite3: false,     // Also good to ignore the native driver
+      };
     }
+
     return config;
   },
 };
