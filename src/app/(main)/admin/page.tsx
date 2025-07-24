@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash2, Users, UserCheck, UserX, Server, CheckCircle, AlertCircle, Wifi, Loader2, Home } from 'lucide-react';
+import { MoreHorizontal, Trash2, Users, UserCheck, UserX, Server, CheckCircle, AlertCircle, Wifi, Loader2, Home, FolderKanban } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -35,7 +35,7 @@ interface UserStats {
     approved: number;
     pending: number;
 }
-interface ActiveSession {
+interface ActiveProject {
     id: string;
     name: string;
     createdBy: string;
@@ -49,24 +49,24 @@ export default function AdminPage() {
     const [users, setUsers] = useState<DisplayUser[]>([]);
     const [feedback, setFeedback] = useState<Feedback[]>([]);
     const [userStats, setUserStats] = useState<UserStats | null>(null);
-    const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
+    const [activeProjects, setActiveProjects] = useState<ActiveProject[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
     const fetchAllData = async () => {
         setIsLoading(true);
         try {
-            const [usersResponse, feedbackResponse, statsResponse, sessionsResponse] = await Promise.all([
+            const [usersResponse, feedbackResponse, statsResponse, projectsResponse] = await Promise.all([
                 fetch('/api/admin/users'),
                 fetch('/api/admin/feedback'),
                 fetch('/api/admin/stats/users'),
-                fetch('/api/admin/stats/sessions'),
+                fetch('/api/admin/stats/projects'),
             ]);
 
             if (usersResponse.ok) setUsers(await usersResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch operators.', variant: 'destructive' });
             if (feedbackResponse.ok) setFeedback(await feedbackResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch feedback.', variant: 'destructive' });
             if (statsResponse.ok) setUserStats(await statsResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch operator stats.', variant: 'destructive' });
-            if (sessionsResponse.ok) setActiveSessions(await sessionsResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch active sessions.', variant: 'destructive' });
+            if (projectsResponse.ok) setActiveProjects(await projectsResponse.json()); else toast({ title: 'Error', description: 'Failed to fetch active projects.', variant: 'destructive' });
 
         } catch (error) {
             toast({ title: 'Error', description: 'An unexpected error occurred while fetching data.', variant: 'destructive' });
@@ -176,28 +176,28 @@ export default function AdminPage() {
             </div>
             <Card className="mt-6">
                  <CardHeader>
-                    <CardTitle>Active Co-Pilot Sessions</CardTitle>
-                    <CardDescription>Real-time list of ongoing collaborative sessions.</CardDescription>
+                    <CardTitle className="flex items-center gap-2"><FolderKanban/>Active Projects</CardTitle>
+                    <CardDescription>Real-time list of ongoing collaborative projects.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {isLoading ? <p>Loading sessions...</p> : 
-                    activeSessions.length > 0 ? (
+                    {isLoading ? <p>Loading projects...</p> : 
+                    activeProjects.length > 0 ? (
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Session Name</TableHead>
+                                <TableHead>Project Name</TableHead>
                                 <TableHead>Created By</TableHead>
                                 <TableHead className="text-right">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                          <TableBody>
-                            {activeSessions.map((session) => (
-                                <TableRow key={session.id}>
-                                    <TableCell className="font-medium">{session.name}</TableCell>
-                                    <TableCell>{session.createdBy}</TableCell>
+                            {activeProjects.map((project) => (
+                                <TableRow key={project.id}>
+                                    <TableCell className="font-medium">{project.name}</TableCell>
+                                    <TableCell>{project.createdBy}</TableCell>
                                     <TableCell className="text-right">
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/co-pilot/${session.id}`}>View</Link>
+                                            <Link href={`/projects/${project.id}`}>View</Link>
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -205,7 +205,7 @@ export default function AdminPage() {
                         </TableBody>
                     </Table>
                     ) : (
-                         <p className="text-sm text-muted-foreground text-center py-4">No active Co-Pilot sessions.</p>
+                         <p className="text-sm text-muted-foreground text-center py-4">No active projects.</p>
                     )}
                 </CardContent>
             </Card>

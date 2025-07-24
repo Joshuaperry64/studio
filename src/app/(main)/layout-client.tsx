@@ -19,7 +19,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { MessageSquare, Image as ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group, Globe, GanttChartSquare, FolderKanban, LayoutDashboard, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageSquare, ImageIcon, Users, Settings, Bot, Shield, Smile, BookOpen, MessageSquarePlus, LogOut, Map, Loader2, Wand2, Fingerprint, Code, Server, PanelLeft, Database, BarChart, BrainCircuit, HardDrive, Group, Globe, GanttChartSquare, FolderKanban, LayoutDashboard, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/store/user-store';
@@ -36,6 +36,11 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useSettingsStore } from '@/store/settings-store';
+import {
+    mainframeItems, fabricationItems, collaborationItems,
+    systemItems, adminMenuItems, useActivePageTitle
+} from '@/lib/menu-items';
+
 
 function Clock() {
   const [time, setTime] = useState(new Date());
@@ -66,12 +71,13 @@ function AudioPlayer() {
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) {
-      if (soundEnabled && audioExists && audio.src !== window.location.origin + '/audio/background_music.mp3') {
+      if (soundEnabled && audioExists && !audio.src.endsWith('/audio/background_music.mp3')) {
         audio.src = '/audio/background_music.mp3';
         audio.play().catch(e => console.error("Audio playback failed:", e));
       } else if (!soundEnabled || !audioExists) {
         audio.pause();
         audio.currentTime = 0;
+        if (audio.src) audio.src = '';
       }
     }
   }, [soundEnabled, audioExists]);
@@ -86,9 +92,9 @@ function AudioPlayer() {
 export default function MainLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, isInitialized } = useUserStore();
-  const { soundEnabled } = useSettingsStore();
-  const router = useRouter();
   const { toast } = useToast();
+  const router = useRouter();
+  const activePageTitle = useActivePageTitle();
 
    useEffect(() => {
     if (isInitialized && !user) {
@@ -106,40 +112,6 @@ export default function MainLayoutClient({ children }: { children: React.ReactNo
         toast({ title: 'Error', description: 'Failed to log out.', variant: 'destructive' });
     }
   }
-
-  const mainframeItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/chat', label: 'Alpha Comm', icon: MessageSquare },
-    { href: '/virtual-environment', label: 'Virtual Environment', icon: Globe, subpath: '/virtual-environment'},
-    { href: '/memory-interface', label: 'Memory Interface', icon: BrainCircuit },
-  ];
-
-  const fabricationItems = [
-    { href: '/visual-synthesis', label: 'Visual Synthesis', icon: ImageIcon },
-    { href: '/code-synthesis', label: 'Code Synthesis', icon: Code },
-    { href: '/voice-biometrics', label: 'Voice Biometrics', icon: Fingerprint },
-  ];
-  
-  const collaborationItems = [
-    { href: '/projects', label: 'Projects', icon: FolderKanban, subpath: '/projects' },
-    { href: '/co-pilot', label: 'AI Co-Pilot', icon: Wand2, subpath: '/co-pilot' },
-    { href: '/lobby', label: 'Chat Lobby', icon: Users, subpath: '/chat/' },
-  ];
-
-  const systemItems = [
-      { href: '/instructions', label: 'Instructions', icon: BookOpen },
-      { href: '/feedback', label: 'Feedback', icon: MessageSquarePlus },
-      { href: '/settings', label: 'Settings', icon: Settings, subpath: '/settings' },
-  ];
-
-  const adminMenuItems = [
-    { href: '/admin', label: 'Admin Panel', icon: Shield },
-    { href: '/analytics', label: 'Analytics', icon: BarChart },
-    { href: '/local-deployment', label: 'Local Deployment', icon: Server },
-    { href: '/roadmap', label: 'Dev Roadmap', icon: GanttChartSquare },
-  ]
-  
-  const allMenuItems = [...mainframeItems, ...fabricationItems, ...collaborationItems, ...systemItems, ...adminMenuItems];
 
 
   if (!isInitialized || !user) {
@@ -253,7 +225,7 @@ export default function MainLayoutClient({ children }: { children: React.ReactNo
                         <SidebarMenu>
                             {adminMenuItems.map((item) => (
                             <SidebarMenuItem key={item.label}>
-                                <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={{ children: item.label }} className="justify-start" >
+                                <SidebarMenuButton asChild isActive={pathname.startsWith(item.subpath || item.href)} tooltip={{ children: item.label }} className="justify-start" >
                                     <Link href={item.href}> <item.icon className="h-5 w-5" /> <span className="group-data-[collapsible=icon]:hidden">{item.label}</span> </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -276,7 +248,7 @@ export default function MainLayoutClient({ children }: { children: React.ReactNo
             <div className='flex items-center gap-4'>
                 <SidebarTrigger className="flex md:hidden" />
                 <h1 className="text-lg font-semibold md:text-xl font-headline">
-                {allMenuItems.find((item) => pathname.startsWith(item.subpath || item.href) && !(item.href === '/chat' && pathname.includes('/chat/')) )?.label || 'AlphaLink'}
+                    {activePageTitle}
                 </h1>
             </div>
             <div className="absolute left-1/2 -translate-x-1/2 hidden md:block">
