@@ -5,8 +5,6 @@ import { db } from '@/ai/genkit';
 import { verifyAuth } from '@/lib/auth-server';
 import { User } from '@/lib/auth';
 import 'dotenv/config'; // Make sure environment variables are loaded
-import fs from 'fs/promises';
-import path from 'path';
 
 export async function GET(request: NextRequest) {
   const auth = await verifyAuth(request);

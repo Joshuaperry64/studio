@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/ai/genkit';
 import { verifyAuth } from '@/lib/auth-server';
-import fs from 'fs/promises';
-import path from 'path';
+import 'dotenv/config';
 import crypto from 'crypto';
 
 
@@ -16,10 +15,10 @@ const aescipher = (secretKey: crypto.BinaryLike | undefined) => {
     if (!key) {
         throw new Error('ENCRYPTION_KEY is not set in environment variables');
     }
-    const iv = crypto.randomBytes(16);
 
     return {
         encrypt: (text: string) => {
+            const iv = crypto.randomBytes(16);
             const cipher = crypto.createCipheriv(algorithm, key, iv);
             const encrypted = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]);
             const tag = cipher.getAuthTag();
