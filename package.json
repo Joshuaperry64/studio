@@ -63,6 +63,10 @@
     "react-syntax-highlighter": "^15.6.1",
     "recharts": "^2.15.1",
     "remark-gfm": "^4.0.1",
+<<<<<<< HEAD
+=======
+    "sqlite3": "^5.1.7",
+>>>>>>> parent of a91c832 (update)
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^9.0.1",
@@ -78,7 +82,6 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "@types/sqlite3": "^3.1.11",
     "@types/uuid": "^9.0.8",
     "@types/wav": "^1.0.3",
     "genkit-cli": "^1.14.1",
