@@ -193,8 +193,13 @@ export default function ChatPage() {
     try {
       const audioDataUri = await fileToDataUri(audioFile);
       const voiceName = activeCharacter?.voiceName || 'Algenib';
+      const characterDetails = activeCharacter ? {
+        name: activeCharacter.name,
+        personality: activeCharacter.personality,
+        backstory: activeCharacter.backstory,
+      } : undefined;
       
-      const result = await voiceToVoiceChat({ audioDataUri, voiceName });
+      const result = await voiceToVoiceChat({ audioDataUri, voiceName, characterDetails });
 
       addMessageToConversation(activeConversationId, {
           id: Date.now(),

@@ -14,6 +14,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { enableVoiceInput } from './enable-voice-input';
 import { analyzeUserInput } from './analyze-user-input';
+import { generateAudio } from './generate-audio';
 
 const VoiceToVoiceChatInputSchema = z.object({
   audioDataUri: z
@@ -22,6 +23,11 @@ const VoiceToVoiceChatInputSchema = z.object({
       "The user's speech as an audio data URI, including MIME type and Base64 encoding."
     ),
   voiceName: z.string().optional().describe('The voice to use for the AI response.'),
+   characterDetails: z.object({
+      name: z.string(),
+      personality: z.string(),
+      backstory: z.string(),
+    }).optional().describe('The details of the active AI character persona.'),
 });
 type VoiceToVoiceChatInput = z.infer<typeof VoiceToVoiceChatInputSchema>;
 
@@ -42,7 +48,7 @@ const voiceToVoiceChatFlow = ai.defineFlow(
     inputSchema: VoiceToVoiceChatInputSchema,
     outputSchema: VoiceToVoiceChatOutputSchema,
   },
-  async ({ audioDataUri, voiceName }) => {
+  async ({ audioDataUri, voiceName, characterDetails }) => {
     // Step 1: Transcribe the user's voice input to text.
     const { transcription } = await enableVoiceInput({ audioDataUri });
 
@@ -55,6 +61,7 @@ const voiceToVoiceChatFlow = ai.defineFlow(
     const { analysisResult, audioDataUri: responseAudio } = await analyzeUserInput({
       textPrompt: transcription,
       voiceName: voiceName,
+      characterDetails: characterDetails,
     });
 
     if (!analysisResult || !responseAudio) {
